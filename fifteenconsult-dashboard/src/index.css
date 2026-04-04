@@ -8,19 +8,18 @@
 
 :root {
   --gold: #C8A96E;
-  --dark-base: #080808;
-  --dark-card: #0f0f0f;
-  --dark-hover: #161616;
-  --dark-border: #1c1c1c;
-  --text-primary: #e8e4d9;
-  --text-muted: #666;
-  --text-dim: #333;
-  --text-ghost: #2a2a2a;
+  --dark-base: #0b1220;
+  --dark-card: #111c2e;
+  --dark-hover: #172035;
+  --dark-border: #1e2d45;
+  --text-primary: #f0ede6;
+  --text-muted: #8a9bb5;
+  --text-dim: #4a5f7a;
+  --text-ghost: #2a3a52;
   --font-mono: 'DM Mono', 'Courier New', monospace;
   --font-display: 'Cormorant Garamond', 'Georgia', serif;
-  --red: #C86E6E;
+  --red: #e07070;
 }
-
 html {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
