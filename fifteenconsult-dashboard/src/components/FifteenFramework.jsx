@@ -161,7 +161,7 @@ export default function FifteenFramework() {
             return (
               <div key={item.id} style={{
                 background: T.base, borderRadius:9, padding:"14px 16px",
-                border: `1px solid ${p < 45 ? T.red+"44" : T.border}`,
+                border: `1px solid ${p < 45 ? "#f8717144" : T.border}`,
                 borderLeft: `2px solid ${sc}`,
               }}>
                 <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8 }}>
@@ -230,7 +230,7 @@ export default function FifteenFramework() {
       </div>
 
       {/* Tagline */}
-      <div style={{ marginTop:20,padding:"14px 20px",background:T.gold+"0a",border:`1px solid ${T.gold}22`,borderRadius:10,textAlign:"center" }}>
+      <div style={{ marginTop:20,padding:"14px 20px",background:"#C8A96E0a",border:`1px solid #C8A96E22`,borderRadius:10,textAlign:"center" }}>
         <div style={{ fontSize:13,color:T.gold,fontFamily:"var(--font-display)",fontStyle:"italic" }}>
           "Turn Marketing Complexity Into Measurable Growth"
         </div>
