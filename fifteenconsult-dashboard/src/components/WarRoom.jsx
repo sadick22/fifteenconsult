@@ -24,7 +24,7 @@ function KpiBlock({ label, current, target, unit="", color }) {
   const p = pct(current,target);
   const sc = statusColor(p);
   return (
-    <div style={{ background:T.base,borderRadius:8,padding:"12px 14px",border:`1px solid ${p<50?T.red+"44":T.border}` }}>
+    <div style={{ background:T.base,borderRadius:8,padding:"12px 14px",border:`1px solid ${p<50?"#f8717144":T.border}` }}>
       <div style={{ fontSize:9,color:T.textDim,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:6 }}>{label}</div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:6 }}>
         <span style={{ fontSize:20,fontWeight:700,color:sc,lineHeight:1 }}>{current}{unit}</span>
@@ -82,7 +82,7 @@ export default function WarRoom({ alerts, taskStates, outputs }) {
         return (
           <div key={m.id} style={{
             background:T.card,
-            border:`1px solid ${hasRed?T.red+"44":T.border}`,
+            border:`1px solid ${hasRed?"#f8717144":T.border}`,
             borderLeft:`3px solid ${m.color}`,
             borderRadius:10,padding:"18px 20px",marginBottom:14,
           }}>
