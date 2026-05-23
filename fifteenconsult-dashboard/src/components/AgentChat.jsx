@@ -424,3 +424,4 @@ export default function AgentChat({ member, lastOutput }) {
     </div>
   );
 }
+
