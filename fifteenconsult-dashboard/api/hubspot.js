@@ -15,9 +15,13 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const apiKey = process.env.HUBSPOT_API_KEY;
+  // Try both env var names for compatibility
+  const apiKey = process.env.HUBSPOT_API_KEY || process.env.VITE_HUBSPOT_API_KEY;
+  
+  // HubSpot EU base URL
+  const HS_BASE = "https://api.hubapi.com";
   if (!apiKey) {
-    return res.status(500).json({ error: "HUBSPOT_API_KEY not configured in Vercel environment variables." });
+    return res.status(500).json({ error: "HUBSPOT_API_KEY not configured. Add it to Vercel Environment Variables (no VITE_ prefix)." });
   }
 
   const { action } = req.query;
@@ -26,10 +30,10 @@ export default async function handler(req, res) {
     if (req.method === "GET" && action === "pipeline") {
       // ── FETCH PIPELINE DATA ──────────────────────────────────────────────
       const [contactsRes, dealsRes] = await Promise.all([
-        fetch("https://api.hubapi.com/crm/v3/objects/contacts?limit=1", {
+        fetch(`${HS_BASE}/crm/v3/objects/contacts?limit=1`, {
           headers: { Authorization: `Bearer ${apiKey}` },
         }),
-        fetch("https://api.hubapi.com/crm/v3/objects/deals?limit=100&properties=dealstage,dealname,amount,closedate", {
+        fetch(`${HS_BASE}/crm/v3/objects/deals?limit=100&properties=dealstage,dealname,amount,closedate`, {
           headers: { Authorization: `Bearer ${apiKey}` },
         }),
       ]);
@@ -61,7 +65,7 @@ export default async function handler(req, res) {
 
       if (!email) return res.status(400).json({ error: "Email is required" });
 
-      const hubRes = await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
+      const hubRes = await fetch(`${HS_BASE}/crm/v3/objects/contacts`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${apiKey}`,
