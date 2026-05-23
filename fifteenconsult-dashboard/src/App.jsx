@@ -740,7 +740,7 @@ export default function App() {
 
           {activeMember&&<MemberDetail member={activeMember} taskStates={taskStates} output={outputs[activeMember.id]} streaming={streaming} alerts={alerts} onToggleTask={toggleTask} onRunBriefing={runBriefing} onBack={()=>setActiveMember(null)}/>}
 
-          {!activeMember&&activeTab==="dashboard"&&(
+          {!activeMember&&activeTab==="dashboard"&&activeView==="dashboard"&&(
             <div style={{ animation:"fadeUp 0.3s ease" }}>
               {/* Critical alert strip */}
               {criticalCount>0&&(
@@ -771,8 +771,12 @@ export default function App() {
           )}
 
           {!activeMember&&activeTab==="summary"&&<WeeklySummary outputs={outputs} streaming={streaming} onRunAll={runAll} histories={histories} alerts={alerts}/>}
-          {!activeMember&&activeView==="warroom"&&<WarRoom alerts={alerts} taskStates={taskStates} outputs={outputs}/>}
-          {!activeMember&&activeView==="framework"&&<FifteenFramework/>}
+          {!activeMember&&activeView==="warroom"&&(
+            <WarRoom alerts={alerts} taskStates={taskStates} outputs={outputs}/>
+          )}
+          {!activeMember&&activeView==="framework"&&(
+            <FifteenFramework/>
+          )}
         </main>
       </div>
     </div>
