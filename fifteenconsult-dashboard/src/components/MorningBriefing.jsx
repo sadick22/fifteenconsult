@@ -116,7 +116,7 @@ export default function MorningBriefing({ outputs, alerts, taskStates, streaming
                 <div key={m.id} style={{
                   display:"flex",alignItems:"center",gap:10,padding:"10px 12px",
                   background:T.card,borderRadius:8,
-                  border:`1px solid ${agentAlerts.length>0?T.red+"44":T.border}`,
+                  border:`1px solid ${agentAlerts.length>0?"#f8717144":T.border}`,
                 }}>
                   <span style={{ fontSize:16 }}>{m.emoji}</span>
                   <div style={{ flex:1,minWidth:0 }}>
@@ -139,7 +139,7 @@ export default function MorningBriefing({ outputs, alerts, taskStates, streaming
 
         {/* GCC context */}
         {dateCtx.isGCCWeekend && (
-          <div style={{ padding:"12px 24px",borderBottom:`1px solid ${T.border}`,background:T.amber+"0a" }}>
+          <div style={{ padding:"12px 24px",borderBottom:`1px solid ${T.border}`,background:"#fbbf240a" }}>
             <div style={{ fontSize:11,color:T.amber }}>
               🌙 GCC Weekend — Outreach paused. Good time to focus on content creation and planning.
             </div>
