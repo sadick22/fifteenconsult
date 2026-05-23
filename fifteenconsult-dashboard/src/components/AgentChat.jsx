@@ -3,13 +3,13 @@ import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
 
 const T = {
-  base:     "#0d1117", card:     "#131d2e",
-  cardHover:"#172236", border:   "#1e2d45",
-  text:     "#e8edf5", textMid:  "#7a90b0",
-  textDim:  "#3d526b", gold:     "#C8A96E",
-  green:    "#4ade80", red:      "#f87171",
-  amber:    "#fbbf24", blue:     "#60a5fa",
-  userBg:   "#172236", agentBg:  "#0d1117",
+  base:     "var(--bg-base)", card:     "var(--bg-card)",
+  cardHover:"var(--bg-hover)", border:   "var(--border)",
+  text:     "var(--text)", textMid:  "var(--text-mid)",
+  textDim:  "var(--text-dim)", gold:     "var(--gold)",
+  green:    "var(--green)", red:      "var(--red)",
+  amber:    "var(--amber)", blue:     "var(--blue)",
+  userBg:   "var(--bg-hover)", agentBg:  "var(--bg-base)",
 };
 
 const CHAT_STORAGE_KEY = "fc_chats_v1";
