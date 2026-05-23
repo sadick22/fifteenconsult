@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 
 const T = {
-  base:"#0d1117", card:"#131d2e", border:"#1e2d45",
-  text:"#e8edf5", textMid:"#7a90b0", textDim:"#3d526b",
-  gold:"#C8A96E", green:"#4ade80", amber:"#fbbf24", red:"#f87171",
+  base:"var(--bg-base)", card:"var(--bg-card)", border:"var(--border)",
+  text:"var(--text)", textMid:"var(--text-mid)", textDim:"var(--text-dim)",
+  gold:"var(--gold)", green:"var(--green)", amber:"var(--amber)", red:"var(--red)",
 };
 
 const NOTIF_KEY = "fc_notifications_v1";
@@ -39,11 +39,11 @@ function markAllRead() {
 
 const TYPE_CONFIG = {
   briefing: { icon:"📄", color:"#6EB5C8", label:"Briefing" },
-  alert:    { icon:"⚠️", color:"#fbbf24", label:"Alert"    },
-  schedule: { icon:"⏰", color:"#C8A96E", label:"Schedule" },
-  system:   { icon:"⚙️", color:"#7a90b0", label:"System"   },
-  success:  { icon:"✅", color:"#4ade80", label:"Success"  },
-  error:    { icon:"❌", color:"#f87171", label:"Error"    },
+  alert:    { icon:"⚠️", color:"var(--amber)", label:"Alert"    },
+  schedule: { icon:"⏰", color:"var(--gold)", label:"Schedule" },
+  system:   { icon:"⚙️", color:"var(--text-mid)", label:"System"   },
+  success:  { icon:"✅", color:"var(--green)", label:"Success"  },
+  error:    { icon:"❌", color:"var(--red)", label:"Error"    },
 };
 
 export default function NotificationCentre({ onClose, onAgentClick }) {
