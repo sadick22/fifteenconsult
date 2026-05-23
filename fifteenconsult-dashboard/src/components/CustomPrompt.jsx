@@ -255,4 +255,3 @@ export default function CustomPrompt({ agentId, color, value, onChange, alerts, 
     </div>
   );
 }
-
