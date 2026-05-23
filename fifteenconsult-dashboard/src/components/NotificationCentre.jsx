@@ -148,3 +148,4 @@ export default function NotificationCentre({ onClose, onAgentClick }) {
     </div>
   );
 }
+
