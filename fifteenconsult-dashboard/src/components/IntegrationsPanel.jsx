@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   fetchHubSpotPipeline, pushContactToHubSpot,
   fetchMailerLiteStats, createMailerLiteDraft,
-  fetchLinkedInStats,
+  fetchLinkedInStats, fetchGA4Stats,
   getGA4SetupSteps, getMetaSetupSteps,
   getConnectionStatuses,
 } from "../lib/integrations.js";
@@ -214,11 +214,16 @@ function LinkedInPanel({ connected }) {
 }
 
 // ── GA4 PANEL ─────────────────────────────────────────────────────────────────
-function GA4Panel() {
+function GA4Panel({ connected }) {
+  const [data,setData]       = useState(null);
+  const [loading,setLoading] = useState(false);
   const setup = getGA4SetupSteps();
   const completedSteps = setup.steps.filter(s=>s.done).length;
 
-  return (
+  const load = async () => { setLoading(true); setData(await fetchGA4Stats()); setLoading(false); };
+  useEffect(() => { if(connected) load(); },[connected]);
+
+  if (!connected) return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
         <SectionLabel>Setup Progress</SectionLabel>
@@ -237,6 +242,48 @@ function GA4Panel() {
           • Contact form conversion rate
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <SectionLabel>Live Stats — fifteenconsult.com (Last 30 days)
+        <button onClick={load} style={{ background:"none",border:"none",color:"#4285f4",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button>
+      </SectionLabel>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)",marginBottom:16 }}>Loading from GA4...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171",marginBottom:16 }}>⚠ {data.error}</div>
+      : data ? (
+        <>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,marginBottom:16 }}>
+            <StatBox label="Sessions"      value={data.sessions?.toLocaleString()||"—"} color="#4285f4"/>
+            <StatBox label="Active Users"  value={data.users?.toLocaleString()||"—"}    color="#4285f4"/>
+            <StatBox label="Bounce Rate"   value={data.bounceRate||"—"}                 color="var(--text)"/>
+            <StatBox label="Avg Duration"  value={data.avgDuration||"—"}               color="var(--text)"/>
+          </div>
+          {data.sources?.length>0&&(
+            <div style={{ marginBottom:16 }}>
+              <SectionLabel>Traffic Sources</SectionLabel>
+              {data.sources.map((s,i)=>(
+                <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid var(--border)",fontSize:12 }}>
+                  <span style={{ color:"var(--text-mid)" }}>{s.channel}</span>
+                  <span style={{ color:"#4285f4",fontWeight:600 }}>{s.sessions} sessions</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {data.topPages?.length>0&&(
+            <div>
+              <SectionLabel>Top Pages</SectionLabel>
+              {data.topPages.map((p,i)=>(
+                <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid var(--border)",fontSize:12 }}>
+                  <span style={{ color:"var(--text-mid)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"70%" }}>{p.path}</span>
+                  <span style={{ color:"#4285f4",fontWeight:600 }}>{p.views} views</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }
@@ -361,7 +408,7 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="hubspot"    && <HubSpotPanel    connected={connected}/>}
               {activeId==="mailerlite" && <MailerLitePanel connected={connected}/>}
               {activeId==="linkedin"   && <LinkedInPanel   connected={connected}/>}
-              {activeId==="ga4"        && <GA4Panel/>}
+              {activeId==="ga4"        && <GA4Panel connected={connected}/>}
               {activeId==="meta"       && <MetaPanel/>}
               {activeId==="make"       && <MakePanel/>}
             </>
@@ -375,4 +422,3 @@ export default function IntegrationsPanel({ onClose }) {
     </div>
   );
 }
-
