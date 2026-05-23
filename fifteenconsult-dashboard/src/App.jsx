@@ -13,16 +13,24 @@ import WarRoom from "./components/WarRoom.jsx";
 import FifteenFramework from "./components/FifteenFramework.jsx";
 import NotificationCentre, { addNotification } from "./components/NotificationCentre.jsx";
 import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNextRun, formatNextRun, markRun } from "./lib/scheduler.js";
+import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
 const T = {
-  base:      "#0d1117", sidebar:   "#0a0f1a",
-  card:      "#131d2e", cardHover: "#172236",
-  border:    "#1e2d45", borderL:   "#243448",
-  gold:      "#C8A96E", text:      "#e8edf5",
-  textMid:   "#7a90b0", textDim:   "#3d526b",
-  green:     "#4ade80", red:       "#f87171",
-  amber:     "#fbbf24", blue:      "#60a5fa",
+  base:     "var(--bg-base)",
+  sidebar:  "var(--bg-sidebar)",
+  card:     "var(--bg-card)",
+  cardHover:"var(--bg-hover)",
+  border:   "var(--border)",
+  borderL:  "var(--border-light)",
+  gold:     "var(--gold)",
+  text:     "var(--text)",
+  textMid:  "var(--text-mid)",
+  textDim:  "var(--text-dim)",
+  green:    "var(--green)",
+  red:      "var(--red)",
+  amber:    "var(--amber)",
+  blue:     "var(--blue)",
 };
 
 // ── STORAGE ───────────────────────────────────────────────────────────────────
@@ -104,6 +112,67 @@ function DateBadge() {
       ].map((b,i)=>(
         <span key={i} style={{ fontSize:9,color:b.color,background:b.color+"18",padding:"3px 9px",borderRadius:20,fontWeight:500,border:`1px solid ${b.color}28` }}>{b.label}</span>
       ))}
+      {/* Mobile bottom nav */}
+      <nav className="mobile-bottom-nav" style={{
+        display:"none", position:"fixed", bottom:0, left:0, right:0,
+        background:T.sidebar, borderTop:`1px solid ${T.border}`,
+        padding:"8px 0 env(safe-area-inset-bottom)",
+        zIndex:80, justifyContent:"space-around", alignItems:"center",
+      }}>
+        {[
+          { id:"dashboard", icon:"⊞", label:"Home",    onClick:()=>{ setActiveTab("dashboard"); setActiveView("dashboard"); setActiveMember(null); } },
+          { id:"summary",   icon:"📋", label:"Summary", onClick:()=>{ setActiveTab("summary");   setActiveView("dashboard"); setActiveMember(null); } },
+          { id:"warroom",   icon:"🎯", label:"War Room",onClick:()=>{ setActiveView("warroom");  setActiveTab("dashboard");  setActiveMember(null); } },
+          { id:"framework", icon:"⬡",  label:"15",      onClick:()=>{ setActiveView("framework");setActiveTab("dashboard");  setActiveMember(null); } },
+          { id:"alerts",    icon:"🔔", label:"Alerts",  onClick:()=>setShowAlerts(true) },
+        ].map(item => {
+          const active = item.id==="alerts" ? false :
+            (item.id==="warroom"||item.id==="framework") ? activeView===item.id :
+            activeTab===item.id && activeView==="dashboard" && !activeMember;
+          return (
+            <button key={item.id} onClick={item.onClick} style={{
+              background:"none", border:"none", display:"flex", flexDirection:"column",
+              alignItems:"center", gap:3, padding:"6px 12px", cursor:"pointer",
+              color: active ? T.gold : T.textDim, transition:"color 0.15s",
+            }}>
+              <span style={{ fontSize:20 }}>{item.icon}</span>
+              <span style={{ fontSize:9, letterSpacing:"0.06em", textTransform:"uppercase" }}>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Mobile sidebar overlay */}
+      {showMobileMenu && (
+        <div style={{ position:"fixed",inset:0,zIndex:200,display:"flex" }}>
+          <div style={{ flex:1, background:"rgba(0,0,0,0.6)" }} onClick={()=>setShowMobileMenu(false)}/>
+          <div style={{ width:260, background:T.sidebar, borderLeft:`1px solid ${T.border}`, overflowY:"auto", animation:"slideIn 0.25s ease" }}>
+            <div style={{ padding:"20px 18px 12px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:`1px solid ${T.border}` }}>
+              <div style={{ fontFamily:"var(--font-display)", fontSize:17, fontWeight:700, color:T.gold }}>FifteenConsult</div>
+              <button onClick={()=>setShowMobileMenu(false)} style={{ background:"none",border:"none",color:T.textMid,fontSize:20,cursor:"pointer" }}>×</button>
+            </div>
+            <div style={{ padding:"12px 10px" }}>
+              {TEAM.map(m => (
+                <button key={m.id} onClick={()=>{ setActiveMember(m); setShowMobileMenu(false); }} style={{
+                  width:"100%", background:"none", border:"none", borderRadius:8,
+                  padding:"10px 12px", fontSize:13, color:T.textMid,
+                  display:"flex", alignItems:"center", gap:10, cursor:"pointer",
+                  textAlign:"left", fontFamily:"var(--font-mono)",
+                }}>
+                  <span style={{ fontSize:16 }}>{m.emoji}</span>
+                  <span>{m.name}</span>
+                </button>
+              ))}
+              <div style={{ borderTop:`1px solid ${T.border}`, marginTop:8, paddingTop:8 }}>
+                <button onClick={()=>{ toggleTheme(); setShowMobileMenu(false); }} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"10px 12px",fontSize:13,color:T.textMid,display:"flex",alignItems:"center",gap:10,cursor:"pointer",textAlign:"left",fontFamily:"var(--font-mono)" }}>
+                  <span style={{ fontSize:16 }}>{theme==="dark"?"☀️":"🌙"}</span>
+                  <span>{theme==="dark"?"Light mode":"Dark mode"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -385,7 +454,7 @@ function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleT
         />
       </div>
 
-      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16 }}>
+      <div className="detail-grid" style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16 }}>
         <div style={{ background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:20 }}>
           <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:14 }}>Tasks · <span style={{ color:member.color }}>{done}/{member.tasks.length}</span></div>
           {member.tasks.map((t,i)=>{
@@ -599,6 +668,14 @@ export default function App() {
   const [streaming,setStreaming]       = useState(null);
   const [showAlerts,setShowAlerts]     = useState(false);
   const [showScheduler,setShowScheduler]   = useState(false);
+  const [theme,setTheme]                   = useState(()=>{ const t=loadTheme(); applyTheme(t); return t; });
+  const [showMobileMenu,setShowMobileMenu] = useState(false);
+
+  const toggleTheme = () => {
+    const next = theme==="dark"?"light":"dark";
+    setTheme(next);
+    saveTheme(next);
+  };
   const [showNotifications,setShowNotifications] = useState(false);
   const [showMorningBriefing,setShowMorningBriefing] = useState(false);
   const [activeView,setActiveView]         = useState("dashboard"); // dashboard|warroom|framework
@@ -692,9 +769,9 @@ export default function App() {
 
   return (
     <div style={{ display:"flex",minHeight:"100vh",background:T.base,color:T.text,fontFamily:"var(--font-mono)" }}>
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length} onOpenMorning={()=>setShowMorningBriefing(true)} onOpenNotifications={()=>setShowNotifications(true)} activeView={activeView} setActiveView={setActiveView}/>
+      <div className="desktop-sidebar"><Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length} onOpenMorning={()=>setShowMorningBriefing(true)} onOpenNotifications={()=>setShowNotifications(true)} activeView={activeView} setActiveView={setActiveView}/></div>
 
-      <div style={{ flex:1,display:"flex",flexDirection:"column",overflow:"auto" }}>
+      <div style={{ flex:1,display:"flex",flexDirection:"column",overflow:"auto",paddingBottom:"env(safe-area-inset-bottom)" }}>
         <header style={{ padding:"16px 26px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:T.base,position:"sticky",top:0,zIndex:50 }}>
           <div>
             <div style={{ fontSize:19,fontWeight:700,color:T.text,fontFamily:"var(--font-display)",marginBottom:8 }}>
@@ -703,11 +780,21 @@ export default function App() {
             <DateBadge/>
           </div>
           <div style={{ display:"flex",gap:9,alignItems:"center" }}>
+            {/* Mobile menu button */}
+            <button className="mobile-menu-btn" onClick={()=>setShowMobileMenu(true)} style={{ display:"none",alignItems:"center",justifyContent:"center",background:T.card,border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 11px",cursor:"pointer",fontSize:16 }}>
+              ☰
+            </button>
             <button onClick={()=>setShowScheduler(true)} style={{ display:"flex",alignItems:"center",gap:6,background:T.card,border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 13px",cursor:"pointer",fontFamily:"var(--font-mono)",transition:"all 0.2s" }}
               onMouseEnter={e=>e.currentTarget.style.borderColor=T.borderL}
               onMouseLeave={e=>e.currentTarget.style.borderColor=T.border}>
               <span style={{ fontSize:13 }}>⏰</span>
               <span style={{ fontSize:10,color:T.textMid }}>Schedule</span>
+            </button>
+            {/* Theme toggle */}
+            <button onClick={toggleTheme} title={theme==="dark"?"Switch to light mode":"Switch to dark mode"} style={{ display:"flex",alignItems:"center",justifyContent:"center",background:T.card,border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 11px",cursor:"pointer",fontSize:15,transition:"all 0.2s" }}
+              onMouseEnter={e=>e.currentTarget.style.borderColor=T.borderL}
+              onMouseLeave={e=>e.currentTarget.style.borderColor=T.border}>
+              {theme==="dark"?"☀️":"🌙"}
             </button>
             <AlertBadge alerts={alerts} onClick={()=>setShowAlerts(true)}/>
             {!activeMember&&activeView==="dashboard"&&(
@@ -763,7 +850,7 @@ export default function App() {
                 </div>
               )}
 
-              <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:28 }}>
+              <div className="stat-grid" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:28 }}>
                 <StatCard label="Active Agents"  value="7"                            sub="All online"                                        icon="🤖" accent={T.gold}/>
                 <StatCard label="Tasks Complete" value={`${totalDone}/${totalTasks}`} sub={`${Math.round(totalDone/totalTasks*100)}% done`}    icon="✅" accent={T.green}/>
                 <StatCard label="Briefings Run"  value={totalOutputs}                 sub={`${TEAM.length-totalOutputs} pending`}              icon="📄" accent={T.blue}/>
@@ -771,7 +858,7 @@ export default function App() {
               </div>
 
               <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:13 }}>Your Team · 7 Agents</div>
-              <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(340px,1fr))",gap:12 }}>
+              <div className="agent-grid" style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(340px,1fr))",gap:12 }}>
                 {TEAM.map(m=>(
                   <MemberCard key={m.id} member={m} taskStates={taskStates} output={outputs[m.id]} streaming={streaming} historyCount={(histories[m.id]||[]).length} alerts={alerts} schedule={schedules[m.id]} onOpen={()=>setActiveMember(m)} onRun={()=>runBriefing(m,"")}/>
                 ))}
