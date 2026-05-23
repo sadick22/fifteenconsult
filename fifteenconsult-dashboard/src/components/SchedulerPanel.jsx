@@ -279,7 +279,7 @@ export default function SchedulerPanel({ schedules, onUpdate, onClose, onRunAll 
       </div>
 
       {/* Info banner */}
-      <div style={{ padding: "12px 24px", background: T.gold + "0e", borderBottom: `1px solid ${T.gold}22` }}>
+      <div style={{ padding: "12px 24px", background: T.gold + "0e", borderBottom: `1px solid #C8A96E22` }}>
         <p style={{ fontSize: 11, color: T.gold + "bb", lineHeight: 1.7 }}>
           ⚡ Schedules run automatically when the dashboard is <strong style={{ color: T.gold }}>open in your browser</strong>. Keep the tab open for fully autonomous operation. Times are in your local timezone.
         </p>
@@ -299,7 +299,7 @@ export default function SchedulerPanel({ schedules, onUpdate, onClose, onRunAll 
         <button onClick={() => {
           Object.keys(schedules).forEach(id => onUpdate(id, { ...schedules[id], enabled: true }));
         }} style={{
-          background: "none", border: `1px solid ${T.green}44`, color: T.green,
+          background: "none", border: `1px solid #4ade8044`, color: T.green,
           borderRadius: 7, padding: "8px 18px",
           fontSize: 10, fontWeight: 600, letterSpacing: "0.12em",
           textTransform: "uppercase", cursor: "pointer",
