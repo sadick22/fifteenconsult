@@ -14,6 +14,8 @@ import FifteenFramework from "./components/FifteenFramework.jsx";
 import NotificationCentre, { addNotification } from "./components/NotificationCentre.jsx";
 import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNextRun, formatNextRun, markRun } from "./lib/scheduler.js";
 import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
+import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
+import { getConnectionStatuses } from "./lib/integrations.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -503,7 +505,7 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
 }
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────────
-function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount, onOpenMorning, onOpenNotifications, activeView, setActiveView }) {
+function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount, onOpenMorning, onOpenNotifications, activeView, setActiveView, onOpenIntegrations, connectionCount }) {
   const red   = alerts.filter(a=>a.level==="red").length;
   const amber = alerts.filter(a=>a.level==="amber").length;
   const green = alerts.filter(a=>a.level==="green").length;
@@ -542,6 +544,14 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
         })}
 
         {/* Alerts button */}
+        <button onClick={onOpenIntegrations} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:400,color:"var(--text-mid)",display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:2 }}
+          onMouseEnter={e=>e.currentTarget.style.background="var(--bg-card)"}
+          onMouseLeave={e=>e.currentTarget.style.background="none"}>
+          <span style={{ fontSize:14 }}>🔌</span>
+          <span style={{ flex:1 }}>Connections</span>
+          <span style={{ fontSize:8,color:connectionCount>0?"#4ade80":"#f87171",fontWeight:700 }}>{connectionCount} live</span>
+        </button>
+
         <button onClick={onOpenMorning} style={{ width:"100%",background:"#C8A96E12",border:`1px solid #C8A96E33`,borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:600,color:T.gold,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:8 }}
           onMouseEnter={e=>e.currentTarget.style.background="#C8A96E22"}
           onMouseLeave={e=>e.currentTarget.style.background="#C8A96E12"}>
@@ -608,6 +618,7 @@ export default function App() {
   const [showAlerts,setShowAlerts]     = useState(false);
   const [showScheduler,setShowScheduler]   = useState(false);
   const [theme,setTheme]                   = useState(()=>{ const t=loadTheme(); applyTheme(t); return t; });
+  const [showIntegrations,setShowIntegrations] = useState(false);
   const [showMobileMenu,setShowMobileMenu] = useState(false);
 
   const toggleTheme = () => {
@@ -708,7 +719,7 @@ export default function App() {
 
   return (
     <div style={{ display:"flex",minHeight:"100vh",background:T.base,color:T.text,fontFamily:"var(--font-mono)" }}>
-      <div className="desktop-sidebar"><Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length} onOpenMorning={()=>setShowMorningBriefing(true)} onOpenNotifications={()=>setShowNotifications(true)} activeView={activeView} setActiveView={setActiveView}/></div>
+      <div className="desktop-sidebar"><Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length} onOpenMorning={()=>setShowMorningBriefing(true)} onOpenNotifications={()=>setShowNotifications(true)} activeView={activeView} setActiveView={setActiveView} onOpenIntegrations={()=>setShowIntegrations(true)} connectionCount={Object.values(getConnectionStatuses()).filter(Boolean).length}/></div>
 
       <div style={{ flex:1,display:"flex",flexDirection:"column",overflow:"auto",paddingBottom:"env(safe-area-inset-bottom)" }}>
         <header style={{ padding:"16px 26px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:T.base,position:"sticky",top:0,zIndex:50 }}>
@@ -754,6 +765,9 @@ export default function App() {
               streaming={streaming} onRunAll={runAll}
               onClose={()=>setShowMorningBriefing(false)}
             />
+          )}
+          {showIntegrations&&(
+            <IntegrationsPanel onClose={()=>setShowIntegrations(false)}/>
           )}
           {showNotifications&&(
             <NotificationCentre
