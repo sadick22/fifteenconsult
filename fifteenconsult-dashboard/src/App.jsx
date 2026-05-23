@@ -104,75 +104,14 @@ function DateBadge() {
   return (
     <div style={{ display:"flex",gap:6,flexWrap:"wrap" }}>
       {[
-        { label:`${d.dayOfWeek}, ${d.dayOfMonth} ${d.month} ${d.year}`, color:T.gold },
-        { label:`Week ${d.weekNum}`, color:T.textMid },
-        { label:`Q${d.currentQuarter} · ${d.daysLeftInQuarter}d left`, color:T.blue },
-        { label:`${d.daysLeftInMonth}d left in month`, color:d.daysLeftInMonth<=7?T.amber:T.textMid },
-        { label:d.isGCCWeekend?"GCC Weekend":"GCC Working Day", color:d.isGCCWeekend?T.amber:T.green },
+        { label:`${d.dayOfWeek}, ${d.dayOfMonth} ${d.month} ${d.year}`, color:"#C8A96E" },
+        { label:`Week ${d.weekNum}`, color:"var(--text-mid)" },
+        { label:`Q${d.currentQuarter} · ${d.daysLeftInQuarter}d left`, color:"var(--blue)" },
+        { label:`${d.daysLeftInMonth}d left in month`, color:d.daysLeftInMonth<=7?"#fbbf24":"var(--text-mid)" },
+        { label:d.isGCCWeekend?"GCC Weekend":"GCC Working Day", color:d.isGCCWeekend?"#fbbf24":"#4ade80" },
       ].map((b,i)=>(
         <span key={i} style={{ fontSize:9,color:b.color,background:b.color+"18",padding:"3px 9px",borderRadius:20,fontWeight:500,border:`1px solid ${b.color}28` }}>{b.label}</span>
       ))}
-      {/* Mobile bottom nav */}
-      <nav className="mobile-bottom-nav" style={{
-        display:"none", position:"fixed", bottom:0, left:0, right:0,
-        background:T.sidebar, borderTop:`1px solid ${T.border}`,
-        padding:"8px 0 env(safe-area-inset-bottom)",
-        zIndex:80, justifyContent:"space-around", alignItems:"center",
-      }}>
-        {[
-          { id:"dashboard", icon:"⊞", label:"Home",    onClick:()=>{ setActiveTab("dashboard"); setActiveView("dashboard"); setActiveMember(null); } },
-          { id:"summary",   icon:"📋", label:"Summary", onClick:()=>{ setActiveTab("summary");   setActiveView("dashboard"); setActiveMember(null); } },
-          { id:"warroom",   icon:"🎯", label:"War Room",onClick:()=>{ setActiveView("warroom");  setActiveTab("dashboard");  setActiveMember(null); } },
-          { id:"framework", icon:"⬡",  label:"15",      onClick:()=>{ setActiveView("framework");setActiveTab("dashboard");  setActiveMember(null); } },
-          { id:"alerts",    icon:"🔔", label:"Alerts",  onClick:()=>setShowAlerts(true) },
-        ].map(item => {
-          const active = item.id==="alerts" ? false :
-            (item.id==="warroom"||item.id==="framework") ? activeView===item.id :
-            activeTab===item.id && activeView==="dashboard" && !activeMember;
-          return (
-            <button key={item.id} onClick={item.onClick} style={{
-              background:"none", border:"none", display:"flex", flexDirection:"column",
-              alignItems:"center", gap:3, padding:"6px 12px", cursor:"pointer",
-              color: active ? T.gold : T.textDim, transition:"color 0.15s",
-            }}>
-              <span style={{ fontSize:20 }}>{item.icon}</span>
-              <span style={{ fontSize:9, letterSpacing:"0.06em", textTransform:"uppercase" }}>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Mobile sidebar overlay */}
-      {showMobileMenu && (
-        <div style={{ position:"fixed",inset:0,zIndex:200,display:"flex" }}>
-          <div style={{ flex:1, background:"rgba(0,0,0,0.6)" }} onClick={()=>setShowMobileMenu(false)}/>
-          <div style={{ width:260, background:T.sidebar, borderLeft:`1px solid ${T.border}`, overflowY:"auto", animation:"slideIn 0.25s ease" }}>
-            <div style={{ padding:"20px 18px 12px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:`1px solid ${T.border}` }}>
-              <div style={{ fontFamily:"var(--font-display)", fontSize:17, fontWeight:700, color:T.gold }}>FifteenConsult</div>
-              <button onClick={()=>setShowMobileMenu(false)} style={{ background:"none",border:"none",color:T.textMid,fontSize:20,cursor:"pointer" }}>×</button>
-            </div>
-            <div style={{ padding:"12px 10px" }}>
-              {TEAM.map(m => (
-                <button key={m.id} onClick={()=>{ setActiveMember(m); setShowMobileMenu(false); }} style={{
-                  width:"100%", background:"none", border:"none", borderRadius:8,
-                  padding:"10px 12px", fontSize:13, color:T.textMid,
-                  display:"flex", alignItems:"center", gap:10, cursor:"pointer",
-                  textAlign:"left", fontFamily:"var(--font-mono)",
-                }}>
-                  <span style={{ fontSize:16 }}>{m.emoji}</span>
-                  <span>{m.name}</span>
-                </button>
-              ))}
-              <div style={{ borderTop:`1px solid ${T.border}`, marginTop:8, paddingTop:8 }}>
-                <button onClick={()=>{ toggleTheme(); setShowMobileMenu(false); }} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"10px 12px",fontSize:13,color:T.textMid,display:"flex",alignItems:"center",gap:10,cursor:"pointer",textAlign:"left",fontFamily:"var(--font-mono)" }}>
-                  <span style={{ fontSize:16 }}>{theme==="dark"?"☀️":"🌙"}</span>
-                  <span>{theme==="dark"?"Light mode":"Dark mode"}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -875,6 +814,69 @@ export default function App() {
           )}
         </main>
       </div>
+      {/* Mobile bottom nav */}
+      <nav className="mobile-bottom-nav" style={{
+        display:"none", position:"fixed", bottom:0, left:0, right:0,
+        background:"var(--bg-sidebar)", borderTop:"1px solid var(--border)",
+        padding:"8px 0 env(safe-area-inset-bottom)",
+        zIndex:80, justifyContent:"space-around", alignItems:"center",
+      }}>
+        {[
+          { id:"dashboard", icon:"⊞", label:"Home"     },
+          { id:"summary",   icon:"📋", label:"Summary"  },
+          { id:"warroom",   icon:"🎯", label:"War Room" },
+          { id:"framework", icon:"⬡",  label:"15"       },
+          { id:"alerts",    icon:"🔔", label:"Alerts"   },
+        ].map(item => {
+          const isActive =
+            item.id==="alerts"    ? false :
+            item.id==="warroom"   ? activeView==="warroom"   && !activeMember :
+            item.id==="framework" ? activeView==="framework" && !activeMember :
+            activeTab===item.id   && activeView==="dashboard" && !activeMember;
+          const handleClick = () => {
+            if(item.id==="alerts")    { setShowAlerts(true); return; }
+            if(item.id==="warroom")   { setActiveView("warroom");   setActiveTab("dashboard"); setActiveMember(null); return; }
+            if(item.id==="framework") { setActiveView("framework"); setActiveTab("dashboard"); setActiveMember(null); return; }
+            setActiveTab(item.id); setActiveView("dashboard"); setActiveMember(null);
+          };
+          return (
+            <button key={item.id} onClick={handleClick} style={{
+              background:"none", border:"none", display:"flex", flexDirection:"column",
+              alignItems:"center", gap:3, padding:"6px 12px", cursor:"pointer",
+              color:isActive?"#C8A96E":"var(--text-dim)", transition:"color 0.15s",
+            }}>
+              <span style={{ fontSize:20 }}>{item.icon}</span>
+              <span style={{ fontSize:9,letterSpacing:"0.06em",textTransform:"uppercase" }}>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Mobile overlay menu */}
+      {showMobileMenu&&(
+        <div style={{ position:"fixed",inset:0,zIndex:200,display:"flex" }}>
+          <div style={{ flex:1,background:"rgba(0,0,0,0.6)" }} onClick={()=>setShowMobileMenu(false)}/>
+          <div style={{ width:260,background:"var(--bg-sidebar)",borderLeft:"1px solid var(--border)",overflowY:"auto",animation:"slideIn 0.25s ease" }}>
+            <div style={{ padding:"20px 18px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid var(--border)" }}>
+              <div style={{ fontFamily:"var(--font-display)",fontSize:17,fontWeight:700,color:"#C8A96E" }}>FifteenConsult</div>
+              <button onClick={()=>setShowMobileMenu(false)} style={{ background:"none",border:"none",color:"var(--text-mid)",fontSize:20,cursor:"pointer" }}>×</button>
+            </div>
+            <div style={{ padding:"12px 10px" }}>
+              {TEAM.map(m=>(
+                <button key={m.id} onClick={()=>{ setActiveMember(m); setShowMobileMenu(false); }} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"10px 12px",fontSize:13,color:"var(--text-mid)",display:"flex",alignItems:"center",gap:10,cursor:"pointer",textAlign:"left",fontFamily:"var(--font-mono)" }}>
+                  <span style={{ fontSize:16 }}>{m.emoji}</span><span>{m.name}</span>
+                </button>
+              ))}
+              <div style={{ borderTop:"1px solid var(--border)",marginTop:8,paddingTop:8 }}>
+                <button onClick={()=>{ toggleTheme(); setShowMobileMenu(false); }} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"10px 12px",fontSize:13,color:"var(--text-mid)",display:"flex",alignItems:"center",gap:10,cursor:"pointer",textAlign:"left",fontFamily:"var(--font-mono)" }}>
+                  <span style={{ fontSize:16 }}>{theme==="dark"?"☀️":"🌙"}</span>
+                  <span>{theme==="dark"?"Light mode":"Dark mode"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
