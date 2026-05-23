@@ -151,7 +151,7 @@ function ChatMessage({ msg, color }) {
       {isUser && (
         <div style={{
           width: 28, height: 28, borderRadius: "50%",
-          background: T.gold + "22", border: `1px solid ${T.gold}44`,
+          background: T.gold + "22", border: `1px solid #C8A96E44`,
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 12, flexShrink: 0, marginLeft: 10, marginTop: 2,
           color: T.gold, fontWeight: 700,
