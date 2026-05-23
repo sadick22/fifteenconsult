@@ -231,7 +231,7 @@ function MemberCard({ member, taskStates, output, streaming, historyCount, alert
       border:`1px solid ${alertColor?alertColor+"55":hov?T.borderL:T.border}`,
       borderRadius:12,padding:20,cursor:"pointer",position:"relative",overflow:"hidden",
       transition:"all 0.2s ease",transform:hov?"translateY(-2px)":"none",
-      boxShadow:hov?`0 8px 32px rgba(0,0,0,0.35)`:hasRed?`0 0 0 1px ${T.red}22`:"none",
+      boxShadow:hov?`0 8px 32px rgba(0,0,0,0.35)`:hasRed?`0 0 0 1px #f8717122`:"none",
     }}>
       {/* Colour accent bar */}
       <div style={{ position:"absolute",top:0,left:0,right:0,height:3,background:`linear-gradient(90deg,${alertColor||member.color},transparent)`,opacity:0.9 }}/>
@@ -273,7 +273,7 @@ function MemberCard({ member, taskStates, output, streaming, historyCount, alert
         {member.kpis.slice(0,2).map(k=>{
           const p=pct(k.current,k.target);
           return (
-            <div key={k.label} style={{ background:T.base,borderRadius:7,padding:"8px 10px",border:`1px solid ${p<40?T.red+"44":T.border}` }}>
+            <div key={k.label} style={{ background:T.base,borderRadius:7,padding:"8px 10px",border:`1px solid ${p<40?"#f8717144":T.border}` }}>
               <div style={{ fontSize:8,color:T.textDim,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:3 }}>{k.label}</div>
               <div style={{ fontSize:16,fontWeight:700,color:p>=60?T.text:p>=40?T.amber:T.red,lineHeight:1 }}>{k.current}{k.unit||""}</div>
               <div style={{ fontSize:8,color:T.textDim,marginTop:2 }}>of {k.target}{k.unit||""}</div>
@@ -594,7 +594,7 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
                 setActiveView("dashboard");
               }
               setActiveMember(null);
-            }} style={{ width:"100%",background:active?T.gold+"18":"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:active?600:400,color:active?T.gold:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)" }}
+            }} style={{ width:"100%",background:active?"#C8A96E18":"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:active?600:400,color:active?T.gold:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)" }}
               onMouseEnter={e=>{if(!active)e.currentTarget.style.background=T.card;}}
               onMouseLeave={e=>{if(!active)e.currentTarget.style.background="none";}}>
               <span style={{ fontSize:14 }}>{item.icon}</span>{item.label}
@@ -603,9 +603,9 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
         })}
 
         {/* Alerts button */}
-        <button onClick={onOpenMorning} style={{ width:"100%",background:T.gold+"12",border:`1px solid ${T.gold}33`,borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:600,color:T.gold,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:8 }}
-          onMouseEnter={e=>e.currentTarget.style.background=T.gold+"22"}
-          onMouseLeave={e=>e.currentTarget.style.background=T.gold+"12"}>
+        <button onClick={onOpenMorning} style={{ width:"100%",background:"#C8A96E12",border:`1px solid #C8A96E33`,borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:600,color:T.gold,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:8 }}
+          onMouseEnter={e=>e.currentTarget.style.background="#C8A96E22"}
+          onMouseLeave={e=>e.currentTarget.style.background="#C8A96E12"}>
           <span style={{ fontSize:14 }}>☀️</span>
           <span style={{ flex:1 }}>Morning Briefing</span>
         </button>
