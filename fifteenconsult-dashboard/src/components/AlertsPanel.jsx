@@ -2,14 +2,14 @@ import { useState } from "react";
 import { ALERT, ALERT_COLORS, getAlertSummary, getWorstLevel } from "../lib/alerts.js";
 
 const T = {
-  base:    "#0d1117",
-  card:    "#131d2e",
-  cardHover:"#172236",
-  border:  "#1e2d45",
-  text:    "#e8edf5",
-  textMid: "#7a90b0",
-  textDim: "#3d526b",
-  gold:    "#C8A96E",
+  base:    "var(--bg-base)",
+  card:    "var(--bg-card)",
+  cardHover:"var(--bg-hover)",
+  border:  "var(--border)",
+  text:    "var(--text)",
+  textMid: "var(--text-mid)",
+  textDim: "var(--text-dim)",
+  gold:    "var(--gold)",
 };
 
 const LEVEL_BG = {
@@ -30,7 +30,7 @@ const LEVEL_LABEL = {
 export function AlertBadge({ alerts, onClick }) {
   const summary = getAlertSummary(alerts);
   const worst   = getWorstLevel(alerts);
-  if (!worst || summary.total === 0) return null;
+  if (summary.total === 0) return null;
 
   const color = ALERT_COLORS[worst];
 
