@@ -1,15 +1,105 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Cormorant+Garamond:wght@400;600;700&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-:root{--font-mono:'DM Mono','Courier New',monospace;--font-display:'Cormorant Garamond','Georgia',serif;}
-html{font-size:14px;-webkit-font-smoothing:antialiased;}
-body{background:#0d1117;color:#e8edf5;font-family:var(--font-mono);min-height:100vh;}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:#0a0f1a;}
-::-webkit-scrollbar-thumb{background:#1e2d45;border-radius:4px;}
-button{font-family:var(--font-mono);cursor:pointer;}
-button:disabled{cursor:not-allowed;}
-pre{font-family:var(--font-mono);}
-input{font-family:var(--font-mono);}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-@keyframes slideIn{from{transform:translateX(100%);}to{transform:translateX(0);}}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+  --font-display: 'Cormorant Garamond', 'Georgia', serif;
+
+  /* Dark theme (default) */
+  --bg-base:      #0d1117;
+  --bg-sidebar:   #0a0f1a;
+  --bg-card:      #131d2e;
+  --bg-hover:     #172236;
+  --border:       #1e2d45;
+  --border-light: #243448;
+  --text:         #e8edf5;
+  --text-mid:     #7a90b0;
+  --text-dim:     #3d526b;
+  --text-ghost:   #2a3a52;
+  --gold:         #C8A96E;
+  --green:        #4ade80;
+  --red:          #f87171;
+  --amber:        #fbbf24;
+  --blue:         #60a5fa;
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --bg-base:      #f4f6fa;
+  --bg-sidebar:   #ffffff;
+  --bg-card:      #ffffff;
+  --bg-hover:     #f0f4ff;
+  --border:       #e2e8f0;
+  --border-light: #cbd5e1;
+  --text:         #0f172a;
+  --text-mid:     #475569;
+  --text-dim:     #94a3b8;
+  --text-ghost:   #cbd5e1;
+  --gold:         #b8892a;
+  --green:        #16a34a;
+  --red:          #dc2626;
+  --amber:        #d97706;
+  --blue:         #2563eb;
+}
+
+html { font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+body {
+  background: var(--bg-base);
+  color: var(--text);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+button { font-family: var(--font-mono); cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+pre, textarea, input, select { font-family: var(--font-mono); }
+
+@keyframes fadeUp   { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse    { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+@keyframes slideIn  { from { transform:translateX(100%); } to { transform:translateX(0); } }
+@keyframes slideUp  { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+/* ── MOBILE SIDEBAR OVERLAY ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 90;
+  backdrop-filter: blur(2px);
+}
+
+/* ── RESPONSIVE BREAKPOINTS ── */
+
+/* Tablet: hide sidebar text, show icons only */
+@media (max-width: 900px) {
+  .sidebar-full  { display: none !important; }
+  .sidebar-icons { display: flex !important; }
+  .main-content  { margin-left: 0 !important; }
+}
+
+/* Mobile: bottom nav instead of sidebar */
+@media (max-width: 640px) {
+  .desktop-sidebar { display: none !important; }
+  .mobile-bottom-nav { display: flex !important; }
+  .sidebar-overlay { display: block; }
+  .stat-grid { grid-template-columns: 1fr 1fr !important; }
+  .agent-grid { grid-template-columns: 1fr !important; }
+  .detail-grid { grid-template-columns: 1fr !important; }
+  .header-badges { display: none !important; }
+  .header-run-btn span.label { display: none !important; }
+  .kpi-grid-4 { grid-template-columns: 1fr 1fr !important; }
+  .framework-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 400px) {
+  .stat-grid { grid-template-columns: 1fr !important; }
+  .framework-grid { grid-template-columns: 1fr !important; }
+}
