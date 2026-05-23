@@ -250,3 +250,4 @@ export function AlertStrip({ alerts, onOpenPanel }) {
     </div>
   );
 }
+
