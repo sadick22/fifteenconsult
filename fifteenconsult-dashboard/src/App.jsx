@@ -6,6 +6,8 @@ import { evaluateAlerts } from "./lib/alerts.js";
 import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.jsx";
 import CustomPrompt from "./components/CustomPrompt.jsx";
 import CopyToolbar from "./components/CopyToolbar.jsx";
+import SchedulerPanel from "./components/SchedulerPanel.jsx";
+import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNextRun, formatNextRun, markRun } from "./lib/scheduler.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -134,7 +136,7 @@ function KpiRow({ label, current, target, unit="", color }) {
 }
 
 // ── MEMBER CARD ───────────────────────────────────────────────────────────────
-function MemberCard({ member, taskStates, output, streaming, historyCount, alerts, onOpen, onRun }) {
+function MemberCard({ member, taskStates, output, streaming, historyCount, alerts, schedule, onOpen, onRun }) {
   const states   = taskStates[member.id]||[];
   const done     = states.filter(Boolean).length;
   const progress = states.length ? pct(done,states.length) : 0;
@@ -211,6 +213,11 @@ function MemberCard({ member, taskStates, output, streaming, historyCount, alert
         <div style={{ fontSize:9,color:output?member.color:T.textDim }}>
           {output?`✓ ${output.timestamp}`:`No briefing · ${member.cadence}`}
           {historyCount>0&&<span style={{ marginLeft:5,color:T.textDim }}>· {historyCount} saved</span>}
+          {schedule?.enabled&&schedule?.frequency!=="disabled"&&(
+            <div style={{ marginTop:3,color:T.textDim }}>
+              ⏰ {formatNextRun(getNextRun(schedule))}
+            </div>
+          )}
         </div>
         <button onClick={e=>{e.stopPropagation();onRun();}} disabled={isBusy} style={{
           background:isBusy?"transparent":member.color+"22",
@@ -481,7 +488,7 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
 }
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────────
-function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts }) {
+function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount }) {
   const red   = alerts.filter(a=>a.level==="red").length;
   const amber = alerts.filter(a=>a.level==="amber").length;
   const green = alerts.filter(a=>a.level==="green").length;
@@ -511,6 +518,14 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
         })}
 
         {/* Alerts button */}
+        <button onClick={onOpenScheduler} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:400,color:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:2 }}
+          onMouseEnter={e=>e.currentTarget.style.background=T.card}
+          onMouseLeave={e=>e.currentTarget.style.background="none"}>
+          <span style={{ fontSize:14 }}>⏰</span>
+          <span style={{ flex:1 }}>Scheduler</span>
+          <span style={{ fontSize:9,color:scheduleActiveCount>0?T.green:T.textDim,background:T.card,padding:"1px 6px",borderRadius:8 }}>{scheduleActiveCount} on</span>
+        </button>
+
         {showAlertsBtn&&(
           <button onClick={onOpenAlerts} style={{ width:"100%",background:worstColor+"12",border:`1px solid ${worstColor}33`,borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:600,color:worstColor,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:4 }}>
             <span style={{ fontSize:14,animation:red>0?"pulse 1.5s infinite":"none" }}>🔔</span>
@@ -553,6 +568,8 @@ export default function App() {
   const [activeMember,setActiveMember] = useState(null);
   const [streaming,setStreaming]       = useState(null);
   const [showAlerts,setShowAlerts]     = useState(false);
+  const [showScheduler,setShowScheduler] = useState(false);
+  const [schedules,setSchedules]       = useState(()=>loadSchedules());
   const [outputs,setOutputs]           = useState(stored.outputs||{});
   const [taskStates,setTaskStates]     = useState(()=>{
     const init={};
@@ -601,6 +618,36 @@ export default function App() {
 
   const runAll=useCallback(async()=>{ if(streaming) return; for(const m of TEAM) await runBriefing(m,""); },[runBriefing,streaming]);
 
+  // Save schedules whenever they change
+  useEffect(()=>{ saveSchedules(schedules); },[schedules]);
+
+  // Update a single agent schedule
+  const handleScheduleUpdate=useCallback((agentId, updated)=>{
+    setSchedules(prev=>({ ...prev, [agentId]:updated }));
+  },[]);
+
+  // Auto-run scheduler — checks every 60 seconds when page is visible
+  useEffect(()=>{
+    const check=()=>{
+      if(streaming) return;
+      const due=getDueAgents(schedules);
+      if(due.length>0) {
+        const agentId=due[0]; // Run one at a time
+        const member=TEAM.find(m=>m.id===agentId);
+        if(member) {
+          markRun(agentId);
+          runBriefing(member,"");
+        }
+      }
+    };
+    // Check on mount
+    const timer=setInterval(check,60000);
+    // Also check when tab becomes visible
+    const onVisible=()=>{ if(document.visibilityState==="visible") check(); };
+    document.addEventListener("visibilitychange",onVisible);
+    return ()=>{ clearInterval(timer); document.removeEventListener("visibilitychange",onVisible); };
+  },[schedules,streaming,runBriefing]);
+
   const totalTasks  = TEAM.reduce((s,m)=>s+m.tasks.length,0);
   const totalDone   = TEAM.reduce((s,m)=>s+(taskStates[m.id]||[]).filter(Boolean).length,0);
   const totalOutputs= Object.keys(outputs).length;
@@ -609,7 +656,7 @@ export default function App() {
 
   return (
     <div style={{ display:"flex",minHeight:"100vh",background:T.base,color:T.text,fontFamily:"var(--font-mono)" }}>
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)}/>
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length}/>
 
       <div style={{ flex:1,display:"flex",flexDirection:"column",overflow:"auto" }}>
         <header style={{ padding:"16px 26px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:T.base,position:"sticky",top:0,zIndex:50 }}>
@@ -620,6 +667,12 @@ export default function App() {
             <DateBadge/>
           </div>
           <div style={{ display:"flex",gap:9,alignItems:"center" }}>
+            <button onClick={()=>setShowScheduler(true)} style={{ display:"flex",alignItems:"center",gap:6,background:T.card,border:`1px solid ${T.border}`,borderRadius:8,padding:"7px 13px",cursor:"pointer",fontFamily:"var(--font-mono)",transition:"all 0.2s" }}
+              onMouseEnter={e=>e.currentTarget.style.borderColor=T.borderL}
+              onMouseLeave={e=>e.currentTarget.style.borderColor=T.border}>
+              <span style={{ fontSize:13 }}>⏰</span>
+              <span style={{ fontSize:10,color:T.textMid }}>Schedule</span>
+            </button>
             <AlertBadge alerts={alerts} onClick={()=>setShowAlerts(true)}/>
             {!activeMember&&(
               <button onClick={runAll} disabled={!!streaming} style={{ background:!!streaming?"transparent":T.gold,color:!!streaming?T.gold:"#000",border:`1px solid ${T.gold}`,padding:"9px 18px",fontSize:10,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",cursor:!!streaming?"not-allowed":"pointer",borderRadius:8,fontFamily:"var(--font-mono)",transition:"all 0.2s" }}>
@@ -635,6 +688,14 @@ export default function App() {
         <main style={{ padding:26,flex:1 }}>
           {showAlerts&&(
             <AlertsPanel alerts={alerts} onClose={()=>setShowAlerts(false)} onAgentClick={(agentId)=>{ setActiveMember(TEAM.find(m=>m.id===agentId)); setShowAlerts(false); }}/>
+          )}
+          {showScheduler&&(
+            <SchedulerPanel
+              schedules={schedules}
+              onUpdate={handleScheduleUpdate}
+              onClose={()=>setShowScheduler(false)}
+              onRunAll={()=>{ setShowScheduler(false); runAll(); }}
+            />
           )}
 
           {activeMember&&<MemberDetail member={activeMember} taskStates={taskStates} output={outputs[activeMember.id]} streaming={streaming} alerts={alerts} onToggleTask={toggleTask} onRunBriefing={runBriefing} onBack={()=>setActiveMember(null)}/>}
@@ -663,7 +724,7 @@ export default function App() {
               <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:13 }}>Your Team · 7 Agents</div>
               <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(340px,1fr))",gap:12 }}>
                 {TEAM.map(m=>(
-                  <MemberCard key={m.id} member={m} taskStates={taskStates} output={outputs[m.id]} streaming={streaming} historyCount={(histories[m.id]||[]).length} alerts={alerts} onOpen={()=>setActiveMember(m)} onRun={()=>runBriefing(m,"")}/>
+                  <MemberCard key={m.id} member={m} taskStates={taskStates} output={outputs[m.id]} streaming={streaming} historyCount={(histories[m.id]||[]).length} alerts={alerts} schedule={schedules[m.id]} onOpen={()=>setActiveMember(m)} onRun={()=>runBriefing(m,"")}/>
                 ))}
               </div>
             </div>
