@@ -495,7 +495,7 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
 }
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────────
-function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount, onOpenMorning, onOpenNotifications, activeView }) {
+function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount, onOpenMorning, onOpenNotifications, activeView, setActiveView }) {
   const red   = alerts.filter(a=>a.level==="red").length;
   const amber = alerts.filter(a=>a.level==="amber").length;
   const green = alerts.filter(a=>a.level==="green").length;
@@ -692,7 +692,7 @@ export default function App() {
 
   return (
     <div style={{ display:"flex",minHeight:"100vh",background:T.base,color:T.text,fontFamily:"var(--font-mono)" }}>
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length} onOpenMorning={()=>setShowMorningBriefing(true)} onOpenNotifications={()=>setShowNotifications(true)} activeView={activeView}/>
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length} onOpenMorning={()=>setShowMorningBriefing(true)} onOpenNotifications={()=>setShowNotifications(true)} activeView={activeView} setActiveView={setActiveView}/>
 
       <div style={{ flex:1,display:"flex",flexDirection:"column",overflow:"auto" }}>
         <header style={{ padding:"16px 26px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:T.base,position:"sticky",top:0,zIndex:50 }}>
