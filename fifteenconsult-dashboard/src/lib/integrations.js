@@ -129,7 +129,7 @@ export function getConnectionStatuses() {
     hubspot:    true, // always available via /api/hubspot proxy (key is server-side)
     mailerlite: !!import.meta.env.VITE_MAILERLITE_API_KEY,
     linkedin:   !!(import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN && import.meta.env.VITE_LINKEDIN_ORG_ID),
-    ga4:        !!(import.meta.env.VITE_GA4_MEASUREMENT_ID && import.meta.env.VITE_GA4_API_SECRET),
+    ga4:        !!import.meta.env.VITE_GA4_MEASUREMENT_ID, // proxy checks server-side keys
     meta:       !!import.meta.env.VITE_META_ACCESS_TOKEN,
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
   };
@@ -219,6 +219,19 @@ export function getGA4SetupSteps() {
       },
     ],
   };
+}
+
+// ── GA4 LIVE DATA ────────────────────────────────────────────────────────────
+
+export async function fetchGA4Stats() {
+  try {
+    const res = await fetch("/api/ga4");
+    const data = await res.json();
+    if (!res.ok) return { error: data.error || "GA4 fetch failed" };
+    return data;
+  } catch (err) {
+    return { error: err.message };
+  }
 }
 
 // ── META ADS SETUP GUIDE ──────────────────────────────────────────────────────
