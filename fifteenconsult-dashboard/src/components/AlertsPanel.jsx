@@ -174,7 +174,7 @@ export function AlertsPanel({ alerts, onClose, onAgentClick }) {
       </div>
 
       {/* Context banner */}
-      <div style={{ padding: "10px 24px", background: T.gold + "0e", borderBottom: `1px solid ${T.gold}22` }}>
+      <div style={{ padding: "10px 24px", background: T.gold + "0e", borderBottom: `1px solid #C8A96E22` }}>
         <p style={{ fontSize: 11, color: T.gold + "bb", lineHeight: 1.6 }}>
           ⚡ Alerts are calibrated for FifteenConsult as a <strong style={{ color: T.gold }}>marketing consultancy seeking clients</strong> in Qatar/GCC — not a brand running campaigns for others.
         </p>
