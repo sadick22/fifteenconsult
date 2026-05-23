@@ -514,9 +514,18 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
         <div style={{ fontSize:9,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:5,padding:"0 8px" }}>Main Menu</div>
 
         {[{id:"dashboard",label:"Dashboard",icon:"⊞"},{id:"summary",label:"Weekly Summary",icon:"📋"},{id:"warroom",label:"War Room",icon:"🎯"},{id:"framework",label:"15 Framework",icon:"⬡"}].map(item=>{
-          const active=activeTab===item.id&&!activeMember;
+          const active=((item.id==="warroom"||item.id==="framework")?activeView===item.id:activeTab===item.id&&activeView==="dashboard")&&!activeMember;
           return (
-            <button key={item.id} onClick={()=>{setActiveTab(item.id);setActiveMember(null);}} style={{ width:"100%",background:active?T.gold+"18":"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:active?600:400,color:active?T.gold:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)" }}
+            <button key={item.id} onClick={()=>{
+              if(item.id==="warroom"||item.id==="framework"){
+                setActiveView(item.id);
+                setActiveTab("dashboard");
+              } else {
+                setActiveTab(item.id);
+                setActiveView("dashboard");
+              }
+              setActiveMember(null);
+            }} style={{ width:"100%",background:active?T.gold+"18":"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:active?600:400,color:active?T.gold:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)" }}
               onMouseEnter={e=>{if(!active)e.currentTarget.style.background=T.card;}}
               onMouseLeave={e=>{if(!active)e.currentTarget.style.background="none";}}>
               <span style={{ fontSize:14 }}>{item.icon}</span>{item.label}
