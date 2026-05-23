@@ -172,10 +172,131 @@ export async function createMailerLiteDraft({ subject, content }) {
 
 export function getConnectionStatuses() {
   return {
-    hubspot:     !!import.meta.env.VITE_HUBSPOT_API_KEY,
-    mailerlite:  !!import.meta.env.VITE_MAILERLITE_API_KEY,
-    ga4:         !!import.meta.env.VITE_GA4_MEASUREMENT_ID,
-    linkedin:    !!import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN,
-    meta:        !!import.meta.env.VITE_META_ACCESS_TOKEN,
+    hubspot:    !!import.meta.env.VITE_HUBSPOT_API_KEY,
+    mailerlite: !!import.meta.env.VITE_MAILERLITE_API_KEY,
+    linkedin:   !!(import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN && import.meta.env.VITE_LINKEDIN_ORG_ID),
+    ga4:        !!(import.meta.env.VITE_GA4_MEASUREMENT_ID && import.meta.env.VITE_GA4_API_SECRET),
+    meta:       !!import.meta.env.VITE_META_ACCESS_TOKEN,
+    make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
+  };
+}
+
+// ── LINKEDIN ──────────────────────────────────────────────────────────────────
+// Uses LinkedIn Pages API to pull follower count + recent post engagement
+// Requires: VITE_LINKEDIN_ACCESS_TOKEN + VITE_LINKEDIN_ORG_ID
+
+const LI_BASE = "https://api.linkedin.com/v2";
+const LI_KEY  = () => import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN;
+const LI_ORG  = () => import.meta.env.VITE_LINKEDIN_ORG_ID;
+
+export async function fetchLinkedInStats() {
+  const key = LI_KEY();
+  const org = LI_ORG();
+  if (!key || !org) return { error: "Add VITE_LINKEDIN_ACCESS_TOKEN and VITE_LINKEDIN_ORG_ID to Vercel." };
+
+  try {
+    // Follower count
+    const followersRes = await fetch(
+      `${LI_BASE}/networkSizes/urn:li:organization:${org}?edgeType=CompanyFollowedByMember`,
+      { headers: { Authorization: `Bearer ${key}` } }
+    );
+    const followersData = await followersRes.json();
+
+    // Recent posts (last 5)
+    const postsRes = await fetch(
+      `${LI_BASE}/shares?q=owners&owners=urn:li:organization:${org}&count=5`,
+      { headers: { Authorization: `Bearer ${key}` } }
+    );
+    const postsData = await postsRes.json();
+
+    const totalFollowers = followersData.firstDegreeSize || 0;
+    const posts = postsData.elements || [];
+
+    return {
+      totalFollowers,
+      postsCount: posts.length,
+      latestPost: posts[0]?.text?.text?.slice(0, 100) || null,
+      connected:  true,
+    };
+  } catch (err) {
+    return { error: err.message };
+  }
+}
+
+// ── GA4 SETUP GUIDE ───────────────────────────────────────────────────────────
+// GA4 requires a backend proxy (no direct browser API access).
+// This returns setup instructions and a status check.
+
+export function getGA4SetupSteps() {
+  const measurementId = import.meta.env.VITE_GA4_MEASUREMENT_ID;
+  return {
+    connected: !!measurementId,
+    measurementId,
+    steps: [
+      {
+        step: 1,
+        title: "Create GA4 Property",
+        detail: "Go to analytics.google.com → Admin → Create Property → Select 'Web' → Enter fifteenconsult.com",
+        done: false,
+      },
+      {
+        step: 2,
+        title: "Install on Webflow",
+        detail: "In Webflow: Site Settings → Custom Code → Head Code → Paste your GA4 tracking snippet (G-XXXXXXXXXX)",
+        done: false,
+      },
+      {
+        step: 3,
+        title: "Add Measurement ID to Vercel",
+        detail: "Vercel → Environment Variables → Add VITE_GA4_MEASUREMENT_ID = G-XXXXXXXXXX",
+        done: !!measurementId,
+      },
+      {
+        step: 4,
+        title: "Create GA4 API Credentials",
+        detail: "Google Cloud Console → Enable Analytics Data API → Create Service Account → Download JSON key",
+        done: false,
+      },
+      {
+        step: 5,
+        title: "Add API Key to Vercel",
+        detail: "Vercel → Environment Variables → Add VITE_GA4_API_SECRET from your service account JSON",
+        done: false,
+      },
+    ],
+  };
+}
+
+// ── META ADS SETUP GUIDE ──────────────────────────────────────────────────────
+export function getMetaSetupSteps() {
+  const token = import.meta.env.VITE_META_ACCESS_TOKEN;
+  return {
+    connected: !!token,
+    steps: [
+      {
+        step: 1,
+        title: "Create Meta Business Account",
+        detail: "Go to business.facebook.com → Create account for FifteenConsult if not already done",
+        done: false,
+      },
+      {
+        step: 2,
+        title: "Get Access Token",
+        detail: "Meta for Developers → My Apps → Create App → Marketing API → Generate long-lived token with ads_read permission",
+        done: false,
+      },
+      {
+        step: 3,
+        title: "Add to Vercel",
+        detail: "Vercel → Environment Variables → Add VITE_META_ACCESS_TOKEN and VITE_META_AD_ACCOUNT_ID",
+        done: !!token,
+      },
+      {
+        step: 4,
+        title: "Launch First Campaign",
+        detail: "Once ads are running, the dashboard will show live spend, CPL, and ROAS per campaign",
+        done: false,
+      },
+    ],
   };
 }
