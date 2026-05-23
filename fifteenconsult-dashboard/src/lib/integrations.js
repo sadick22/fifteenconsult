@@ -9,77 +9,31 @@
  * MailerLite: VITE_MAILERLITE_API_KEY
  */
 
-// ── HUBSPOT ───────────────────────────────────────────────────────────────────
-
-const HS_BASE = "https://api.hubapi.com";
-const HS_KEY  = () => import.meta.env.VITE_HUBSPOT_API_KEY;
+// ── HUBSPOT (via Vercel serverless proxy — fixes CORS) ────────────────────────
+// API key stored as HUBSPOT_API_KEY (no VITE_ prefix) in Vercel env vars
+// Proxy endpoint: /api/hubspot
 
 export async function fetchHubSpotPipeline() {
-  const key = HS_KEY();
-  if (!key) return { error: "No HubSpot API key. Add VITE_HUBSPOT_API_KEY to Vercel." };
-
   try {
-    // Fetch contacts count
-    const contactsRes = await fetch(
-      `${HS_BASE}/crm/v3/objects/contacts?limit=1&properties=hs_lead_status`,
-      { headers: { Authorization: `Bearer ${key}` } }
-    );
-    const contacts = await contactsRes.json();
-
-    // Fetch deals
-    const dealsRes = await fetch(
-      `${HS_BASE}/crm/v3/objects/deals?limit=100&properties=dealstage,dealname,amount,closedate`,
-      { headers: { Authorization: `Bearer ${key}` } }
-    );
-    const deals = await dealsRes.json();
-
-    // Count deals by stage
-    const stageMap = {};
-    (deals.results || []).forEach(d => {
-      const stage = d.properties?.dealstage || "unknown";
-      stageMap[stage] = (stageMap[stage] || 0) + 1;
-    });
-
-    return {
-      totalContacts: contacts.total || 0,
-      totalDeals:    (deals.results || []).length,
-      dealsByStage:  stageMap,
-      openDeals:     (deals.results || []).filter(d => !["closedwon","closedlost"].includes(d.properties?.dealstage)).length,
-      wonDeals:      (deals.results || []).filter(d => d.properties?.dealstage === "closedwon").length,
-    };
+    const res = await fetch("/api/hubspot?action=pipeline");
+    const data = await res.json();
+    if (!res.ok) return { error: data.error || "HubSpot fetch failed" };
+    return data;
   } catch (err) {
     return { error: err.message };
   }
 }
 
 export async function pushContactToHubSpot({ firstName, lastName, email, company, phone, notes }) {
-  const key = HS_KEY();
-  if (!key) return { error: "No HubSpot API key." };
-
   try {
-    const res = await fetch(`${HS_BASE}/crm/v3/objects/contacts`, {
+    const res = await fetch("/api/hubspot?action=contact", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        properties: {
-          firstname:   firstName || "",
-          lastname:    lastName  || "",
-          email:       email     || "",
-          company:     company   || "",
-          phone:       phone     || "",
-          description: notes     || "Added via FifteenConsult AI Dashboard",
-          hs_lead_status: "NEW",
-          lifecyclestage:  "lead",
-        },
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName, lastName, email, company, phone, notes }),
     });
-
     const data = await res.json();
-    if (!res.ok) return { error: data.message || "Failed to create contact" };
-    return { success: true, id: data.id, contact: data };
+    if (!res.ok) return { error: data.error || "Failed to create contact" };
+    return { success: true, id: data.id };
   } catch (err) {
     return { error: err.message };
   }
@@ -172,7 +126,7 @@ export async function createMailerLiteDraft({ subject, content }) {
 
 export function getConnectionStatuses() {
   return {
-    hubspot:    !!import.meta.env.VITE_HUBSPOT_API_KEY,
+    hubspot:    true, // always available via /api/hubspot proxy (key is server-side)
     mailerlite: !!import.meta.env.VITE_MAILERLITE_API_KEY,
     linkedin:   !!(import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN && import.meta.env.VITE_LINKEDIN_ORG_ID),
     ga4:        !!(import.meta.env.VITE_GA4_MEASUREMENT_ID && import.meta.env.VITE_GA4_API_SECRET),
