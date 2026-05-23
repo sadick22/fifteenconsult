@@ -2,348 +2,319 @@ import { useState, useEffect } from "react";
 import {
   fetchHubSpotPipeline, pushContactToHubSpot,
   fetchMailerLiteStats, createMailerLiteDraft,
+  fetchLinkedInStats,
+  getGA4SetupSteps, getMetaSetupSteps,
   getConnectionStatuses,
 } from "../lib/integrations.js";
 
 const INTEGRATIONS = [
-  {
-    id: "hubspot",
-    name: "HubSpot CRM",
-    icon: "🟠",
-    color: "#ff7a59",
-    agentId: "kwame",
-    agentName: "Kwame",
-    description: "Live pipeline data · Push leads",
-    envKey: "VITE_HUBSPOT_API_KEY",
-    docsUrl: "https://app.hubspot.com/api-key",
-  },
-  {
-    id: "mailerlite",
-    name: "MailerLite",
-    icon: "💚",
-    color: "#09c269",
-    agentId: "nadia",
-    agentName: "Nadia",
-    description: "Subscriber stats · Push drafts",
-    envKey: "VITE_MAILERLITE_API_KEY",
-    docsUrl: "https://app.mailerlite.com/integrations/api",
-  },
-  {
-    id: "ga4",
-    name: "Google Analytics 4",
-    icon: "📊",
-    color: "#4285f4",
-    agentId: "zara",
-    agentName: "Zara",
-    description: "Traffic · Conversions · Sources",
-    envKey: "VITE_GA4_MEASUREMENT_ID",
-    docsUrl: "https://analytics.google.com",
-    comingSoon: true,
-  },
-  {
-    id: "linkedin",
-    name: "LinkedIn",
-    icon: "💼",
-    color: "#0077b5",
-    agentId: "sara",
-    agentName: "Sara",
-    description: "Followers · Engagement · Ads",
-    envKey: "VITE_LINKEDIN_ACCESS_TOKEN",
-    docsUrl: "https://www.linkedin.com/developers/",
-    comingSoon: true,
-  },
-  {
-    id: "meta",
-    name: "Meta Ads",
-    icon: "📱",
-    color: "#1877f2",
-    agentId: "hassan",
-    agentName: "Hassan",
-    description: "Ad spend · CPL · ROAS",
-    envKey: "VITE_META_ACCESS_TOKEN",
-    docsUrl: "https://developers.facebook.com/docs/marketing-api",
-    comingSoon: true,
-  },
-  {
-    id: "make",
-    name: "Make.com",
-    icon: "⚙️",
-    color: "#6d00cc",
-    agentId: null,
-    agentName: "All agents",
-    description: "Automation · Webhooks · Workflows",
-    envKey: "VITE_MAKE_WEBHOOK_URL",
-    docsUrl: "https://make.com",
-    comingSoon: true,
-  },
+  { id:"hubspot",    name:"HubSpot CRM",           icon:"🟠", color:"#ff7a59", agentName:"Kwame",   description:"Pipeline · Push leads",       envKeys:["VITE_HUBSPOT_API_KEY"] },
+  { id:"mailerlite", name:"MailerLite",             icon:"💚", color:"#09c269", agentName:"Nadia",   description:"Subscribers · Push drafts",    envKeys:["VITE_MAILERLITE_API_KEY"] },
+  { id:"linkedin",   name:"LinkedIn Pages",         icon:"💼", color:"#0077b5", agentName:"Sara",    description:"Followers · Post engagement",  envKeys:["VITE_LINKEDIN_ACCESS_TOKEN","VITE_LINKEDIN_ORG_ID"] },
+  { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
+  { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan",  description:"Ad spend · CPL · ROAS",        envKeys:["VITE_META_ACCESS_TOKEN","VITE_META_AD_ACCOUNT_ID"], setupGuide:true },
+  { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
 ];
 
-function StatusBadge({ connected, comingSoon }) {
-  if (comingSoon) return (
-    <span style={{ fontSize:9,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:"#7a90b0",background:"#1e2d45",padding:"2px 8px",borderRadius:10 }}>
-      Coming Soon
-    </span>
-  );
+// ── SHARED ────────────────────────────────────────────────────────────────────
+function SectionLabel({ children }) {
+  return <div style={{ fontSize:10,color:"var(--text-dim)",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10 }}>{children}</div>;
+}
+
+function StatBox({ label, value, color }) {
   return (
-    <span style={{ fontSize:9,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:connected?"#4ade80":"#f87171",background:connected?"#4ade8018":"#f8717118",padding:"2px 8px",borderRadius:10 }}>
-      {connected ? "● Connected" : "○ Not connected"}
-    </span>
+    <div style={{ background:"var(--bg-base)",borderRadius:8,padding:"10px 12px",border:"1px solid var(--border)" }}>
+      <div style={{ fontSize:9,color:"var(--text-dim)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4 }}>{label}</div>
+      <div style={{ fontSize:18,fontWeight:700,color:color||"var(--text)" }}>{value}</div>
+    </div>
   );
 }
 
-function HubSpotPanel({ connected }) {
-  const [data, setData]       = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm]       = useState({ firstName:"", lastName:"", email:"", company:"", notes:"" });
-  const [pushing, setPushing] = useState(false);
-  const [pushResult, setPushResult] = useState(null);
-
-  const load = async () => {
-    setLoading(true);
-    const result = await fetchHubSpotPipeline();
-    setData(result);
-    setLoading(false);
-  };
-
-  useEffect(() => { if (connected) load(); }, [connected]);
-
-  const handlePush = async () => {
-    if (!form.email) return;
-    setPushing(true);
-    const result = await pushContactToHubSpot(form);
-    setPushResult(result);
-    setPushing(false);
-    if (result.success) setForm({ firstName:"", lastName:"", email:"", company:"", notes:"" });
-    setTimeout(() => setPushResult(null), 4000);
-  };
-
-  if (!connected) return (
-    <div style={{ padding:"14px 0",fontSize:12,color:"var(--text-dim)",lineHeight:1.7 }}>
-      Add <code style={{ background:"var(--bg-base)",padding:"2px 6px",borderRadius:4,fontSize:11 }}>VITE_HUBSPOT_API_KEY</code> to Vercel environment variables to connect.
-      <br/>
-      <a href="https://app.hubspot.com/api-key" target="_blank" rel="noreferrer" style={{ color:"#ff7a59",fontSize:11 }}>Get your HubSpot API key →</a>
-    </div>
-  );
-
+function SetupStep({ step, done }) {
   return (
-    <div>
-      {/* Live pipeline data */}
-      <div style={{ marginBottom:16 }}>
-        <div style={{ fontSize:10,color:"var(--text-dim)",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10 }}>
-          Live Pipeline
-          <button onClick={load} style={{ marginLeft:10,background:"none",border:"none",color:"#ff7a59",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
-        </div>
-        {loading ? (
-          <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading from HubSpot...</div>
-        ) : data?.error ? (
-          <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
-        ) : data ? (
-          <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10 }}>
-            {[
-              { label:"Total Contacts", value:data.totalContacts?.toLocaleString() || "—" },
-              { label:"Open Deals",     value:data.openDeals || "—" },
-              { label:"Total Deals",    value:data.totalDeals || "—" },
-              { label:"Deals Won",      value:data.wonDeals || "—" },
-            ].map(s => (
-              <div key={s.label} style={{ background:"var(--bg-base)",borderRadius:8,padding:"10px 12px",border:"1px solid var(--border)" }}>
-                <div style={{ fontSize:9,color:"var(--text-dim)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4 }}>{s.label}</div>
-                <div style={{ fontSize:18,fontWeight:700,color:"#ff7a59" }}>{s.value}</div>
-              </div>
-            ))}
-          </div>
-        ) : null}
+    <div style={{ display:"flex",gap:12,padding:"12px 0",borderBottom:"1px solid var(--border)" }}>
+      <div style={{ width:24,height:24,borderRadius:"50%",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,background:done?"#4ade8018":"var(--bg-base)",border:`1px solid ${done?"#4ade80":"var(--border)"}`,color:done?"#4ade80":"var(--text-dim)" }}>
+        {done?"✓":step.step}
       </div>
-
-      {/* Push new contact */}
       <div>
-        <div style={{ fontSize:10,color:"var(--text-dim)",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10 }}>
-          Push New Lead to HubSpot
-        </div>
-        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8 }}>
-          {[
-            { key:"firstName", placeholder:"First name" },
-            { key:"lastName",  placeholder:"Last name"  },
-            { key:"email",     placeholder:"Email *"    },
-            { key:"company",   placeholder:"Company"    },
-          ].map(f => (
-            <input key={f.key} value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))}
-              placeholder={f.placeholder}
-              style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none" }}
-              onFocus={e=>e.target.style.borderColor="#ff7a59"}
-              onBlur={e=>e.target.style.borderColor="var(--border)"}
-            />
-          ))}
-        </div>
-        <input value={form.notes} onChange={e=>setForm(p=>({...p,notes:e.target.value}))}
-          placeholder="Notes (optional)"
-          style={{ width:"100%",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",marginBottom:8 }}
-          onFocus={e=>e.target.style.borderColor="#ff7a59"}
-          onBlur={e=>e.target.style.borderColor="var(--border)"}
-        />
-        <div style={{ display:"flex",gap:10,alignItems:"center" }}>
-          <button onClick={handlePush} disabled={!form.email||pushing} style={{
-            background:!form.email||pushing?"transparent":"#ff7a59",
-            color:!form.email||pushing?"#ff7a59":"#000",
-            border:"1px solid #ff7a59",borderRadius:7,padding:"8px 20px",
-            fontSize:10,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",
-            cursor:!form.email||pushing?"not-allowed":"pointer",fontFamily:"var(--font-mono)",
-          }}>
-            {pushing?"Pushing...":"Push to HubSpot"}
-          </button>
-          {pushResult?.success && <span style={{ fontSize:11,color:"#4ade80" }}>✓ Contact created in HubSpot</span>}
-          {pushResult?.error   && <span style={{ fontSize:11,color:"#f87171" }}>⚠ {pushResult.error}</span>}
-        </div>
+        <div style={{ fontSize:12,fontWeight:600,color:done?"#4ade80":"var(--text)",marginBottom:3 }}>{step.title}</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.6 }}>{step.detail}</div>
       </div>
     </div>
   );
 }
 
-function MailerLitePanel({ connected }) {
-  const [data, setData]       = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [draft, setDraft]     = useState({ subject:"", content:"" });
-  const [pushing, setPushing] = useState(false);
-  const [pushResult, setPushResult] = useState(null);
-
-  const load = async () => {
-    setLoading(true);
-    const result = await fetchMailerLiteStats();
-    setData(result);
-    setLoading(false);
-  };
-
-  useEffect(() => { if (connected) load(); }, [connected]);
-
-  const handlePush = async () => {
-    if (!draft.subject) return;
-    setPushing(true);
-    const result = await createMailerLiteDraft(draft);
-    setPushResult(result);
-    setPushing(false);
-    setTimeout(() => setPushResult(null), 5000);
-  };
-
-  if (!connected) return (
-    <div style={{ padding:"14px 0",fontSize:12,color:"var(--text-dim)",lineHeight:1.7 }}>
-      Add <code style={{ background:"var(--bg-base)",padding:"2px 6px",borderRadius:4,fontSize:11 }}>VITE_MAILERLITE_API_KEY</code> to Vercel environment variables to connect.
-      <br/>
-      <a href="https://app.mailerlite.com/integrations/api" target="_blank" rel="noreferrer" style={{ color:"#09c269",fontSize:11 }}>Get your MailerLite API key →</a>
-    </div>
-  );
-
+function NotConnectedMsg({ envKeys, docsHint }) {
   return (
-    <div>
-      {/* Live stats */}
-      <div style={{ marginBottom:16 }}>
-        <div style={{ fontSize:10,color:"var(--text-dim)",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10 }}>
-          Live Stats
-          <button onClick={load} style={{ marginLeft:10,background:"none",border:"none",color:"#09c269",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
-        </div>
-        {loading ? (
-          <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading from MailerLite...</div>
-        ) : data?.error ? (
-          <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
-        ) : data ? (
-          <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:12 }}>
-            {[
-              { label:"Subscribers",   value:data.totalSubscribers?.toLocaleString() || "—" },
-              { label:"Last Open Rate",value:data.openRate  || "—" },
-              { label:"Last CTR",      value:data.clickRate || "—" },
-            ].map(s => (
-              <div key={s.label} style={{ background:"var(--bg-base)",borderRadius:8,padding:"10px 12px",border:"1px solid var(--border)" }}>
-                <div style={{ fontSize:9,color:"var(--text-dim)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4 }}>{s.label}</div>
-                <div style={{ fontSize:18,fontWeight:700,color:"#09c269" }}>{s.value}</div>
-              </div>
-            ))}
-          </div>
-        ) : null}
-        {data?.lastCampaignName && (
-          <div style={{ fontSize:11,color:"var(--text-dim)" }}>Last campaign: <span style={{ color:"var(--text-mid)" }}>{data.lastCampaignName}</span></div>
-        )}
-      </div>
-
-      {/* Push newsletter draft */}
-      <div>
-        <div style={{ fontSize:10,color:"var(--text-dim)",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10 }}>
-          Push Newsletter Draft to MailerLite
-        </div>
-        <input value={draft.subject} onChange={e=>setDraft(p=>({...p,subject:e.target.value}))}
-          placeholder="Email subject line *"
-          style={{ width:"100%",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",marginBottom:8 }}
-          onFocus={e=>e.target.style.borderColor="#09c269"}
-          onBlur={e=>e.target.style.borderColor="var(--border)"}
-        />
-        <textarea value={draft.content} onChange={e=>setDraft(p=>({...p,content:e.target.value}))}
-          placeholder="Email content (paste Nadia's newsletter draft here)"
-          rows={4}
-          style={{ width:"100%",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",resize:"vertical",lineHeight:1.6,marginBottom:8 }}
-          onFocus={e=>e.target.style.borderColor="#09c269"}
-          onBlur={e=>e.target.style.borderColor="var(--border)"}
-        />
-        <div style={{ display:"flex",gap:10,alignItems:"center",flexWrap:"wrap" }}>
-          <button onClick={handlePush} disabled={!draft.subject||pushing} style={{
-            background:!draft.subject||pushing?"transparent":"#09c269",
-            color:!draft.subject||pushing?"#09c269":"#000",
-            border:"1px solid #09c269",borderRadius:7,padding:"8px 20px",
-            fontSize:10,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",
-            cursor:!draft.subject||pushing?"not-allowed":"pointer",fontFamily:"var(--font-mono)",
-          }}>
-            {pushing?"Creating draft...":"Create Draft in MailerLite"}
-          </button>
-          {pushResult?.success && (
-            <span style={{ fontSize:11,color:"#4ade80" }}>
-              ✓ Draft created!
-              {pushResult.url && <a href={pushResult.url} target="_blank" rel="noreferrer" style={{ color:"#09c269",marginLeft:6 }}>Open in MailerLite →</a>}
-            </span>
-          )}
-          {pushResult?.error && <span style={{ fontSize:11,color:"#f87171" }}>⚠ {pushResult.error}</span>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ComingSoonPanel({ integration }) {
-  return (
-    <div style={{ padding:"16px 0" }}>
+    <div style={{ padding:"14px 0" }}>
       <div style={{ fontSize:12,color:"var(--text-dim)",lineHeight:1.8,marginBottom:12 }}>
-        {integration.description} will be available once connected.
+        Add these environment variables to Vercel to connect:
       </div>
-      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 16px" }}>
-        <div style={{ fontSize:10,color:"var(--text-dim)",letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:6 }}>
-          To connect
+      {envKeys.map(k => (
+        <div key={k} style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 14px",fontFamily:"var(--font-mono)",fontSize:12,color:"var(--text)",marginBottom:6 }}>
+          {k}
         </div>
-        <div style={{ fontSize:11,color:"var(--text-mid)",lineHeight:1.8 }}>
-          1. Get your API key from <a href={integration.docsUrl} target="_blank" rel="noreferrer" style={{ color:integration.color }}>
-            {integration.name} →
-          </a><br/>
-          2. Add <code style={{ background:"var(--bg-card)",padding:"2px 6px",borderRadius:4 }}>{integration.envKey}</code> to Vercel Environment Variables<br/>
-          3. Redeploy — the integration activates automatically
+      ))}
+      {docsHint && <div style={{ fontSize:11,color:"var(--text-dim)",marginTop:8,lineHeight:1.6 }}>{docsHint}</div>}
+    </div>
+  );
+}
+
+// ── HUBSPOT PANEL ─────────────────────────────────────────────────────────────
+function HubSpotPanel({ connected }) {
+  const [data,setData]             = useState(null);
+  const [loading,setLoading]       = useState(false);
+  const [form,setForm]             = useState({ firstName:"",lastName:"",email:"",company:"",notes:"" });
+  const [pushing,setPushing]       = useState(false);
+  const [pushResult,setPushResult] = useState(null);
+
+  const load = async () => { setLoading(true); setData(await fetchHubSpotPipeline()); setLoading(false); };
+  useEffect(() => { if(connected) load(); },[connected]);
+
+  const handlePush = async () => {
+    if(!form.email) return;
+    setPushing(true);
+    const r = await pushContactToHubSpot(form);
+    setPushResult(r);
+    setPushing(false);
+    if(r.success) setForm({ firstName:"",lastName:"",email:"",company:"",notes:"" });
+    setTimeout(()=>setPushResult(null),4000);
+  };
+
+  if(!connected) return <NotConnectedMsg envKeys={["VITE_HUBSPOT_API_KEY"]} docsHint="Get your key: HubSpot → Settings → Integrations → Private Apps"/>;
+
+  return (
+    <div>
+      <SectionLabel>Live Pipeline <button onClick={load} style={{ background:"none",border:"none",color:"#ff7a59",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button></SectionLabel>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)",marginBottom:16 }}>Loading from HubSpot...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171",marginBottom:16 }}>⚠ {data.error}</div>
+      : data ? (
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10,marginBottom:20 }}>
+          <StatBox label="Total Contacts" value={data.totalContacts?.toLocaleString()||"—"} color="#ff7a59"/>
+          <StatBox label="Open Deals"     value={data.openDeals||"—"}                       color="#ff7a59"/>
+          <StatBox label="Total Deals"    value={data.totalDeals||"—"}                       color="var(--text)"/>
+          <StatBox label="Deals Won"      value={data.wonDeals||"—"}                         color="#4ade80"/>
+        </div>
+      ) : null}
+
+      <SectionLabel>Push New Lead to HubSpot</SectionLabel>
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8 }}>
+        {[["firstName","First name"],["lastName","Last name"],["email","Email *"],["company","Company"]].map(([k,p])=>(
+          <input key={k} value={form[k]} onChange={e=>setForm(v=>({...v,[k]:e.target.value}))} placeholder={p}
+            style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none" }}
+            onFocus={e=>e.target.style.borderColor="#ff7a59"} onBlur={e=>e.target.style.borderColor="var(--border)"}/>
+        ))}
+      </div>
+      <input value={form.notes} onChange={e=>setForm(v=>({...v,notes:e.target.value}))} placeholder="Notes (optional)"
+        style={{ width:"100%",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",marginBottom:10 }}
+        onFocus={e=>e.target.style.borderColor="#ff7a59"} onBlur={e=>e.target.style.borderColor="var(--border)"}/>
+      <div style={{ display:"flex",gap:10,alignItems:"center" }}>
+        <button onClick={handlePush} disabled={!form.email||pushing} style={{ background:!form.email||pushing?"transparent":"#ff7a59",color:!form.email||pushing?"#ff7a59":"#000",border:"1px solid #ff7a59",borderRadius:7,padding:"8px 20px",fontSize:10,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",cursor:!form.email||pushing?"not-allowed":"pointer",fontFamily:"var(--font-mono)" }}>
+          {pushing?"Pushing...":"Push to HubSpot"}
+        </button>
+        {pushResult?.success && <span style={{ fontSize:11,color:"#4ade80" }}>✓ Created in HubSpot</span>}
+        {pushResult?.error   && <span style={{ fontSize:11,color:"#f87171" }}>⚠ {pushResult.error}</span>}
+      </div>
+    </div>
+  );
+}
+
+// ── MAILERLITE PANEL ──────────────────────────────────────────────────────────
+function MailerLitePanel({ connected }) {
+  const [data,setData]             = useState(null);
+  const [loading,setLoading]       = useState(false);
+  const [draft,setDraft]           = useState({ subject:"",content:"" });
+  const [pushing,setPushing]       = useState(false);
+  const [pushResult,setPushResult] = useState(null);
+
+  const load = async () => { setLoading(true); setData(await fetchMailerLiteStats()); setLoading(false); };
+  useEffect(() => { if(connected) load(); },[connected]);
+
+  const handlePush = async () => {
+    if(!draft.subject) return;
+    setPushing(true);
+    const r = await createMailerLiteDraft(draft);
+    setPushResult(r);
+    setPushing(false);
+    setTimeout(()=>setPushResult(null),5000);
+  };
+
+  if(!connected) return <NotConnectedMsg envKeys={["VITE_MAILERLITE_API_KEY"]} docsHint="Get your key: MailerLite → Integrations → API"/>;
+
+  return (
+    <div>
+      <SectionLabel>Live Stats <button onClick={load} style={{ background:"none",border:"none",color:"#09c269",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button></SectionLabel>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)",marginBottom:16 }}>Loading from MailerLite...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171",marginBottom:16 }}>⚠ {data.error}</div>
+      : data ? (
+        <>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:data.lastCampaignName?8:20 }}>
+            <StatBox label="Subscribers"    value={data.totalSubscribers?.toLocaleString()||"—"} color="#09c269"/>
+            <StatBox label="Last Open Rate" value={data.openRate||"—"}                           color="#09c269"/>
+            <StatBox label="Last CTR"       value={data.clickRate||"—"}                          color="var(--text)"/>
+          </div>
+          {data.lastCampaignName && <div style={{ fontSize:11,color:"var(--text-dim)",marginBottom:16 }}>Last: <span style={{ color:"var(--text-mid)" }}>{data.lastCampaignName}</span></div>}
+        </>
+      ) : null}
+
+      <SectionLabel>Push Newsletter Draft</SectionLabel>
+      <input value={draft.subject} onChange={e=>setDraft(p=>({...p,subject:e.target.value}))} placeholder="Subject line *"
+        style={{ width:"100%",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",marginBottom:8 }}
+        onFocus={e=>e.target.style.borderColor="#09c269"} onBlur={e=>e.target.style.borderColor="var(--border)"}/>
+      <textarea value={draft.content} onChange={e=>setDraft(p=>({...p,content:e.target.value}))} placeholder="Paste Nadia's newsletter content here" rows={4}
+        style={{ width:"100%",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:7,padding:"8px 12px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",resize:"vertical",lineHeight:1.6,marginBottom:8 }}
+        onFocus={e=>e.target.style.borderColor="#09c269"} onBlur={e=>e.target.style.borderColor="var(--border)"}/>
+      <div style={{ display:"flex",gap:10,alignItems:"center",flexWrap:"wrap" }}>
+        <button onClick={handlePush} disabled={!draft.subject||pushing} style={{ background:!draft.subject||pushing?"transparent":"#09c269",color:!draft.subject||pushing?"#09c269":"#000",border:"1px solid #09c269",borderRadius:7,padding:"8px 20px",fontSize:10,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",cursor:!draft.subject||pushing?"not-allowed":"pointer",fontFamily:"var(--font-mono)" }}>
+          {pushing?"Creating...":"Create Draft in MailerLite"}
+        </button>
+        {pushResult?.success && <span style={{ fontSize:11,color:"#4ade80" }}>✓ Draft created! {pushResult.url&&<a href={pushResult.url} target="_blank" rel="noreferrer" style={{ color:"#09c269",marginLeft:4 }}>Open →</a>}</span>}
+        {pushResult?.error   && <span style={{ fontSize:11,color:"#f87171" }}>⚠ {pushResult.error}</span>}
+      </div>
+    </div>
+  );
+}
+
+// ── LINKEDIN PANEL ────────────────────────────────────────────────────────────
+function LinkedInPanel({ connected }) {
+  const [data,setData]     = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => { setLoading(true); setData(await fetchLinkedInStats()); setLoading(false); };
+  useEffect(() => { if(connected) load(); },[connected]);
+
+  if(!connected) return (
+    <div>
+      <NotConnectedMsg
+        envKeys={["VITE_LINKEDIN_ACCESS_TOKEN","VITE_LINKEDIN_ORG_ID"]}
+        docsHint="LinkedIn Developer Portal → Create App → Request r_organization_social + rw_organization_admin permissions. Your Org ID is in your LinkedIn company page URL."
+      />
+      <div style={{ background:"#0077b518",border:"1px solid #0077b544",borderRadius:8,padding:"12px 16px",marginTop:12 }}>
+        <div style={{ fontSize:11,color:"#0077b5",fontWeight:600,marginBottom:4 }}>📌 Note on LinkedIn API</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          LinkedIn's API requires a verified business app and approval for follower analytics. The process takes 1–5 business days. Apply at developers.linkedin.com.
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <SectionLabel>Live Stats <button onClick={load} style={{ background:"none",border:"none",color:"#0077b5",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button></SectionLabel>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading from LinkedIn...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
+      : data ? (
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10 }}>
+          <StatBox label="LinkedIn Followers" value={data.totalFollowers?.toLocaleString()||"—"} color="#0077b5"/>
+          <StatBox label="Recent Posts"       value={data.postsCount||"—"}                       color="var(--text)"/>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+// ── GA4 PANEL ─────────────────────────────────────────────────────────────────
+function GA4Panel() {
+  const setup = getGA4SetupSteps();
+  const completedSteps = setup.steps.filter(s=>s.done).length;
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
+        <SectionLabel>Setup Progress</SectionLabel>
+        <span style={{ fontSize:10,color:"#4285f4",fontWeight:700 }}>{completedSteps}/{setup.steps.length} steps done</span>
+      </div>
+      <div style={{ background:"var(--bg-base)",borderRadius:8,height:4,marginBottom:16,overflow:"hidden" }}>
+        <div style={{ width:`${(completedSteps/setup.steps.length)*100}%`,height:"100%",background:"#4285f4",borderRadius:4,transition:"width 0.8s ease" }}/>
+      </div>
+      {setup.steps.map(s=><SetupStep key={s.step} step={s} done={s.done}/>)}
+      <div style={{ marginTop:16,padding:"12px 16px",background:"#4285f418",border:"1px solid #4285f444",borderRadius:8 }}>
+        <div style={{ fontSize:11,color:"#4285f4",fontWeight:600,marginBottom:4 }}>Once connected, Zara will show:</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
+          • Live sessions, bounce rate, avg time on page<br/>
+          • Traffic sources (organic, social, paid, direct)<br/>
+          • Top pages on fifteenconsult.com<br/>
+          • Contact form conversion rate
         </div>
       </div>
     </div>
   );
 }
 
+// ── META PANEL ────────────────────────────────────────────────────────────────
+function MetaPanel() {
+  const setup = getMetaSetupSteps();
+  const completedSteps = setup.steps.filter(s=>s.done).length;
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
+        <SectionLabel>Setup Progress</SectionLabel>
+        <span style={{ fontSize:10,color:"#1877f2",fontWeight:700 }}>{completedSteps}/{setup.steps.length} steps done</span>
+      </div>
+      <div style={{ background:"var(--bg-base)",borderRadius:8,height:4,marginBottom:16,overflow:"hidden" }}>
+        <div style={{ width:`${(completedSteps/setup.steps.length)*100}%`,height:"100%",background:"#1877f2",borderRadius:4,transition:"width 0.8s ease" }}/>
+      </div>
+      {setup.steps.map(s=><SetupStep key={s.step} step={s} done={s.done}/>)}
+      <div style={{ marginTop:16,padding:"12px 16px",background:"#1877f218",border:"1px solid #1877f244",borderRadius:8 }}>
+        <div style={{ fontSize:11,color:"#1877f2",fontWeight:600,marginBottom:4 }}>Once ads are running, Hassan will see:</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
+          • Live ad spend per campaign<br/>
+          • Cost per lead (vs QAR 150 target)<br/>
+          • ROAS per campaign<br/>
+          • Audience performance breakdown
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MAKE PANEL ────────────────────────────────────────────────────────────────
+function MakePanel() {
+  return (
+    <div>
+      <SectionLabel>Automation Layer</SectionLabel>
+      <div style={{ fontSize:12,color:"var(--text-mid)",lineHeight:1.8,marginBottom:16 }}>
+        Make.com connects FifteenConsult's dashboard to any platform via webhooks — automating tasks agents recommend.
+      </div>
+      {[
+        { title:"Kwame books a call", action:"→ HubSpot deal created automatically + calendar invite sent" },
+        { title:"Nadia finishes a LinkedIn post", action:"→ Scheduled in Buffer/Hootsuite automatically" },
+        { title:"Hassan detects high CPL", action:"→ Slack alert + pause ad campaign in Meta" },
+        { title:"Zara's weekly report runs", action:"→ PDF emailed to you every Friday at 5pm" },
+        { title:"New contact in HubSpot", action:"→ Added to MailerLite segment automatically" },
+      ].map((w,i)=>(
+        <div key={i} style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",marginBottom:8 }}>
+          <div style={{ fontSize:12,fontWeight:600,color:"var(--text)",marginBottom:3 }}>{w.title}</div>
+          <div style={{ fontSize:11,color:"#6d00cc" }}>{w.action}</div>
+        </div>
+      ))}
+      <div style={{ marginTop:12,padding:"12px 16px",background:"#6d00cc18",border:"1px solid #6d00cc44",borderRadius:8 }}>
+        <div style={{ fontSize:11,color:"#6d00cc",lineHeight:1.7 }}>
+          Add <code style={{ background:"var(--bg-card)",padding:"2px 6px",borderRadius:4 }}>VITE_MAKE_WEBHOOK_URL</code> to Vercel to trigger Make scenarios from the dashboard. Get your webhook URL from Make → Scenarios → Webhooks.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MAIN PANEL ────────────────────────────────────────────────────────────────
 export default function IntegrationsPanel({ onClose }) {
   const [activeId, setActiveId] = useState("hubspot");
   const statuses = getConnectionStatuses();
-  const active   = INTEGRATIONS.find(i => i.id === activeId);
+  const active   = INTEGRATIONS.find(i=>i.id===activeId);
   const connected = statuses[activeId];
+  const connectedCount = Object.values(statuses).filter(Boolean).length;
 
   return (
-    <div style={{
-      position:"fixed",top:0,right:0,bottom:0,width:600,
-      background:"var(--bg-base)",borderLeft:"1px solid var(--border)",
-      display:"flex",flexDirection:"column",zIndex:300,
-      animation:"slideIn 0.25s ease",boxShadow:"-8px 0 32px rgba(0,0,0,0.4)",
-    }}>
+    <div style={{ position:"fixed",top:0,right:0,bottom:0,width:600,background:"var(--bg-base)",borderLeft:"1px solid var(--border)",display:"flex",flexDirection:"column",zIndex:300,animation:"slideIn 0.25s ease",boxShadow:"-8px 0 32px rgba(0,0,0,0.4)" }}>
       {/* Header */}
       <div style={{ padding:"20px 24px",borderBottom:"1px solid var(--border)",display:"flex",justifyContent:"space-between",alignItems:"flex-start" }}>
         <div>
-          <div style={{ fontSize:17,fontWeight:700,color:"var(--text)",marginBottom:6 }}>🔌 External Connections</div>
-          <div style={{ fontSize:11,color:"var(--text-dim)" }}>
-            {Object.values(statuses).filter(Boolean).length} of {INTEGRATIONS.length} connected
+          <div style={{ fontSize:17,fontWeight:700,color:"var(--text)",marginBottom:5 }}>🔌 External Connections</div>
+          <div style={{ display:"flex",gap:8 }}>
+            <span style={{ fontSize:10,color:"#4ade80",background:"#4ade8018",padding:"2px 10px",borderRadius:10,fontWeight:700 }}>{connectedCount} connected</span>
+            <span style={{ fontSize:10,color:"var(--text-dim)",background:"var(--bg-card)",padding:"2px 10px",borderRadius:10 }}>{INTEGRATIONS.length-connectedCount} pending</span>
           </div>
         </div>
         <button onClick={onClose} style={{ background:"none",border:"1px solid var(--border)",color:"var(--text-mid)",fontSize:18,width:32,height:32,borderRadius:8,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center" }}>×</button>
@@ -351,59 +322,55 @@ export default function IntegrationsPanel({ onClose }) {
 
       <div style={{ display:"flex",flex:1,overflow:"hidden" }}>
         {/* Integration list */}
-        <div style={{ width:180,borderRight:"1px solid var(--border)",overflowY:"auto",flexShrink:0 }}>
-          {INTEGRATIONS.map(intg => {
-            const isActive   = activeId === intg.id;
+        <div style={{ width:176,borderRight:"1px solid var(--border)",overflowY:"auto",flexShrink:0 }}>
+          {INTEGRATIONS.map(intg=>{
+            const isActive    = activeId===intg.id;
             const isConnected = statuses[intg.id];
             return (
-              <div key={intg.id} onClick={()=>setActiveId(intg.id)} style={{
-                padding:"14px 16px",cursor:"pointer",
-                borderLeft:isActive?`3px solid ${intg.color}`:"3px solid transparent",
-                background:isActive?intg.color+"12":"transparent",
-                borderBottom:"1px solid var(--border)",transition:"all 0.15s",
-              }}>
-                <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:4 }}>
-                  <span style={{ fontSize:16 }}>{intg.icon}</span>
-                  <span style={{ fontSize:12,fontWeight:isActive?600:400,color:isActive?intg.color:"var(--text-mid)" }}>
-                    {intg.name}
-                  </span>
+              <div key={intg.id} onClick={()=>setActiveId(intg.id)} style={{ padding:"13px 14px",cursor:"pointer",borderLeft:isActive?`3px solid ${intg.color}`:"3px solid transparent",background:isActive?intg.color+"12":"transparent",borderBottom:"1px solid var(--border)",transition:"all 0.15s" }}>
+                <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:3 }}>
+                  <span style={{ fontSize:15 }}>{intg.icon}</span>
+                  <span style={{ fontSize:11,fontWeight:isActive?600:400,color:isActive?intg.color:"var(--text-mid)",lineHeight:1.3 }}>{intg.name}</span>
                 </div>
-                <div style={{ display:"flex",alignItems:"center",gap:6 }}>
-                  <span style={{ width:6,height:6,borderRadius:"50%",background:intg.comingSoon?"var(--text-dim)":isConnected?"#4ade80":"#f87171",display:"inline-block" }}/>
-                  <span style={{ fontSize:9,color:"var(--text-dim)" }}>{intg.comingSoon?"soon":isConnected?"live":"not set"}</span>
+                <div style={{ display:"flex",alignItems:"center",gap:5,paddingLeft:23 }}>
+                  <span style={{ width:5,height:5,borderRadius:"50%",background:intg.setupGuide?"var(--text-dim)":isConnected?"#4ade80":"#f87171",display:"inline-block" }}/>
+                  <span style={{ fontSize:9,color:"var(--text-dim)" }}>{intg.setupGuide?"setup guide":isConnected?"● live":"not set"}</span>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Detail panel */}
-        <div style={{ flex:1,overflow:"auto",padding:"20px 24px" }}>
-          {active && (
+        {/* Detail */}
+        <div style={{ flex:1,overflow:"auto",padding:"20px 22px" }}>
+          {active&&(
             <>
-              <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
+              <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18 }}>
                 <div style={{ display:"flex",alignItems:"center",gap:12 }}>
-                  <span style={{ fontSize:24 }}>{active.icon}</span>
+                  <span style={{ fontSize:22 }}>{active.icon}</span>
                   <div>
-                    <div style={{ fontSize:15,fontWeight:700,color:"var(--text)" }}>{active.name}</div>
-                    <div style={{ fontSize:10,color:active.color,letterSpacing:"0.1em",textTransform:"uppercase",marginTop:2 }}>
-                      {active.agentName} · {active.description}
-                    </div>
+                    <div style={{ fontSize:14,fontWeight:700,color:"var(--text)" }}>{active.name}</div>
+                    <div style={{ fontSize:10,color:active.color,letterSpacing:"0.1em",textTransform:"uppercase",marginTop:2 }}>{active.agentName} · {active.description}</div>
                   </div>
                 </div>
-                <StatusBadge connected={connected} comingSoon={active.comingSoon}/>
+                <span style={{ fontSize:9,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",color:active.setupGuide?"var(--text-dim)":connected?"#4ade80":"#f87171",background:active.setupGuide?"var(--bg-card)":connected?"#4ade8018":"#f8717118",padding:"3px 10px",borderRadius:10 }}>
+                  {active.setupGuide?"Setup Guide":connected?"● Live":"Not connected"}
+                </span>
               </div>
 
               {activeId==="hubspot"    && <HubSpotPanel    connected={connected}/>}
               {activeId==="mailerlite" && <MailerLitePanel connected={connected}/>}
-              {active.comingSoon       && <ComingSoonPanel  integration={active}/>}
+              {activeId==="linkedin"   && <LinkedInPanel   connected={connected}/>}
+              {activeId==="ga4"        && <GA4Panel/>}
+              {activeId==="meta"       && <MetaPanel/>}
+              {activeId==="make"       && <MakePanel/>}
             </>
           )}
         </div>
       </div>
 
-      <div style={{ padding:"12px 24px",borderTop:"1px solid var(--border)",fontSize:10,color:"var(--text-dim)" }}>
-        All API keys stored securely as Vercel environment variables — never in code.
+      <div style={{ padding:"12px 22px",borderTop:"1px solid var(--border)",fontSize:10,color:"var(--text-dim)",lineHeight:1.6 }}>
+        API keys stored securely as Vercel environment variables — never in code. Redeploy after adding each key.
       </div>
     </div>
   );
