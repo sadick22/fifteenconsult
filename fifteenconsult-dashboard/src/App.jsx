@@ -5,6 +5,7 @@ import { getDateContext, buildBriefingTrigger } from "./lib/dateContext.js";
 import { evaluateAlerts } from "./lib/alerts.js";
 import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.jsx";
 import CustomPrompt from "./components/CustomPrompt.jsx";
+import CopyToolbar from "./components/CopyToolbar.jsx";
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
 const T = {
@@ -42,40 +43,39 @@ function pct(c,t){ return Math.min(100, Math.round((c/t)*100)); }
 
 // ── LIVE KPI DATA (maps team KPIs to alert engine format) ─────────────────────
 function buildKpiData(team) {
+  const KEY_MAP = {
+    "Posts/Week":           "postsPerWeek",
+    "Blog Drafts":          "blogDrafts",
+    "Newsletter":           "newsletterDrafts",
+    "Engagement Rate":      "engagementRate",
+    "Keywords Tracked":     "keywordsTracked",
+    "Domain Authority":     "domainAuthority",
+    "Organic Visits/Mo":    "organicVisits",
+    "Backlinks Built":      "backlinksBuilt",
+    "LinkedIn Followers":   "linkedinFollowers",
+    "Instagram Followers":  "instagramFollowers",
+    "Avg Engagement %":     "avgEngagement",
+    "Leads Researched/Wk":  "leadsResearched",
+    "Outreach Sent":        "outreachSent",
+    "Response Rate":        "responseRate",
+    "Meetings Booked":      "meetingsBooked",
+    "Design Assets/Wk":     "designAssets",
+    "Brand Consistency":    "brandConsistency",
+    "Proposals Designed":   "proposalsDesigned",
+    "Campaigns Active":     "campaignsActive",
+    "Cost Per Lead":        "costPerLead",
+    "Monthly Spend":        "monthlySpend",
+    "ROAS":                 "roas",
+    "Reports Delivered":    "reportsDelivered",
+    "Data Sources":         "dataSourcesConnected",
+    "Dashboard Updates":    "dashboardUpdates",
+    "Insights Actioned":    "insightsActioned",
+  };
   const data = {};
   team.forEach(m => {
     const kpiMap = {};
     m.kpis.forEach(k => {
-      // Map KPI labels to alert engine keys
-      const keyMap = {
-        "Posts/Week":          "postsPerWeek",
-        "Blog Drafts":         "blogDrafts",
-        "Newsletter":          "newsletterDrafts",
-        "Engagement Rate":     "engagementRate",
-        "Keywords Tracked":    "keywordsTracked",
-        "Domain Authority":    "domainAuthority",
-        "Organic Visits/Mo":   "organicVisits",
-        "Backlinks Built":     "backlinksBuilt",
-        "LinkedIn Followers":  "linkedinFollowers",
-        "Instagram Followers": "instagramFollowers",
-        "Posts/Week":          "postsPerWeek",
-        "Avg Engagement %":    "avgEngagement",
-        "Leads Researched/Wk": "leadsResearched",
-        "Outreach Sent":       "outreachSent",
-        "Response Rate":       "responseRate",
-        "Meetings Booked":     "meetingsBooked",
-        "Design Assets/Wk":    "designAssets",
-        "Brand Consistency":   "brandConsistency",
-        "Campaigns Active":    "campaignsActive",
-        "Cost Per Lead":       "costPerLead",
-        "Monthly Spend":       "monthlySpend",
-        "ROAS":                "roas",
-        "Reports Delivered":   "reportsDelivered",
-        "Data Sources":        "dataSourcesConnected",
-        "Dashboard Updates":   "dashboardUpdates",
-        "Insights Actioned":   "insightsActioned",
-      };
-      const key = keyMap[k.label];
+      const key = KEY_MAP[k.label];
       if (key) kpiMap[key] = k.current;
     });
     data[m.id] = kpiMap;
@@ -271,13 +271,8 @@ function HistoryPanel({ agentId, agentName, color, onClose, onRestore }) {
 }
 
 // ── OUTPUT LOG ────────────────────────────────────────────────────────────────
-function OutputLog({ output, color, isStreaming, onHistory }) {
-  const [copied,setCopied]=useState(false);
+function OutputLog({ agentId, output, color, isStreaming, onHistory }) {
   if(!output&&!isStreaming) return null;
-  const handleCopy=()=>{
-    if(!output?.text) return;
-    navigator.clipboard.writeText(output.text).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2000); });
-  };
   return (
     <div style={{ background:T.base,border:`1px solid ${T.border}`,borderLeft:`3px solid ${color}`,borderRadius:10,padding:"16px 20px",marginTop:20 }}>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10 }}>
@@ -287,7 +282,6 @@ function OutputLog({ output, color, isStreaming, onHistory }) {
         </div>
         <div style={{ display:"flex",gap:7,alignItems:"center" }}>
           {output&&<span style={{ fontSize:9,color:T.textDim }}>{output.timestamp}</span>}
-          {output?.text&&<button onClick={handleCopy} style={{ background:copied?color+"22":"transparent",border:`1px solid ${copied?color:T.border}`,color:copied?color:T.textMid,fontSize:9,fontWeight:600,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:6,cursor:"pointer",fontFamily:"var(--font-mono)",transition:"all 0.2s" }}>{copied?"✓ Copied":"Copy"}</button>}
           {onHistory&&<button onClick={onHistory} style={{ background:"transparent",border:`1px solid ${T.border}`,color:T.textMid,fontSize:9,fontWeight:600,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:6,cursor:"pointer",fontFamily:"var(--font-mono)" }}>History</button>}
         </div>
       </div>
@@ -295,6 +289,14 @@ function OutputLog({ output, color, isStreaming, onHistory }) {
         {output?.text||(isStreaming?"Initialising agent...":"")}
         {isStreaming&&<span style={{ color,animation:"pulse 0.8s infinite" }}>▌</span>}
       </pre>
+      {!isStreaming&&output?.text&&(
+        <CopyToolbar
+          agentId={agentId}
+          outputText={output.text}
+          color={color}
+          timestamp={output.timestamp}
+        />
+      )}
     </div>
   );
 }
@@ -394,7 +396,7 @@ function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleT
         </div>
       </div>
 
-      <OutputLog output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)}/>
+      <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)}/>
 
       <div style={{ background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:20,marginTop:16 }}>
         <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:12 }}>System Prompt</div>
@@ -458,9 +460,14 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
                   {!out&&streaming===m.id&&<span style={{ marginLeft:"auto",width:7,height:7,borderRadius:"50%",background:m.color,animation:"pulse 1s infinite",display:"inline-block" }}/>}
                 </div>
                 {out?(
-                  <pre style={{ fontSize:11,color:T.textMid,lineHeight:1.8,whiteSpace:"pre-wrap",fontFamily:"var(--font-mono)",padding:"13px 20px",margin:0,maxHeight:160,overflowY:"auto" }}>
+                  <>
+                  <div style={{ padding:"8px 20px 0",display:"flex",justifyContent:"flex-end",gap:8 }}>
+                    <button onClick={()=>navigator.clipboard.writeText(out.text)} style={{ background:"none",border:`1px solid ${T.border}`,color:T.textDim,fontSize:9,fontWeight:600,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:6,cursor:"pointer",fontFamily:"var(--font-mono)" }}>Copy Full</button>
+                  </div>
+                  <pre style={{ fontSize:11,color:T.textMid,lineHeight:1.8,whiteSpace:"pre-wrap",fontFamily:"var(--font-mono)",padding:"8px 20px 13px",margin:0,maxHeight:160,overflowY:"auto" }}>
                     {out.text.length>500?out.text.slice(0,500)+"\n\n[Open agent for full output →]":out.text}
                   </pre>
+                  </>
                 ):(
                   <div style={{ padding:"13px 20px",fontSize:11,color:T.textDim }}>No briefing yet</div>
                 )}
@@ -475,8 +482,12 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────────
 function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts }) {
-  const { red, amber } = { red: alerts.filter(a=>a.level==="red").length, amber: alerts.filter(a=>a.level==="amber").length };
-  const worstColor = red>0?"#f87171":amber>0?"#fbbf24":null;
+  const red   = alerts.filter(a=>a.level==="red").length;
+  const amber = alerts.filter(a=>a.level==="amber").length;
+  const green = alerts.filter(a=>a.level==="green").length;
+  const total = alerts.length;
+  const worstColor = red>0?"#f87171":amber>0?"#fbbf24":green>0?"#4ade80":"#60a5fa";
+  const showAlertsBtn = total > 0;
 
   return (
     <aside style={{ width:210,flexShrink:0,background:T.sidebar,borderRight:`1px solid ${T.border}`,display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0 }}>
@@ -500,7 +511,7 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
         })}
 
         {/* Alerts button */}
-        {worstColor&&(
+        {showAlertsBtn&&(
           <button onClick={onOpenAlerts} style={{ width:"100%",background:worstColor+"12",border:`1px solid ${worstColor}33`,borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:600,color:worstColor,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:4 }}>
             <span style={{ fontSize:14,animation:red>0?"pulse 1.5s infinite":"none" }}>🔔</span>
             <span style={{ flex:1 }}>Alerts</span>
