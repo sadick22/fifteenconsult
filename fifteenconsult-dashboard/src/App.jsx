@@ -7,6 +7,11 @@ import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.js
 import CustomPrompt from "./components/CustomPrompt.jsx";
 import CopyToolbar from "./components/CopyToolbar.jsx";
 import SchedulerPanel from "./components/SchedulerPanel.jsx";
+import AgentChat from "./components/AgentChat.jsx";
+import MorningBriefing from "./components/MorningBriefing.jsx";
+import WarRoom from "./components/WarRoom.jsx";
+import FifteenFramework from "./components/FifteenFramework.jsx";
+import NotificationCentre, { addNotification } from "./components/NotificationCentre.jsx";
 import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNextRun, formatNextRun, markRun } from "./lib/scheduler.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
@@ -405,6 +410,8 @@ function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleT
 
       <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)}/>
 
+      <AgentChat member={member} lastOutput={displayOutput}/>
+
       <div style={{ background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:20,marginTop:16 }}>
         <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:12 }}>System Prompt</div>
         <pre style={{ fontSize:10,color:T.textDim,lineHeight:1.8,whiteSpace:"pre-wrap",fontFamily:"var(--font-mono)",maxHeight:160,overflowY:"auto",background:T.base,padding:12,borderRadius:8 }}>{member.systemPrompt}</pre>
@@ -488,7 +495,7 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
 }
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────────
-function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount }) {
+function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount, onOpenMorning, onOpenNotifications, activeView }) {
   const red   = alerts.filter(a=>a.level==="red").length;
   const amber = alerts.filter(a=>a.level==="amber").length;
   const green = alerts.filter(a=>a.level==="green").length;
@@ -506,7 +513,7 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
       <nav style={{ padding:"12px 10px",flex:1,overflowY:"auto" }}>
         <div style={{ fontSize:9,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:5,padding:"0 8px" }}>Main Menu</div>
 
-        {[{id:"dashboard",label:"Dashboard",icon:"⊞"},{id:"summary",label:"Weekly Summary",icon:"📋"}].map(item=>{
+        {[{id:"dashboard",label:"Dashboard",icon:"⊞"},{id:"summary",label:"Weekly Summary",icon:"📋"},{id:"warroom",label:"War Room",icon:"🎯"},{id:"framework",label:"15 Framework",icon:"⬡"}].map(item=>{
           const active=activeTab===item.id&&!activeMember;
           return (
             <button key={item.id} onClick={()=>{setActiveTab(item.id);setActiveMember(null);}} style={{ width:"100%",background:active?T.gold+"18":"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:active?600:400,color:active?T.gold:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)" }}
@@ -518,6 +525,20 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
         })}
 
         {/* Alerts button */}
+        <button onClick={onOpenMorning} style={{ width:"100%",background:T.gold+"12",border:`1px solid ${T.gold}33`,borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:600,color:T.gold,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:8 }}
+          onMouseEnter={e=>e.currentTarget.style.background=T.gold+"22"}
+          onMouseLeave={e=>e.currentTarget.style.background=T.gold+"12"}>
+          <span style={{ fontSize:14 }}>☀️</span>
+          <span style={{ flex:1 }}>Morning Briefing</span>
+        </button>
+
+        <button onClick={onOpenNotifications} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:400,color:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:2 }}
+          onMouseEnter={e=>e.currentTarget.style.background=T.card}
+          onMouseLeave={e=>e.currentTarget.style.background="none"}>
+          <span style={{ fontSize:14 }}>🔔</span>
+          <span style={{ flex:1 }}>Notifications</span>
+        </button>
+
         <button onClick={onOpenScheduler} style={{ width:"100%",background:"none",border:"none",borderRadius:8,padding:"9px 10px",fontSize:12,fontWeight:400,color:T.textMid,display:"flex",alignItems:"center",gap:9,cursor:"pointer",transition:"all 0.15s",textAlign:"left",fontFamily:"var(--font-mono)",marginTop:2 }}
           onMouseEnter={e=>e.currentTarget.style.background=T.card}
           onMouseLeave={e=>e.currentTarget.style.background="none"}>
@@ -568,7 +589,10 @@ export default function App() {
   const [activeMember,setActiveMember] = useState(null);
   const [streaming,setStreaming]       = useState(null);
   const [showAlerts,setShowAlerts]     = useState(false);
-  const [showScheduler,setShowScheduler] = useState(false);
+  const [showScheduler,setShowScheduler]   = useState(false);
+  const [showNotifications,setShowNotifications] = useState(false);
+  const [showMorningBriefing,setShowMorningBriefing] = useState(false);
+  const [activeView,setActiveView]         = useState("dashboard"); // dashboard|warroom|framework
   const [schedules,setSchedules]       = useState(()=>loadSchedules());
   const [outputs,setOutputs]           = useState(stored.outputs||{});
   const [taskStates,setTaskStates]     = useState(()=>{
@@ -612,6 +636,9 @@ export default function App() {
       if(finalText&&!finalText.startsWith("⚠")) {
         const newHistory=pushHistory(member.id,{text:finalText,timestamp:t,customPrompt,weekNum:getDateContext().weekNum});
         setHistories(prev=>({...prev,[member.id]:newHistory}));
+        addNotification("briefing",`${member.name} briefing complete`,`${member.role} · ${t}`,member.id);
+      } else if(finalText.startsWith("⚠")) {
+        addNotification("error",`${member.name} briefing failed`,finalText.slice(0,80),member.id);
       }
     }
   },[streaming]);
@@ -656,13 +683,13 @@ export default function App() {
 
   return (
     <div style={{ display:"flex",minHeight:"100vh",background:T.base,color:T.text,fontFamily:"var(--font-mono)" }}>
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length}/>
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} activeMember={activeMember} setActiveMember={setActiveMember} streaming={streaming} histories={histories} alerts={alerts} onOpenAlerts={()=>setShowAlerts(true)} onOpenScheduler={()=>setShowScheduler(true)} scheduleActiveCount={Object.values(schedules).filter(s=>s.enabled&&s.frequency!=="disabled").length} onOpenMorning={()=>setShowMorningBriefing(true)} onOpenNotifications={()=>setShowNotifications(true)} activeView={activeView}/>
 
       <div style={{ flex:1,display:"flex",flexDirection:"column",overflow:"auto" }}>
         <header style={{ padding:"16px 26px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:T.base,position:"sticky",top:0,zIndex:50 }}>
           <div>
             <div style={{ fontSize:19,fontWeight:700,color:T.text,fontFamily:"var(--font-display)",marginBottom:8 }}>
-              {activeMember?activeMember.name:activeTab==="dashboard"?"Dashboard":"Weekly Summary"}
+              {activeMember?activeMember.name:activeView==="warroom"?"War Room":activeView==="framework"?"The Fifteen Framework":activeTab==="dashboard"?"Dashboard":"Weekly Summary"}
             </div>
             <DateBadge/>
           </div>
@@ -674,7 +701,7 @@ export default function App() {
               <span style={{ fontSize:10,color:T.textMid }}>Schedule</span>
             </button>
             <AlertBadge alerts={alerts} onClick={()=>setShowAlerts(true)}/>
-            {!activeMember&&(
+            {!activeMember&&activeView==="dashboard"&&(
               <button onClick={runAll} disabled={!!streaming} style={{ background:!!streaming?"transparent":T.gold,color:!!streaming?T.gold:"#000",border:`1px solid ${T.gold}`,padding:"9px 18px",fontSize:10,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",cursor:!!streaming?"not-allowed":"pointer",borderRadius:8,fontFamily:"var(--font-mono)",transition:"all 0.2s" }}>
                 {!!streaming?`● ${TEAM.find(m=>m.id===streaming)?.name||"Running"}...`:"⚡ Run All Agents"}
               </button>
@@ -686,6 +713,19 @@ export default function App() {
         </header>
 
         <main style={{ padding:26,flex:1 }}>
+          {showMorningBriefing&&(
+            <MorningBriefing
+              outputs={outputs} alerts={alerts} taskStates={taskStates}
+              streaming={streaming} onRunAll={runAll}
+              onClose={()=>setShowMorningBriefing(false)}
+            />
+          )}
+          {showNotifications&&(
+            <NotificationCentre
+              onClose={()=>setShowNotifications(false)}
+              onAgentClick={(agentId)=>{ setActiveMember(TEAM.find(m=>m.id===agentId)); setShowNotifications(false); }}
+            />
+          )}
           {showAlerts&&(
             <AlertsPanel alerts={alerts} onClose={()=>setShowAlerts(false)} onAgentClick={(agentId)=>{ setActiveMember(TEAM.find(m=>m.id===agentId)); setShowAlerts(false); }}/>
           )}
@@ -731,6 +771,8 @@ export default function App() {
           )}
 
           {!activeMember&&activeTab==="summary"&&<WeeklySummary outputs={outputs} streaming={streaming} onRunAll={runAll} histories={histories} alerts={alerts}/>}
+          {!activeMember&&activeView==="warroom"&&<WarRoom alerts={alerts} taskStates={taskStates} outputs={outputs}/>}
+          {!activeMember&&activeView==="framework"&&<FifteenFramework/>}
         </main>
       </div>
     </div>
