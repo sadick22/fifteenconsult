@@ -3,9 +3,9 @@ import { getDateContext } from "../lib/dateContext.js";
 import { TEAM } from "../data/team.js";
 
 const T = {
-  base:"#0d1117", card:"#131d2e", border:"#1e2d45",
-  text:"#e8edf5", textMid:"#7a90b0", textDim:"#3d526b",
-  gold:"#C8A96E", green:"#4ade80", amber:"#fbbf24", red:"#f87171",
+  base:"var(--bg-base)", card:"var(--bg-card)", border:"var(--border)",
+  text:"var(--text)", textMid:"var(--text-mid)", textDim:"var(--text-dim)",
+  gold:"var(--gold)", green:"var(--green)", amber:"var(--amber)", red:"var(--red)",
 };
 
 const GCC_GREETINGS = [
