@@ -39,4 +39,3 @@ export const DARK = {
   amber:    "var(--amber)",
   blue:     "var(--blue)",
 };
-
