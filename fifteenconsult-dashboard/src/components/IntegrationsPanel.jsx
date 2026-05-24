@@ -15,7 +15,7 @@ const INTEGRATIONS = [
   { id:"mailerlite", name:"MailerLite",             icon:"💚", color:"#09c269", agentName:"Nadia",   description:"Subscribers · Push drafts",    envKeys:["VITE_MAILERLITE_API_KEY"] },
   { id:"linkedin",   name:"LinkedIn Pages",         icon:"💼", color:"#0077b5", agentName:"Sara",    description:"Followers · Post engagement",  envKeys:["VITE_LINKEDIN_ACCESS_TOKEN","VITE_LINKEDIN_ORG_ID"] },
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
-  { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan",  description:"Ad spend · CPL · ROAS",        envKeys:["VITE_META_ACCESS_TOKEN","VITE_META_AD_ACCOUNT_ID"], setupGuide:true },
+  { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
   { id:"instagram",  name:"Instagram",              icon:"📸", color:"#E1306C", agentName:"Sara",    description:"Followers · Engagement · Posts", envKeys:["INSTAGRAM_ACCESS_TOKEN","INSTAGRAM_ACCOUNT_ID"] },
   { id:"tiktok",     name:"TikTok Business",        icon:"🎵", color:"#69C9D0", agentName:"Sara/Malik", description:"Views · Engagement · Ads",    envKeys:["TIKTOK_ACCESS_TOKEN"] },
@@ -569,4 +569,3 @@ export default function IntegrationsPanel({ onClose }) {
     </div>
   );
 }
-
