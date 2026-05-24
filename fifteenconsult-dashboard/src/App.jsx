@@ -16,6 +16,8 @@ import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNex
 import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
 import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
+import DocumentLibrary from "./components/DocumentLibrary.jsx";
+import CompetitorIntel from "./components/CompetitorIntel.jsx";
 import { getConnectionStatuses } from "./lib/integrations.js";
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
@@ -422,6 +424,12 @@ function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleT
       <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)}/>
 
       <AgentChat member={member} lastOutput={displayOutput}/>
+      {member.id==="david"&&(
+        <>
+          <CompetitorIntel color={member.color}/>
+          <DocumentLibrary agentId={member.id} agentColor={member.color} agentName={member.name}/>
+        </>
+      )}
 
       <div style={{ background:T.card,border:`1px solid ${T.border}`,borderRadius:12,padding:20,marginTop:16 }}>
         <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:12 }}>System Prompt</div>
