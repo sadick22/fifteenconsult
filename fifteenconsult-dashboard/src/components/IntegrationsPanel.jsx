@@ -3,6 +3,8 @@ import {
   fetchHubSpotPipeline, pushContactToHubSpot,
   fetchMailerLiteStats, createMailerLiteDraft,
   fetchLinkedInStats, fetchGA4Stats,
+  fetchInstagramProfile, fetchInstagramPosts,
+  fetchTikTokInsights,
   getGA4SetupSteps, getMetaSetupSteps,
   getConnectionStatuses,
 } from "../lib/integrations.js";
@@ -14,6 +16,9 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan",  description:"Ad spend · CPL · ROAS",        envKeys:["VITE_META_ACCESS_TOKEN","VITE_META_AD_ACCOUNT_ID"], setupGuide:true },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"instagram",  name:"Instagram",              icon:"📸", color:"#E1306C", agentName:"Sara",    description:"Followers · Engagement · Posts", envKeys:["INSTAGRAM_ACCESS_TOKEN","INSTAGRAM_ACCOUNT_ID"] },
+  { id:"tiktok",     name:"TikTok Business",        icon:"🎵", color:"#69C9D0", agentName:"Sara/Malik", description:"Views · Engagement · Ads",    envKeys:["TIKTOK_ACCESS_TOKEN"] },
+  { id:"adadvisor",  name:"AdAdvisor",              icon:"🎯", color:"#FF6B35", agentName:"Hassan/Malik", description:"Meta Ads Intelligence",      envKeys:["VITE_ADADVISOR_CONNECTED"] },
 ];
 
 // ── SHARED ────────────────────────────────────────────────────────────────────
@@ -170,6 +175,144 @@ function MailerLitePanel({ connected }) {
         </button>
         {pushResult?.success && <span style={{ fontSize:11,color:"#4ade80" }}>✓ Draft created! {pushResult.url&&<a href={pushResult.url} target="_blank" rel="noreferrer" style={{ color:"#09c269",marginLeft:4 }}>Open →</a>}</span>}
         {pushResult?.error   && <span style={{ fontSize:11,color:"#f87171" }}>⚠ {pushResult.error}</span>}
+      </div>
+    </div>
+  );
+}
+
+// ── INSTAGRAM PANEL ──────────────────────────────────────────────────────────────
+function InstagramPanel({ connected }) {
+  const [profile,setProfile] = useState(null);
+  const [posts,setPosts]     = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    const [p,po] = await Promise.all([fetchInstagramProfile(), fetchInstagramPosts()]);
+    setProfile(p); setPosts(po);
+    setLoading(false);
+  };
+  useEffect(() => { if(connected) load(); },[connected]);
+
+  if(!connected) return (
+    <div>
+      <NotConnectedMsg
+        envKeys={["INSTAGRAM_ACCESS_TOKEN","INSTAGRAM_ACCOUNT_ID"]}
+        docsHint="Setup: developers.facebook.com → Create App → Instagram Graph API → Get long-lived token + Account ID"
+      />
+      <div style={{ background:"#E1306C18",border:"1px solid #E1306C44",borderRadius:8,padding:"12px 16px",marginTop:12 }}>
+        <div style={{ fontSize:11,color:"#E1306C",fontWeight:600,marginBottom:4 }}>📋 Quick Setup (10 minutes)</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
+          1. Go to developers.facebook.com → My Apps → Create App → Business<br/>
+          2. Add "Instagram Graph API" product<br/>
+          3. Connect your @fifteenconsult Instagram Business account<br/>
+          4. Generate a long-lived user access token<br/>
+          5. Get your Instagram Business Account ID from the API Explorer<br/>
+          6. Add both to Vercel as server-side env vars (no VITE_ prefix)
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <SectionLabel>Live Stats — @fifteenconsult
+        <button onClick={load} style={{ background:"none",border:"none",color:"#E1306C",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button>
+      </SectionLabel>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading from Instagram...</div>
+      : profile?.error ? <div style={{ fontSize:11,color:"#f87171" }}>⚠ {profile.error}</div>
+      : profile ? (
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:16 }}>
+          <StatBox label="Followers"  value={profile.followers?.toLocaleString()||"—"} color="#E1306C"/>
+          <StatBox label="Following"  value={profile.following?.toLocaleString()||"—"} color="var(--text)"/>
+          <StatBox label="Posts"      value={profile.posts?.toLocaleString()||"—"}     color="var(--text)"/>
+        </div>
+      ) : null}
+      {posts && !posts.error && (
+        <>
+          <SectionLabel>Recent Post Engagement</SectionLabel>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12 }}>
+            <StatBox label="Avg Engagement" value={posts.avgEngagement||"—"} color="#E1306C"/>
+            <StatBox label="Total Likes"    value={posts.totalLikes?.toLocaleString()||"—"} color="var(--text)"/>
+          </div>
+          {(posts.posts||[]).slice(0,3).map((p,i) => (
+            <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid var(--border)",fontSize:11 }}>
+              <span style={{ color:"var(--text-mid)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:"65%" }}>
+                {p.caption?.slice(0,50)||"[No caption]"}...
+              </span>
+              <span style={{ color:"#E1306C",fontWeight:600,flexShrink:0 }}>❤️ {p.like_count||0}</span>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── TIKTOK PANEL ──────────────────────────────────────────────────────────────
+function TikTokPanel({ connected }) {
+  const [data,setData]       = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => { setLoading(true); setData(await fetchTikTokInsights()); setLoading(false); };
+  useEffect(() => { if(connected) load(); },[connected]);
+
+  if(!connected) return (
+    <div>
+      <NotConnectedMsg
+        envKeys={["TIKTOK_ACCESS_TOKEN","TIKTOK_ADVERTISER_ID"]}
+        docsHint="Setup: business.tiktok.com → Developer Tools → App Management → Create App → Generate access token with analytics permissions"
+      />
+    </div>
+  );
+
+  return (
+    <div>
+      <SectionLabel>Live TikTok Business Stats (Last 30 days)
+        <button onClick={load} style={{ background:"none",border:"none",color:"#69C9D0",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button>
+      </SectionLabel>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading from TikTok...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
+      : data ? (
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:10 }}>
+          <StatBox label="Total Spend"       value={`$${data.totalSpend}`}                    color="#69C9D0"/>
+          <StatBox label="Impressions"       value={data.totalImpressions?.toLocaleString()||"—"} color="var(--text)"/>
+          <StatBox label="Clicks"            value={data.totalClicks?.toLocaleString()||"—"}  color="var(--text)"/>
+          <StatBox label="Avg CTR"           value={data.avgCTR||"—"}                         color="#69C9D0"/>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+// ── ADADVISOR PANEL ───────────────────────────────────────────────────────────
+function AdAdvisorPanel({ connected }) {
+  return (
+    <div>
+      <div style={{ padding:"14px 0" }}>
+        <div style={{ fontSize:12,color:"var(--text-mid)",lineHeight:1.8,marginBottom:16 }}>
+          AdAdvisor connects your Meta Ads account directly to AI — giving Hassan and Malik live campaign data, creative insights, and competitor ad intelligence.
+        </div>
+        <div style={{ background:"#FF6B3518",border:"1px solid #FF6B3544",borderRadius:8,padding:"14px 16px",marginBottom:12 }}>
+          <div style={{ fontSize:11,color:"#FF6B35",fontWeight:600,marginBottom:6 }}>✅ Your AdAdvisor account is connected</div>
+          <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
+            AdAdvisor MCP is active in your Claude account. Hassan and Malik can access live Meta campaign data, performance metrics, and ad creative analysis directly in their briefings.
+          </div>
+        </div>
+        <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+          <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What AdAdvisor gives your agents:</div>
+          {[
+            "Live Meta campaign performance (spend, ROAS, CPL, CTR)",
+            "Creative performance analysis — which ad formats are winning",
+            "Competitor ad library — what other brands in your space are running",
+            "Audience insights — who is engaging with your ads",
+            "Anomaly detection — alerts when performance drops",
+          ].map((item,i) => (
+            <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+              <span style={{ color:"#FF6B35" }}>→</span> {item}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -408,6 +551,9 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="hubspot"    && <HubSpotPanel    connected={connected}/>}
               {activeId==="mailerlite" && <MailerLitePanel connected={connected}/>}
               {activeId==="linkedin"   && <LinkedInPanel   connected={connected}/>}
+              {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
+              {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
+              {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
               {activeId==="ga4"        && <GA4Panel connected={connected}/>}
               {activeId==="meta"       && <MetaPanel/>}
               {activeId==="make"       && <MakePanel/>}
