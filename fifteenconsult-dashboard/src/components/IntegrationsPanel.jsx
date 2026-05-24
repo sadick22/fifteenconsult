@@ -433,29 +433,60 @@ function GA4Panel({ connected }) {
 }
 
 // ── META PANEL ────────────────────────────────────────────────────────────────
-function MetaPanel() {
-  const setup = getMetaSetupSteps();
-  const completedSteps = setup.steps.filter(s=>s.done).length;
+function MetaPanel({ connected }) {
+  const [perf,setPerf]       = useState(null);
+  const [anomalies,setAnom]  = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    const [p,a] = await Promise.all([fetchMetaAdsPerformance(), fetchMetaAdsAnomalies()]);
+    setPerf(p); setAnom(a);
+    setLoading(false);
+  };
+  useEffect(() => { if(connected) load(); },[connected]);
 
   return (
     <div>
-      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
-        <SectionLabel>Setup Progress</SectionLabel>
-        <span style={{ fontSize:10,color:"#1877f2",fontWeight:700 }}>{completedSteps}/{setup.steps.length} steps done</span>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+        <SectionLabel>Meta Ads — Official MCP</SectionLabel>
+        <button onClick={load} style={{ background:"none",border:"none",color:"#1877f2",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
       </div>
-      <div style={{ background:"var(--bg-base)",borderRadius:8,height:4,marginBottom:16,overflow:"hidden" }}>
-        <div style={{ width:`${(completedSteps/setup.steps.length)*100}%`,height:"100%",background:"#1877f2",borderRadius:4,transition:"width 0.8s ease" }}/>
+      <div style={{ background:"#1877f218",border:"1px solid #1877f244",borderRadius:8,padding:"10px 14px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#1877f2",fontWeight:600,marginBottom:3 }}>✅ Official Meta Ads MCP Connected</div>
+        <div style={{ fontSize:10,color:"var(--text-dim)" }}>Ad Account: 932655362719996 · 29 tools available · Pending account activation</div>
       </div>
-      {setup.steps.map(s=><SetupStep key={s.step} step={s} done={s.done}/>)}
-      <div style={{ marginTop:16,padding:"12px 16px",background:"#1877f218",border:"1px solid #1877f244",borderRadius:8 }}>
-        <div style={{ fontSize:11,color:"#1877f2",fontWeight:600,marginBottom:4 }}>Once ads are running, Hassan will see:</div>
-        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
-          • Live ad spend per campaign<br/>
-          • Cost per lead (vs QAR 150 target)<br/>
-          • ROAS per campaign<br/>
-          • Audience performance breakdown
+      {loading ? (
+        <div style={{ fontSize:12,color:"var(--text-dim)" }}>Checking Meta Ads status...</div>
+      ) : perf?.pending ? (
+        <div>
+          <div style={{ background:"#fbbf2418",border:"1px solid #fbbf2444",borderRadius:8,padding:"12px 16px",marginBottom:12 }}>
+            <div style={{ fontSize:11,color:"#fbbf24",fontWeight:600,marginBottom:4 }}>⏳ Pending Account Activation</div>
+            <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+              Meta is rolling out MCP access gradually. Your account is queued — this activates automatically, check back in a few days.
+            </div>
+          </div>
+          <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+            <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>Once activated, Hassan + Malik will see:</div>
+            {["Live spend, impressions, clicks, CTR per campaign","ROAS and CPL vs QAR 150 target","Performance anomaly detection","Industry benchmark comparison","Auction ranking analysis"].map((item,i) => (
+              <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+                <span style={{ color:"#1877f2" }}>→</span> {item}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : perf?.error ? (
+        <div style={{ fontSize:11,color:"#f87171" }}>⚠ {perf.error}</div>
+      ) : perf ? (
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10 }}>
+          <StatBox label="Ad Spend"    value={`$${perf.spend||"—"}`}                        color="#1877f2"/>
+          <StatBox label="ROAS"        value={perf.roas||"—"}                               color="#4ade80"/>
+          <StatBox label="CTR"         value={perf.ctr||"—"}                               color="var(--text)"/>
+          <StatBox label="Impressions" value={perf.impressions?.toLocaleString()||"—"}      color="var(--text)"/>
+          <StatBox label="Clicks"      value={perf.clicks?.toLocaleString()||"—"}           color="var(--text)"/>
+          <StatBox label="CPM"         value={`$${perf.cpm||"—"}`}                         color="var(--text)"/>
+        </div>
+      ) : null}
     </div>
   );
 }
