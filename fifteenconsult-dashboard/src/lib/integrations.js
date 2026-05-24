@@ -122,16 +122,94 @@ export async function createMailerLiteDraft({ subject, content }) {
   }
 }
 
+// ── INSTAGRAM ────────────────────────────────────────────────────────────────────
+
+export async function fetchInstagramProfile() {
+  try {
+    const r = await fetch("/api/instagram?action=profile");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return {
+      username:      d.username,
+      followers:     d.followers_count || 0,
+      following:     d.follows_count   || 0,
+      posts:         d.media_count     || 0,
+      connected:     true,
+    };
+  } catch (err) { return { error: err.message }; }
+}
+
+export async function fetchInstagramPosts() {
+  try {
+    const r = await fetch("/api/instagram?action=posts");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    const posts = (d.data || []).slice(0, 5);
+    const totalLikes    = posts.reduce((s,p) => s + (p.like_count||0), 0);
+    const totalComments = posts.reduce((s,p) => s + (p.comments_count||0), 0);
+    const avgEngagement = posts.length > 0
+      ? ((totalLikes + totalComments) / posts.length).toFixed(1)
+      : 0;
+    return { posts, avgEngagement, totalLikes, totalComments };
+  } catch (err) { return { error: err.message }; }
+}
+
+// ── TIKTOK ────────────────────────────────────────────────────────────────────
+
+export async function fetchTikTokInsights() {
+  try {
+    const r = await fetch("/api/tiktok?action=insights");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    const rows = d.list || [];
+    const totalSpend       = rows.reduce((s,r) => s + parseFloat(r.metrics?.spend||0), 0);
+    const totalImpressions = rows.reduce((s,r) => s + parseInt(r.metrics?.impressions||0), 0);
+    const totalClicks      = rows.reduce((s,r) => s + parseInt(r.metrics?.clicks||0), 0);
+    return {
+      totalSpend:       totalSpend.toFixed(2),
+      totalImpressions,
+      totalClicks,
+      avgCTR:           totalImpressions > 0
+        ? ((totalClicks/totalImpressions)*100).toFixed(2) + "%"
+        : "—",
+      connected: true,
+    };
+  } catch (err) { return { error: err.message }; }
+}
+
+// ── ADADVISOR ────────────────────────────────────────────────────────────────────
+
+export async function fetchAdAdvisorPerformance() {
+  try {
+    const r = await fetch("/api/adadvisor?action=performance");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
+export async function fetchAdAdvisorInsights() {
+  try {
+    const r = await fetch("/api/adadvisor?action=insights");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
 // ── CONNECTION STATUS ─────────────────────────────────────────────────────────
 
 export function getConnectionStatuses() {
   return {
-    hubspot:    true, // always available via /api/hubspot proxy (key is server-side)
+    hubspot:    true,
     mailerlite: !!import.meta.env.VITE_MAILERLITE_API_KEY,
     linkedin:   !!(import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN && import.meta.env.VITE_LINKEDIN_ORG_ID),
-    ga4:        !!import.meta.env.VITE_GA4_MEASUREMENT_ID, // proxy checks server-side keys
+    ga4:        !!import.meta.env.VITE_GA4_MEASUREMENT_ID,
     meta:       !!import.meta.env.VITE_META_ACCESS_TOKEN,
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
+    instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
+    tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
+    adadvisor:  !!import.meta.env.VITE_ADADVISOR_CONNECTED,
   };
 }
 
