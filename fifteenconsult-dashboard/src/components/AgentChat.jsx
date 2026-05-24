@@ -73,6 +73,20 @@ const SUGGESTED_QUESTIONS = {
     "Analyse the advertising landscape for real estate in GCC",
     "How should we approach Snapchat advertising for B2B in Qatar?",
   ],
+  david: [
+    "What are the top 3 business opportunities for FifteenConsult right now in GCC?",
+    "Analyse our competitive position against the top agencies in Qatar",
+    "Build a revenue model for FifteenConsult for next quarter",
+    "What West African market should we enter first and why?",
+    "Identify upsell opportunities across our 5 existing clients",
+  ],
+  sofia: [
+    "Give me my morning briefing — news, insights, and what I need to focus on today",
+    "What skills should I be developing as a marketing consultancy founder?",
+    "What are the most important trends in marketing and advertising right now?",
+    "Help me prepare for a client pitch meeting",
+    "Review my week — what went well and what should I improve?",
+  ],
   amani: [
     "Give me this morning's executive briefing",
     "Review the team's outputs from this week and flag any issues",
