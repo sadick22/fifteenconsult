@@ -177,6 +177,28 @@ export async function fetchTikTokInsights() {
   } catch (err) { return { error: err.message }; }
 }
 
+// ── META ADS (Official MCP) ──────────────────────────────────────────────────────
+
+export async function fetchMetaAdsPerformance() {
+  try {
+    const r = await fetch("/api/metaads?action=performance");
+    const d = await r.json();
+    if (d.pending) return { pending: true, message: d.message };
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
+export async function fetchMetaAdsAnomalies() {
+  try {
+    const r = await fetch("/api/metaads?action=anomalies");
+    const d = await r.json();
+    if (d.pending) return { pending: true, message: d.message };
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
 // ── ADADVISOR ────────────────────────────────────────────────────────────────────
 
 export async function fetchAdAdvisorPerformance() {
@@ -205,7 +227,7 @@ export function getConnectionStatuses() {
     mailerlite: !!import.meta.env.VITE_MAILERLITE_API_KEY,
     linkedin:   !!(import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN && import.meta.env.VITE_LINKEDIN_ORG_ID),
     ga4:        !!import.meta.env.VITE_GA4_MEASUREMENT_ID,
-    meta:       !!import.meta.env.VITE_META_ACCESS_TOKEN,
+    meta:       true, // Connected via official Meta MCP — pending account activation
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
     tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
