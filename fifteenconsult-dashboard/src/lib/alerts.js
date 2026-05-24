@@ -165,7 +165,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
     });
   }
 
-  if ((tariq.backlinksBuilt || 0) < 2 && isEndOfWeek) {
+  if ((tariq.backlinksBuilt || 0) < 2) {
     alerts.push({
       id: "no_backlinks",
       level: ALERT.AMBER,
@@ -284,8 +284,8 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
   }
 
   // ── BRIEFING FRESHNESS ────────────────────────────────────────────────────
-  const agentsWithoutBriefing = Object.keys(outputs).length;
-  if (agentsWithoutBriefing === 0 && isEndOfWeek) {
+  const briefingsRun = Object.keys(outputs).length;
+  if (briefingsRun === 0) {
     alerts.push({
       id: "no_briefings",
       level: ALERT.AMBER,
@@ -325,6 +325,24 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
     });
   }
 
+  // Malik — no active campaigns
+  const malikMember = kpiData.malik;
+  if (!malikMember || (malikMember.activeCampaigns || 0) === 0) {
+    alerts.push({ id:"malik-no-campaigns", agent:"malik", level:ALERT.AMBER, emoji:"📢",
+      title:"No active ad campaigns",
+      detail:"FifteenConsult has no paid campaigns running across GCC or West Africa.",
+      action:"Ask Malik to build a starter campaign plan for LinkedIn lead generation." });
+  }
+
+  // Amani — no brief sent
+  const amaniMember = kpiData.amani;
+  if (!amaniMember || (amaniMember.weeklyBriefsSent || 0) === 0) {
+    alerts.push({ id:"amani-no-brief", agent:"amani", level:ALERT.AMBER, emoji:"👑",
+      title:"No CMO brief this week",
+      detail:"Amani hasn't produced a consolidated executive brief yet this week.",
+      action:"Activate Amani for your morning CMO briefing — she reviews all 8 agents." });
+  }
+
   // Sort: RED first, then AMBER, then GREEN, then BLUE
   const order = { red:0, amber:1, green:2, blue:3 };
   return alerts.sort((a,b) => order[a.level] - order[b.level]);
@@ -333,6 +351,9 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
 /**
  * Get a summary count of alerts by level.
  */
+// ── MALIK + AMANI alerts injected into evaluateAlerts ──────────────────────────
+// These are checked inline with the main team data
+
 export function getAlertSummary(alerts) {
   return {
     red:   alerts.filter(a=>a.level===ALERT.RED).length,
