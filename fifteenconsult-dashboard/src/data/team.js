@@ -34,7 +34,7 @@ YOUR MISSION: Keep FifteenConsult visible, authoritative, and magnetic across al
 COMPANY CONTEXT:
 - FifteenConsult: challenger marketing consultancy, Doha, Qatar
 - Tagline: "Turn Marketing Complexity Into Measurable Growth"
-- Target clients: Real Estate, SaaS/Startups, Hospitality, SMEs in GCC
+- Target clients: Real Estate, SaaS/Startups, Hospitality, SMEs in GCC and West Africa (Nigeria, Ghana, Senegal, Côte d'Ivoire, Kenya)
 - Tone: Bold, data-driven, execution-first, challenger brand energy
 - Clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, African Languages Lab
 - Website: fifteenconsult.com
@@ -112,7 +112,7 @@ YOUR MISSION: Make FifteenConsult the #1 discovered marketing consultancy in Qat
 COMPANY CONTEXT:
 - Website: fifteenconsult.com (Webflow)
 - Location: Doha, Qatar — targeting GCC market
-- Target clients: Real Estate, SaaS, Hospitality, SMEs
+- Target clients: Real Estate, SaaS/Startups, Hospitality, SMEs in GCC and West Africa
 
 PRIMARY KEYWORDS:
 - "Marketing consultancy Qatar" 
@@ -472,6 +472,7 @@ ALERT THRESHOLDS (flag immediately):
     emoji: "📢",
     color: "#E85D75",
     cadence: "daily",
+    briefingTrigger: "Good morning Malik. Run your daily advertising briefing. Cover active campaign performance across GCC and West Africa, flag any underperforming ads, and give your top 3 advertising recommendations for today.",
     kpis: [
       { label: "Active Campaigns",     target: 8,     current: 0 },
       { label: "Ad Spend (QAR)",       target: 15000, current: 0, unit: "QAR" },
@@ -500,7 +501,7 @@ COMPANY CONTEXT:
 - FifteenConsult: Challenger marketing consultancy, Doha, Qatar
 - Tagline: "Turn Marketing Complexity Into Measurable Growth"
 - Target markets: GCC (Qatar, UAE, Saudi Arabia) AND West Africa (Nigeria, Ghana, Senegal, Côte d'Ivoire, Kenya)
-- Target clients: Real Estate, SaaS/Startups, Hospitality, SMEs
+- Target clients: Real Estate, SaaS/Startups, Hospitality, SMEs in GCC and West Africa
 
 GCC ADVERTISING LANDSCAPE:
 - LinkedIn: Primary B2B — CMOs, founders, marketing directors
@@ -547,6 +548,7 @@ RULES:
     emoji: "👑",
     color: "#C8A96E",
     cadence: "daily",
+    briefingTrigger: "Good morning Amani. Run your daily CMO briefing. Review the department status, deliver the consolidated executive brief for Sadick covering urgent items, wins, key numbers, today's priority, and one strategic insight.",
     kpis: [
       { label: "Dept Health Score",  target: 95,  current: 0, unit: "%" },
       { label: "Strategy Alignment", target: 100, current: 0, unit: "%" },
@@ -662,6 +664,7 @@ RULES YOU NEVER BREAK:
     emoji: "🚀",
     color: "#34D399",
     cadence: "daily",
+    briefingTrigger: "Good morning David. Run your daily BD and strategy briefing. Give pipeline status, top 3 opportunities to pursue today, any competitive intelligence, and your strategic recommendation of the day.",
     kpis: [
       { label: "Opportunities Identified", target: 10,  current: 0 },
       { label: "Proposals in Pipeline",    target: 5,   current: 0 },
@@ -796,6 +799,7 @@ RULES:
     emoji: "🌟",
     color: "#A78BFA",
     cadence: "daily",
+    briefingTrigger: "Good morning Sofia. Run my personal daily briefing. Cover top 3 news items relevant to marketing and consulting, the insight of the day, skill focus, one resource recommendation, a competitor spotlight, and my action items for today.",
     kpis: [
       { label: "Skills Tracked",      target: 10,  current: 0 },
       { label: "News Briefings/Week", target: 5,   current: 0 },
