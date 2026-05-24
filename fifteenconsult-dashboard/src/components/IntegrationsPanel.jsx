@@ -5,6 +5,7 @@ import {
   fetchLinkedInStats, fetchGA4Stats,
   fetchInstagramProfile, fetchInstagramPosts,
   fetchTikTokInsights,
+  fetchMetaAdsPerformance, fetchMetaAdsAnomalies,
   getGA4SetupSteps, getMetaSetupSteps,
   getConnectionStatuses,
 } from "../lib/integrations.js";
@@ -555,7 +556,7 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
               {activeId==="ga4"        && <GA4Panel connected={connected}/>}
-              {activeId==="meta"       && <MetaPanel/>}
+              {activeId==="meta"       && <MetaPanel       connected={connected}/>}
               {activeId==="make"       && <MakePanel/>}
             </>
           )}
