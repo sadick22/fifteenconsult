@@ -1,24 +1,20 @@
 /**
  * /api/ga4.js
  * GA4 Data API proxy using OAuth refresh token
- * Uses the account owner's credentials — full access to GA4 property
+ * Generated via OAuth Playground with Google's default credentials
  */
 
 async function getAccessToken() {
   const refreshToken = process.env.GA4_REFRESH_TOKEN;
-  
-  if (!refreshToken) throw new Error("GA4_REFRESH_TOKEN not configured in Vercel");
+  if (!refreshToken) throw new Error("GA4_REFRESH_TOKEN not configured");
 
-  // Use Google's OAuth playground client (public) or your own
-  const clientId     = process.env.GA4_CLIENT_ID     || "407408718192.apps.googleusercontent.com";
-  const clientSecret = process.env.GA4_CLIENT_SECRET || "GOCSPX-placeholder";
-
+  // OAuth Playground default client credentials
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      client_id:     clientId,
-      client_secret: clientSecret,
+      client_id:     "407408718192.apps.googleusercontent.com",
+      client_secret: "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",
       refresh_token: refreshToken,
       grant_type:    "refresh_token",
     }),
@@ -26,7 +22,7 @@ async function getAccessToken() {
 
   const data = await res.json();
   if (!res.ok || !data.access_token) {
-    throw new Error(data.error_description || data.error || "Failed to get access token");
+    throw new Error(data.error_description || data.error || "Failed to get GA4 access token");
   }
   return data.access_token;
 }
@@ -38,56 +34,35 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   const propertyId = process.env.GA4_PROPERTY_ID;
-  if (!propertyId) {
-    return res.status(500).json({ error: "GA4_PROPERTY_ID not configured. Should be: properties/538720845" });
-  }
-  if (!process.env.GA4_REFRESH_TOKEN) {
-    return res.status(500).json({ error: "GA4_REFRESH_TOKEN not configured in Vercel environment variables." });
+  if (!propertyId || !process.env.GA4_REFRESH_TOKEN) {
+    return res.status(500).json({ error: "GA4_PROPERTY_ID and GA4_REFRESH_TOKEN required in Vercel env vars." });
   }
 
   try {
     const token   = await getAccessToken();
     const BASE    = `https://analyticsdata.googleapis.com/v1beta/${propertyId}`;
-    const HEADERS = {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
-
+    const HEADERS = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
     const dateRange = { startDate: "30daysAgo", endDate: "today" };
 
     const [sessRes, pagesRes, srcRes] = await Promise.all([
-      fetch(`${BASE}:runReport`, {
-        method: "POST", headers: HEADERS,
-        body: JSON.stringify({
-          dateRanges: [dateRange],
-          metrics: [
-            { name: "sessions" },
-            { name: "activeUsers" },
-            { name: "bounceRate" },
-            { name: "averageSessionDuration" },
-          ],
-        }),
-      }),
-      fetch(`${BASE}:runReport`, {
-        method: "POST", headers: HEADERS,
-        body: JSON.stringify({
-          dateRanges: [dateRange],
-          dimensions: [{ name: "pagePath" }],
-          metrics: [{ name: "screenPageViews" }],
-          orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
-          limit: 5,
-        }),
-      }),
-      fetch(`${BASE}:runReport`, {
-        method: "POST", headers: HEADERS,
-        body: JSON.stringify({
-          dateRanges: [dateRange],
-          dimensions: [{ name: "sessionDefaultChannelGroup" }],
-          metrics: [{ name: "sessions" }],
-          orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
-          limit: 5,
-        }),
-      }),
+      fetch(`${BASE}:runReport`, { method:"POST", headers:HEADERS, body:JSON.stringify({
+        dateRanges:[dateRange],
+        metrics:[{name:"sessions"},{name:"activeUsers"},{name:"bounceRate"},{name:"averageSessionDuration"}],
+      })}),
+      fetch(`${BASE}:runReport`, { method:"POST", headers:HEADERS, body:JSON.stringify({
+        dateRanges:[dateRange],
+        dimensions:[{name:"pagePath"}],
+        metrics:[{name:"screenPageViews"}],
+        orderBys:[{metric:{metricName:"screenPageViews"},desc:true}],
+        limit:5,
+      })}),
+      fetch(`${BASE}:runReport`, { method:"POST", headers:HEADERS, body:JSON.stringify({
+        dateRanges:[dateRange],
+        dimensions:[{name:"sessionDefaultChannelGroup"}],
+        metrics:[{name:"sessions"}],
+        orderBys:[{metric:{metricName:"sessions"},desc:true}],
+        limit:5,
+      })}),
     ]);
 
     if (!sessRes.ok) {
@@ -98,30 +73,18 @@ export default async function handler(req, res) {
     const sess  = await sessRes.json();
     const pages = await pagesRes.json();
     const src   = await srcRes.json();
-
-    const row         = sess.rows?.[0];
-    const sessions    = parseInt(row?.metricValues?.[0]?.value || "0");
-    const users       = parseInt(row?.metricValues?.[1]?.value || "0");
-    const bounceRate  = parseFloat(row?.metricValues?.[2]?.value || "0");
-    const avgDuration = parseFloat(row?.metricValues?.[3]?.value || "0");
+    const row   = sess.rows?.[0];
 
     return res.status(200).json({
-      sessions,
-      users,
-      bounceRate:  `${(bounceRate * 100).toFixed(1)}%`,
-      avgDuration: `${Math.floor(avgDuration / 60)}m ${Math.floor(avgDuration % 60)}s`,
-      topPages: (pages.rows || []).map(r => ({
-        path:  r.dimensionValues?.[0]?.value,
-        views: parseInt(r.metricValues?.[0]?.value || "0"),
-      })),
-      sources: (src.rows || []).map(r => ({
-        channel:  r.dimensionValues?.[0]?.value,
-        sessions: parseInt(r.metricValues?.[0]?.value || "0"),
-      })),
+      sessions:    parseInt(row?.metricValues?.[0]?.value || "0"),
+      users:       parseInt(row?.metricValues?.[1]?.value || "0"),
+      bounceRate:  `${(parseFloat(row?.metricValues?.[2]?.value||"0")*100).toFixed(1)}%`,
+      avgDuration: (d => `${Math.floor(d/60)}m ${Math.floor(d%60)}s`)(parseFloat(row?.metricValues?.[3]?.value||"0")),
+      topPages: (pages.rows||[]).map(r=>({ path:r.dimensionValues?.[0]?.value, views:parseInt(r.metricValues?.[0]?.value||"0") })),
+      sources:  (src.rows||[]).map(r=>({ channel:r.dimensionValues?.[0]?.value, sessions:parseInt(r.metricValues?.[0]?.value||"0") })),
     });
 
   } catch (err) {
-    console.error("GA4 error:", err);
     return res.status(500).json({ error: err.message });
   }
 }
