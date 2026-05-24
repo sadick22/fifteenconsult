@@ -804,7 +804,7 @@ export default function App() {
               )}
 
               <div className="stat-grid" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:28 }}>
-                <StatCard label="Active Agents"  value="7"                            sub="All online"                                        icon="🤖" accent={T.gold}/>
+                <StatCard label="Active Agents"  value={TEAM.length}                  sub="All online"                                        icon="🤖" accent={T.gold}/>
                 <StatCard label="Tasks Complete" value={`${totalDone}/${totalTasks}`} sub={`${Math.round(totalDone/totalTasks*100)}% done`}    icon="✅" accent={T.green}/>
                 <StatCard label="Briefings Run"  value={totalOutputs}                 sub={`${TEAM.length-totalOutputs} pending`}              icon="📄" accent={T.blue}/>
                 <StatCard label="Alerts"         value={criticalCount>0?`${criticalCount} 🚨`:alerts.filter(a=>a.level==="amber").length>0?`${alerts.filter(a=>a.level==="amber").length} ⚠️`:"All clear ✓"} sub={criticalCount>0?"Action needed today":alerts.filter(a=>a.level==="amber").length>0?"Review this week":"On track"} icon="🔔" accent={criticalCount>0?T.red:alerts.filter(a=>a.level==="amber").length>0?T.amber:T.green}/>
@@ -894,4 +894,3 @@ export default function App() {
     </div>
   );
 }
-
