@@ -569,3 +569,4 @@ export default function IntegrationsPanel({ onClose }) {
     </div>
   );
 }
+
