@@ -66,6 +66,20 @@ const SUGGESTED_QUESTIONS = {
     "What's the best audience to target for Real Estate clients?",
     "A/B test idea for this week",
   ],
+  malik: [
+    "Build a media plan for FifteenConsult's lead generation in Qatar",
+    "What advertising platforms should we prioritise in Nigeria?",
+    "Write 3 ad creative briefs for LinkedIn campaigns",
+    "Analyse the advertising landscape for real estate in GCC",
+    "How should we approach Snapchat advertising for B2B in Qatar?",
+  ],
+  amani: [
+    "Give me this morning's executive briefing",
+    "Review the team's outputs from this week and flag any issues",
+    "What is the single most important marketing priority for FifteenConsult right now?",
+    "Are our agents aligned with the Fifteen Framework?",
+    "What strategic opportunities are we missing in GCC and West Africa?",
+  ],
   zara: [
     "What are our top 3 metrics this week?",
     "Which marketing channel is performing best?",
@@ -424,4 +438,3 @@ export default function AgentChat({ member, lastOutput }) {
     </div>
   );
 }
-
