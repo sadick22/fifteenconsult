@@ -24,19 +24,36 @@ export default function DocumentLibrary({ agentId, agentColor, agentName }) {
   const handleUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Warn about scanned PDFs
+    if (file.type === "application/pdf") {
+      const ok = window.confirm(
+        "PDF detected.\n\nText-based PDFs (exported from Word/Google Docs) work perfectly.\nScanned/image PDFs cannot be read.\n\nFor best results, save your document as .txt or .md first.\n\nContinue anyway?"
+      );
+      if (!ok) { e.target.value = ""; return; }
+    }
+
     setUploading(true);
 
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const content = ev.target.result;
+      const rawContent = ev.target.result;
+      // Clean and limit content
+      const cleaned = typeof rawContent === "string"
+        ? rawContent.replace(/[^ -~
+
+	]/g, " ").replace(/\s{3,}/g, "\n").trim()
+        : "[Binary file — could not extract text]";
+
       const newDoc = {
         id:        Date.now(),
         name:      file.name,
         type:      file.type,
         size:      (file.size / 1024).toFixed(1) + " KB",
-        content:   content.slice(0, 8000), // limit to 8k chars for context
+        content:   cleaned.slice(0, 8000),
         note:      note,
         uploadedAt: new Date().toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" }),
+        charCount: cleaned.length,
       };
 
       const all  = loadDocs();
@@ -89,7 +106,7 @@ export default function DocumentLibrary({ agentId, agentColor, agentName }) {
           onFocus={e=>e.target.style.borderColor=agentColor}
           onBlur={e=>e.target.style.borderColor="var(--border)"}
         />
-        <input ref={fileRef} type="file" accept=".txt,.md,.pdf,.docx,.csv,.json" onChange={handleUpload} style={{ display:"none" }}/>
+        <input ref={fileRef} type="file" accept=".txt,.md,.pdf,.csv,.json" onChange={handleUpload} style={{ display:"none" }}/>
         <button
           onClick={()=>fileRef.current?.click()}
           disabled={uploading||docs.length>=10}
@@ -103,7 +120,7 @@ export default function DocumentLibrary({ agentId, agentColor, agentName }) {
             fontFamily:"var(--font-mono)",width:"100%",transition:"all 0.2s",
           }}
         >
-          {uploading?"Processing...":"+ Upload Document (.txt, .md, .pdf, .csv, .json)"}
+          {uploading?"Processing...":"+ Upload Document (.txt or .md recommended · .pdf, .csv, .json also supported)"}
         </button>
         <div style={{ fontSize:10,color:"var(--text-dim)",marginTop:6 }}>
           Documents are stored locally and injected into {agentName}'s context when running briefings
@@ -125,7 +142,7 @@ export default function DocumentLibrary({ agentId, agentColor, agentName }) {
             <div style={{ flex:1,minWidth:0 }}>
               <div style={{ fontSize:12,fontWeight:600,color:"var(--text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{doc.name}</div>
               <div style={{ fontSize:10,color:"var(--text-dim)",marginTop:2 }}>
-                {doc.size} · Uploaded {doc.uploadedAt}
+                {doc.size} · {doc.charCount ? `${doc.charCount.toLocaleString()} chars` : "?"} · Uploaded {doc.uploadedAt}
                 {doc.note && <span style={{ color:agentColor }}> · {doc.note}</span>}
               </div>
             </div>
