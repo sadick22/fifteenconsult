@@ -310,7 +310,7 @@ function OutputLog({ agentId, output, color, isStreaming, onHistory, onExpand })
         <div style={{ display:"flex",gap:7,alignItems:"center" }}>
           {output&&<span style={{ fontSize:9,color:T.textDim }}>{output.timestamp}</span>}
           {onHistory&&<button onClick={onHistory} style={{ background:"transparent",border:`1px solid ${T.border}`,color:T.textMid,fontSize:9,fontWeight:600,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:6,cursor:"pointer",fontFamily:"var(--font-mono)" }}>History</button>}
-          {output?.text&&<button onClick={onExpand} style={{ background:"transparent",border:`1px solid ${T.border}`,color:T.textMid,fontSize:11,padding:"3px 8px",borderRadius:6,cursor:"pointer" }} title="Expand output">⛶</button>}
+          {output?.text&&<button onClick={()=>onExpand&&onExpand(output.text, output.timestamp, agentId)} style={{ background:"transparent",border:`1px solid ${T.border}`,color:T.textMid,fontSize:11,padding:"3px 8px",borderRadius:6,cursor:"pointer" }} title="Expand output">⛶</button>}
         </div>
       </div>
       <pre style={{ fontSize:12,color:T.textMid,lineHeight:1.9,whiteSpace:"pre-wrap",fontFamily:"var(--font-mono)",margin:0,maxHeight:400,overflowY:"auto" }}>
@@ -347,7 +347,7 @@ function AgentAlertSummary({ alerts, color }) {
 }
 
 // ── MEMBER DETAIL ─────────────────────────────────────────────────────────────
-function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleTask, onRunBriefing, onBack }) {
+function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleTask, onRunBriefing, onBack , onExpand }) {
   const states=taskStates[member.id]||member.tasks.map(t=>t.done);
   const done=states.filter(Boolean).length;
   const isStreaming=streaming===member.id;
@@ -424,7 +424,7 @@ function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleT
         </div>
       </div>
 
-      <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)} onExpand={()=>setExpandedOutput({ text:displayOutput?.text, timestamp:displayOutput?.timestamp, agentName:member.name })}/>
+      <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)} onExpand={(text,ts,id)=>onExpand&&onExpand(text,ts,id)}/>
 
       <AgentChat member={member} lastOutput={displayOutput}/>
       {member.id==="david"&&(
@@ -854,7 +854,7 @@ ${competitorCtx}
             />
           )}
 
-          {activeMember&&<MemberDetail member={activeMember} taskStates={taskStates} output={outputs[activeMember.id]} streaming={streaming} alerts={alerts} onToggleTask={toggleTask} onRunBriefing={runBriefing} onBack={()=>setActiveMember(null)}/>}
+          {activeMember&&<MemberDetail member={activeMember} taskStates={taskStates} output={outputs[activeMember.id]} streaming={streaming} alerts={alerts} onToggleTask={toggleTask} onRunBriefing={runBriefing} onBack={()=>setActiveMember(null)} onExpand={(text, timestamp, name) => setExpandedOutput({ text, timestamp, agentName: name })}/>}
 
           {!activeMember&&activeTab==="dashboard"&&activeView==="dashboard"&&(
             <div style={{ animation:"fadeUp 0.3s ease" }}>
