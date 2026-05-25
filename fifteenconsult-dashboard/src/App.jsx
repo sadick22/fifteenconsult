@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { TEAM } from "./data/team.js";
 import { callClaudeAPI } from "./lib/api.js";
+import { isFirebaseEnabled, saveRunHistory, saveKPIs, saveSettings, checkFirebaseStatus } from "./lib/firebase.js";
 import { getAgentDocuments } from "./components/DocumentLibrary.jsx";
 import { getCompetitorContext } from "./components/CompetitorIntel.jsx";
 import { getDateContext, buildBriefingTrigger } from "./lib/dateContext.js";
@@ -53,6 +54,8 @@ function pushHistory(agentId, entry) {
   if (!s.history[agentId]) s.history[agentId] = [];
   s.history[agentId] = [{ ...entry, id: Date.now() }, ...s.history[agentId]].slice(0,20);
   writeStorage(s);
+  // Sync to Firebase in background
+  if (isFirebaseEnabled()) saveRunHistory(agentId, s.history[agentId]).catch(()=>{});
   return s.history[agentId];
 }
 function readHistory(agentId) { return initStorage().history?.[agentId] || []; }
@@ -631,6 +634,12 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 export default function App() {
   const stored=initStorage();
+  // Init Firebase on mount
+  useEffect(()=>{
+    if(isFirebaseEnabled()){
+      checkFirebaseStatus().then(s=>{ if(s.connected) console.log("✅ Firebase connected:",s.projectId); }).catch(()=>{});
+    }
+  },[]);
   const [activeTab,setActiveTab]       = useState("dashboard");
   const [activeMember,setActiveMember] = useState(null);
   const [streaming,setStreaming]       = useState(null);
