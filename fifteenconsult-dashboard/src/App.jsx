@@ -651,6 +651,42 @@ export default function App() {
         console.log("☁️ KPIs loaded from Firestore");
       }
 
+      // Sync chats from Firestore
+      const { cloudLoad } = await import("./lib/firebase.js");
+      const cloudChats = await cloudLoad("chats", "all_chats", null).catch(()=>null);
+      if(cloudChats && Object.keys(cloudChats).length > 0){
+        localStorage.setItem("fc_chats_v1", JSON.stringify(cloudChats));
+        console.log("☁️ Chats loaded from Firestore");
+      }
+
+      // Sync competitors
+      const cloudComps = await cloudLoad("dashboard", "competitors", null).catch(()=>null);
+      if(cloudComps){
+        localStorage.setItem("fc_competitors_v1", JSON.stringify(cloudComps));
+        console.log("☁️ Competitors loaded from Firestore");
+      }
+
+      // Sync framework
+      const cloudFramework = await cloudLoad("dashboard", "framework", null).catch(()=>null);
+      if(cloudFramework){
+        localStorage.setItem("fc_framework_v1", JSON.stringify(cloudFramework));
+        console.log("☁️ Framework loaded from Firestore");
+      }
+
+      // Sync notifications
+      const cloudNotifs = await cloudLoad("dashboard", "notifications", null).catch(()=>null);
+      if(cloudNotifs && cloudNotifs.length > 0){
+        localStorage.setItem("fc_notifications_v1", JSON.stringify(cloudNotifs));
+        console.log("☁️ Notifications loaded from Firestore");
+      }
+
+      // Sync documents
+      const cloudDocs = await cloudLoad("documents", "all_docs", null).catch(()=>null);
+      if(cloudDocs && Object.keys(cloudDocs).length > 0){
+        localStorage.setItem("fc_documents_v1", JSON.stringify(cloudDocs));
+        console.log("☁️ Documents loaded from Firestore");
+      }
+
       // Sync run history for all agents
       const { TEAM } = await import("./data/team.js");
       const store = initStorage();
