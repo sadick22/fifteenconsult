@@ -1,3 +1,4 @@
+import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
@@ -20,6 +21,7 @@ function loadChats() {
 }
 function saveChats(chats) {
   try { localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chats)); } catch {}
+  if (isFirebaseEnabled()) cloudSave("chats", "all_chats", chats).catch(()=>{});
 }
 
 // Suggested follow-up questions per agent role
