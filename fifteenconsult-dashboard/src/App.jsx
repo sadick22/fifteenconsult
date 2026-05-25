@@ -634,11 +634,47 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 export default function App() {
   const stored=initStorage();
-  // Init Firebase on mount
+  // Init Firebase on mount + load cloud data
   useEffect(()=>{
-    if(isFirebaseEnabled()){
-      checkFirebaseStatus().then(s=>{ if(s.connected) console.log("✅ Firebase connected:",s.projectId); }).catch(()=>{});
-    }
+    if(!isFirebaseEnabled()) return;
+    checkFirebaseStatus().then(async s=>{
+      if(!s.connected) return;
+      console.log("✅ Firebase connected:", s.projectId);
+
+      // Load KPIs from Firestore
+      const { loadKPIs, loadRunHistory } = await import("./lib/firebase.js");
+
+      // Sync KPIs
+      const cloudKPIs = await loadKPIs().catch(()=>null);
+      if(cloudKPIs && Object.keys(cloudKPIs).length > 0){
+        localStorage.setItem("fc_live_kpis_v1", JSON.stringify(cloudKPIs));
+        console.log("☁️ KPIs loaded from Firestore");
+      }
+
+      // Sync run history for all agents
+      const { TEAM } = await import("./data/team.js");
+      const store = initStorage();
+      if(!store.history) store.history = {};
+      let historyUpdated = false;
+      for(const agent of TEAM){
+        const cloudHistory = await loadRunHistory(agent.id).catch(()=>null);
+        if(cloudHistory && cloudHistory.length > 0){
+          store.history[agent.id] = cloudHistory;
+          historyUpdated = true;
+        }
+      }
+      if(historyUpdated){
+        writeStorage(store);
+        console.log("☁️ Run history loaded from Firestore");
+        // Reload outputs from history
+        const latestOutputs = {};
+        TEAM.forEach(a=>{
+          const h = store.history?.[a.id];
+          if(h && h.length > 0) latestOutputs[a.id] = { text: h[0].text, timestamp: h[0].timestamp };
+        });
+        setOutputs(prev=>({ ...latestOutputs, ...prev }));
+      }
+    }).catch(()=>{});
   },[]);
   const [activeTab,setActiveTab]       = useState("dashboard");
   const [activeMember,setActiveMember] = useState(null);
