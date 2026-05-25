@@ -7,16 +7,10 @@ const T = {
   gold:"#C8A96E", green:"#4ade80", red:"#f87171", amber:"#fbbf24",
 };
 
+import { saveLiveKPIs, loadLiveKPIs, saveDashboardSettings, loadDashboardSettings } from "../lib/storage.js";
+
 const SETTINGS_KEY = "fc_settings_v1";
 const KPIS_KEY     = "fc_live_kpis_v1";
-
-function loadLiveKPIs() {
-  try { return JSON.parse(localStorage.getItem(KPIS_KEY) || "{}"); }
-  catch { return {}; }
-}
-function saveLiveKPIs(data) {
-  try { localStorage.setItem(KPIS_KEY, JSON.stringify(data)); } catch {}
-}
 
 function Input({ label, value, onChange, type="text", unit="" }) {
   return (
@@ -180,7 +174,7 @@ export default function SettingsPanel({ onClose }) {
   const [activeTab, setActiveTab] = useState("kpis");
   const [liveKPIs, setLiveKPIs]   = useState(loadLiveKPIs);
   const [settings, setSettings]   = useState(() => {
-    try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}"); } catch { return {}; }
+    return loadDashboardSettings();
   });
   const [saved, setSaved]         = useState(false);
 
@@ -192,7 +186,7 @@ export default function SettingsPanel({ onClose }) {
 
   const handleSettingsSave = (vals) => {
     setSettings(vals);
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(vals));
+    saveDashboardSettings(vals);
   };
 
   const tabs = [
