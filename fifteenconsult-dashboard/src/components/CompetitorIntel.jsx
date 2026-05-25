@@ -1,3 +1,4 @@
+import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState } from "react";
 
 const COMP_KEY = "fc_competitors_v1";
@@ -21,6 +22,7 @@ function loadCompetitors() {
 }
 function saveCompetitors(data) {
   try { localStorage.setItem(COMP_KEY, JSON.stringify(data)); } catch {}
+  if (isFirebaseEnabled()) cloudSave("dashboard", "competitors", data).catch(()=>{});
 }
 
 export function getCompetitorContext() {
