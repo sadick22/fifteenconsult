@@ -1,3 +1,4 @@
+import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useEffect } from "react";
 
 const T = {
@@ -22,6 +23,7 @@ export function addNotification(type, title, detail, agentId=null) {
       read: false,
     });
     localStorage.setItem(NOTIF_KEY, JSON.stringify(all.slice(0,50)));
+  if (isFirebaseEnabled()) cloudSave("dashboard", "notifications", all.slice(0,50)).catch(()=>{});
   } catch {}
 }
 
@@ -34,6 +36,7 @@ function markAllRead() {
   try {
     const all = loadNotifications().map(n=>({...n,read:true}));
     localStorage.setItem(NOTIF_KEY, JSON.stringify(all));
+  if (isFirebaseEnabled()) cloudSave("dashboard", "notifications", all).catch(()=>{});
   } catch {}
 }
 
