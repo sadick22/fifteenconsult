@@ -40,9 +40,7 @@ export default function DocumentLibrary({ agentId, agentColor, agentName }) {
       const rawContent = ev.target.result;
       // Clean and limit content
       const cleaned = typeof rawContent === "string"
-        ? rawContent.replace(/[^ -~
-
-	]/g, " ").replace(/\s{3,}/g, "\n").trim()
+        ? rawContent.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, " ").replace(/  +/g, " ").trim()
         : "[Binary file — could not extract text]";
 
       const newDoc = {
@@ -156,4 +154,3 @@ export default function DocumentLibrary({ agentId, agentColor, agentName }) {
     </div>
   );
 }
-
