@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { TEAM } from "./data/team.js";
 import { callClaudeAPI } from "./lib/api.js";
+import { getAgentDocuments } from "./components/DocumentLibrary.jsx";
+import { getCompetitorContext } from "./components/CompetitorIntel.jsx";
 import { getDateContext, buildBriefingTrigger } from "./lib/dateContext.js";
 import { evaluateAlerts } from "./lib/alerts.js";
 import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.jsx";
@@ -677,8 +679,46 @@ export default function App() {
     const trigger=buildBriefingTrigger(member.briefingTrigger,dateCtx,customPrompt);
     setOutputs(prev=>({...prev,[member.id]:{text:"",timestamp:t}}));
     let finalText="";
+
+    // Build enriched system prompt with live context
+    let enrichedSystemPrompt = member.systemPrompt;
+
+    // Inject competitor intelligence for David and Sofia
+    if (member.id === "david" || member.id === "sofia" || member.id === "amani") {
+      const competitorCtx = getCompetitorContext();
+      enrichedSystemPrompt += `
+
+---
+CURRENT COMPETITOR INTELLIGENCE (updated by Sadick):
+${competitorCtx}
+---`;
+    }
+
+    // Inject uploaded documents for David
+    if (member.id === "david") {
+      const docs = getAgentDocuments("david");
+      if (docs.length > 0) {
+        const docContext = docs.map((d, i) =>
+          `DOCUMENT ${i+1}: ${d.name}${d.note ? ` (Note: ${d.note})` : ""}
+Uploaded: ${d.uploadedAt}
+---
+${d.content}
+---`
+        ).join("
+
+");
+        enrichedSystemPrompt += `
+
+===
+UPLOADED DOCUMENTS FOR ANALYSIS (${docs.length} document${docs.length>1?"s":""}):
+${docContext}
+===
+When running your briefing, acknowledge these documents and reference them in your analysis and recommendations.`;
+      }
+    }
+
     try {
-      finalText=await callClaudeAPI(member.systemPrompt,trigger,(partial)=>{
+      finalText=await callClaudeAPI(enrichedSystemPrompt,trigger,(partial)=>{
         setOutputs(prev=>({...prev,[member.id]:{text:partial,timestamp:t}}));
       });
     } catch(err) {
