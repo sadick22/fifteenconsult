@@ -186,3 +186,4 @@ export async function checkFirebaseStatus() {
   if (!db) return { connected: false, reason: "Failed to initialize" };
   return { connected: true, projectId: firebaseConfig.projectId };
 }
+
