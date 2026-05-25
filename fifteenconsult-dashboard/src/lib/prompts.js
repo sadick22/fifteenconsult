@@ -347,8 +347,6 @@ export const AGENT_PRESETS = {
       prompt: "Focus on completing the analytics infrastructure. What's still missing? Give step-by-step instructions for connecting GA4, HubSpot, MailerLite, and social analytics into a unified view. Prioritise what will give us the most insight fastest.",
     },
   ],
-};
-
 
   malik: [
     {
