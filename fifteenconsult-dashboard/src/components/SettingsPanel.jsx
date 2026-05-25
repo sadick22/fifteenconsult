@@ -199,6 +199,7 @@ export default function SettingsPanel({ onClose }) {
     { id:"kpis",      label:"Live KPIs",        icon:"📊" },
     { id:"dashboard", label:"Dashboard",         icon:"⚙️" },
     { id:"agents",    label:"Agent Info",        icon:"🤖" },
+    { id:"cloud",     label:"Cloud Sync",        icon:"☁️" },
   ];
 
   return (
@@ -252,6 +253,52 @@ export default function SettingsPanel({ onClose }) {
           <DashboardSettings settings={settings} onSave={handleSettingsSave}/>
         )}
 
+        {activeTab==="cloud" && (
+          <div>
+            <div style={{ fontSize:12,color:"var(--text-mid)",lineHeight:1.7,marginBottom:20,padding:"12px 16px",background:"#60a5fa0a",border:"1px solid #60a5fa22",borderRadius:8 }}>
+              ☁️ Connect Firebase to sync your KPIs, run history, documents, and settings across any device — no more single-browser limitation.
+            </div>
+            <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:10,padding:18,marginBottom:16 }}>
+              <div style={{ fontSize:12,fontWeight:600,color:"var(--text)",marginBottom:12 }}>Setup (free — 5 minutes)</div>
+              {[
+                "Go to console.firebase.google.com",
+                "Click 'Add project' → name it 'fifteenconsult-dashboard'",
+                "Click '</> Web' to add a web app → copy the config",
+                "Enable Firestore Database → Start in test mode",
+                "Add these to Vercel env vars (all with VITE_ prefix):",
+              ].map((step,i) => (
+                <div key={i} style={{ display:"flex",gap:10,padding:"6px 0",borderBottom:"1px solid var(--border)",fontSize:11,color:"var(--text-dim)" }}>
+                  <span style={{ color:"var(--gold)",fontWeight:700,flexShrink:0 }}>{i+1}.</span>
+                  <span>{step}</span>
+                </div>
+              ))}
+              <div style={{ marginTop:12,background:"#0d1117",borderRadius:8,padding:"10px 14px",fontSize:11,color:"#4ade80",fontFamily:"var(--font-mono)",lineHeight:2 }}>
+                VITE_FIREBASE_API_KEY<br/>
+                VITE_FIREBASE_AUTH_DOMAIN<br/>
+                VITE_FIREBASE_PROJECT_ID<br/>
+                VITE_FIREBASE_STORAGE_BUCKET<br/>
+                VITE_FIREBASE_MESSAGING_SENDER_ID<br/>
+                VITE_FIREBASE_APP_ID
+              </div>
+            </div>
+            <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:10,padding:18 }}>
+              <div style={{ fontSize:12,fontWeight:600,color:"var(--text)",marginBottom:8 }}>What gets synced to Firebase:</div>
+              {[
+                "Live KPI values — update on one device, see on all",
+                "Agent run history — all 20 briefings per agent",
+                "Uploaded documents — David's document library",
+                "Competitor intelligence — your competitor list",
+                "Dashboard settings — preferences and targets",
+                "Fifteen Framework — pillar tracking data",
+                "Notification history — all activity log",
+              ].map((item,i) => (
+                <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"5px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+                  <span style={{ color:"#4ade80" }}>→</span> {item}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         {activeTab==="agents" && (
           <div>
             <div style={{ fontSize:12,color:T.textMid,lineHeight:1.7,marginBottom:20,padding:"12px 16px",background:"#60a5fa0a",border:"1px solid #60a5fa22",borderRadius:8 }}>
