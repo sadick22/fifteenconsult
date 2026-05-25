@@ -699,21 +699,9 @@ ${competitorCtx}
       const docs = getAgentDocuments("david");
       if (docs.length > 0) {
         const docContext = docs.map((d, i) =>
-          `DOCUMENT ${i+1}: ${d.name}${d.note ? ` (Note: ${d.note})` : ""}
-Uploaded: ${d.uploadedAt}
----
-${d.content}
----`
-        ).join("
-
-");
-        enrichedSystemPrompt += `
-
-===
-UPLOADED DOCUMENTS FOR ANALYSIS (${docs.length} document${docs.length>1?"s":""}):
-${docContext}
-===
-When running your briefing, acknowledge these documents and reference them in your analysis and recommendations.`;
+          `DOCUMENT ${i+1}: ${d.name}${d.note ? ` (Note: ${d.note})` : ""}\nUploaded: ${d.uploadedAt}\n---\n${d.content}\n---`
+        ).join("\n\n");
+        enrichedSystemPrompt += `\n\n===\nUPLOADED DOCUMENTS FOR ANALYSIS (${docs.length} document${docs.length>1?"s":""}):\n${docContext}\n===\nWhen running your briefing, acknowledge these documents and reference them in your analysis and recommendations.`;
       }
     }
 
