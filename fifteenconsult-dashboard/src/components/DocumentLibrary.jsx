@@ -1,3 +1,4 @@
+import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useRef } from "react";
 
 const DOC_KEY = "fc_documents_v1";
@@ -8,6 +9,7 @@ function loadDocs() {
 }
 function saveDocs(data) {
   try { localStorage.setItem(DOC_KEY, JSON.stringify(data)); } catch {}
+  if (isFirebaseEnabled()) cloudSave("documents", "all_docs", data).catch(()=>{});
 }
 
 export function getAgentDocuments(agentId) {
