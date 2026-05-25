@@ -298,7 +298,7 @@ function HistoryPanel({ agentId, agentName, color, onClose, onRestore }) {
 }
 
 // ── OUTPUT LOG ────────────────────────────────────────────────────────────────
-function OutputLog({ agentId, output, color, isStreaming, onHistory }) {
+function OutputLog({ agentId, output, color, isStreaming, onHistory, onExpand }) {
   if(!output&&!isStreaming) return null;
   return (
     <div style={{ background:T.base,border:`1px solid ${T.border}`,borderLeft:`3px solid ${color}`,borderRadius:10,padding:"16px 20px",marginTop:20 }}>
@@ -310,6 +310,7 @@ function OutputLog({ agentId, output, color, isStreaming, onHistory }) {
         <div style={{ display:"flex",gap:7,alignItems:"center" }}>
           {output&&<span style={{ fontSize:9,color:T.textDim }}>{output.timestamp}</span>}
           {onHistory&&<button onClick={onHistory} style={{ background:"transparent",border:`1px solid ${T.border}`,color:T.textMid,fontSize:9,fontWeight:600,letterSpacing:"0.1em",textTransform:"uppercase",padding:"3px 10px",borderRadius:6,cursor:"pointer",fontFamily:"var(--font-mono)" }}>History</button>}
+          {output?.text&&<button onClick={onExpand} style={{ background:"transparent",border:`1px solid ${T.border}`,color:T.textMid,fontSize:11,padding:"3px 8px",borderRadius:6,cursor:"pointer" }} title="Expand output">⛶</button>}
         </div>
       </div>
       <pre style={{ fontSize:12,color:T.textMid,lineHeight:1.9,whiteSpace:"pre-wrap",fontFamily:"var(--font-mono)",margin:0,maxHeight:400,overflowY:"auto" }}>
@@ -423,7 +424,7 @@ function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleT
         </div>
       </div>
 
-      <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)}/>
+      <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)} onExpand={()=>setExpandedOutput({ text:displayOutput?.text, timestamp:displayOutput?.timestamp, agentName:member.name })}/>
 
       <AgentChat member={member} lastOutput={displayOutput}/>
       {member.id==="david"&&(
@@ -638,6 +639,7 @@ export default function App() {
   const [theme,setTheme]                   = useState(()=>{ const t=loadTheme(); applyTheme(t); return t; });
   const [showIntegrations,setShowIntegrations] = useState(false);
   const [showSettings,setShowSettings]         = useState(false);
+  const [expandedOutput,setExpandedOutput]     = useState(null);
   const [showMobileMenu,setShowMobileMenu] = useState(false);
 
   const toggleTheme = () => {
@@ -811,7 +813,24 @@ ${competitorCtx}
               onClose={()=>setShowMorningBriefing(false)}
             />
           )}
-          {showSettings&&(
+          {/* Expanded output modal */}
+      {expandedOutput&&(
+        <div style={{ position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:500,display:"flex",flexDirection:"column",padding:24 }}
+          onClick={e=>{ if(e.target===e.currentTarget) setExpandedOutput(null); }}>
+          <div style={{ background:"var(--bg-card)",borderRadius:12,border:"1px solid var(--border)",flex:1,display:"flex",flexDirection:"column",maxWidth:900,margin:"0 auto",width:"100%",overflow:"hidden" }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"16px 20px",borderBottom:"1px solid var(--border)" }}>
+              <div style={{ fontSize:13,fontWeight:600,color:"var(--text)" }}>
+                {expandedOutput.agentName} — {expandedOutput.timestamp}
+              </div>
+              <button onClick={()=>setExpandedOutput(null)} style={{ background:"none",border:"1px solid var(--border)",color:"var(--text-mid)",fontSize:18,width:32,height:32,borderRadius:8,cursor:"pointer" }}>×</button>
+            </div>
+            <pre style={{ flex:1,overflowY:"auto",padding:"20px 24px",fontSize:13,color:"var(--text-mid)",lineHeight:2,whiteSpace:"pre-wrap",fontFamily:"var(--font-mono)",margin:0 }}>
+              {expandedOutput.text}
+            </pre>
+          </div>
+        </div>
+      )}
+      {showSettings&&(
             <SettingsPanel onClose={()=>setShowSettings(false)}/>
           )}
           {showIntegrations&&(
