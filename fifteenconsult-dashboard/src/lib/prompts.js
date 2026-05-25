@@ -349,6 +349,202 @@ export const AGENT_PRESETS = {
   ],
 };
 
+
+  malik: [
+    {
+      id: "gccc_campaign_plan",
+      icon: "📢",
+      label: "GCC campaign plan",
+      category: "Strategy",
+      prompt: "Build a full advertising campaign plan for FifteenConsult targeting GCC decision makers. Include platform mix (LinkedIn, Meta, Snapchat), budget allocation, audience targeting, and ad formats. Focus on generating qualified leads from Real Estate and SaaS sectors in Qatar and UAE.",
+    },
+    {
+      id: "west_africa_ads",
+      icon: "🌍",
+      label: "West Africa ad strategy",
+      category: "Strategy",
+      prompt: "Develop an advertising strategy for FifteenConsult's West Africa expansion. Focus on Nigeria (Lagos) and Ghana (Accra). Which platforms dominate? What messaging resonates? What budget makes sense for market entry? Give a specific 90-day paid media plan.",
+    },
+    {
+      id: "snapchat_strategy",
+      icon: "👻",
+      label: "Snapchat for B2B Qatar",
+      category: "Platform",
+      prompt: "Snapchat has massive penetration in Qatar and UAE. Most B2B consultancies ignore it. Build a Snapchat advertising strategy for FifteenConsult targeting business decision makers in GCC. Is there a real opportunity here? If yes, exactly how should we use it?",
+    },
+    {
+      id: "creative_brief",
+      icon: "🎨",
+      label: "Write 3 ad creative briefs",
+      category: "Output",
+      prompt: "Write 3 complete ad creative briefs for Hassan to execute. One for LinkedIn Sponsored Content, one for Meta (Facebook/Instagram), one for Google Display. Each brief: headline, body copy, CTA, visual direction, target audience, and success metric. All for FifteenConsult lead generation.",
+    },
+    {
+      id: "competitor_ads",
+      icon: "🕵️",
+      label: "Competitor ad analysis",
+      category: "Research",
+      prompt: "Analyse what our competitors in the GCC marketing consultancy space are doing with their advertising. What messages are they leading with? What platforms? Where are the gaps FifteenConsult can own? Give specific recommendations to differentiate our advertising.",
+    },
+    {
+      id: "roas_optimisation",
+      icon: "📈",
+      label: "ROAS optimisation plan",
+      category: "Optimisation",
+      prompt: "Our target ROAS is 5x. Build a step-by-step plan to hit it. Cover: which metrics to track, what ROAS benchmarks to expect by platform, how to structure campaigns for profitability, and when to scale vs when to cut. Make it specific to FifteenConsult's consultancy business model.",
+    },
+  ],
+
+  amani: [
+    {
+      id: "morning_brief",
+      icon: "☀️",
+      label: "Morning CMO brief",
+      category: "Daily",
+      prompt: "Run your full morning CMO briefing. Review the entire department's status. Deliver the executive brief covering: urgent items, items to watch, wins to double down on, yesterday's key numbers, today's single priority, and one strategic insight about our market position.",
+    },
+    {
+      id: "department_review",
+      icon: "🔍",
+      label: "Full department review",
+      category: "Review",
+      prompt: "Conduct a thorough review of all 8 agents' recent work. For each agent: rate their output quality, flag anything off-brand or strategically misaligned, and give one specific piece of feedback to improve. Be direct and constructive — no sugarcoating.",
+    },
+    {
+      id: "strategy_challenge",
+      icon: "⚡",
+      label: "Challenge our strategy",
+      category: "Strategic",
+      prompt: "Challenge FifteenConsult's current marketing strategy. What assumptions are we making that could be wrong? What are we not doing that we should be? What are the 3 biggest strategic risks to FifteenConsult's growth in the next 6 months? Be a critical friend.",
+    },
+    {
+      id: "framework_alignment",
+      icon: "15",
+      label: "Fifteen Framework check",
+      category: "Review",
+      prompt: "Audit whether the team's current activities align with the Fifteen Framework. Are we operating on 15 minutes of executive attention? Tracking the right 15 metrics? Following the 15 strategic pillars? What's missing or misaligned? Give specific corrections.",
+    },
+    {
+      id: "monthly_roadmap",
+      icon: "🗺",
+      label: "30-day strategic roadmap",
+      category: "Planning",
+      prompt: "Build FifteenConsult's strategic marketing roadmap for the next 30 days. Prioritise activities by revenue impact. Assign clear ownership to each agent. Set measurable targets. What must happen this month to move FifteenConsult meaningfully closer to its growth targets?",
+    },
+    {
+      id: "west_africa_plan",
+      icon: "🌍",
+      label: "West Africa expansion plan",
+      category: "Strategic",
+      prompt: "Build FifteenConsult's West Africa market entry strategy. Which country first? What's our positioning? Who are the ideal clients? What marketing approach works in Lagos or Accra vs Doha? What are the risks? Give a clear 90-day action plan.",
+    },
+  ],
+
+  david: [
+    {
+      id: "opportunity_scan",
+      icon: "🔭",
+      label: "GCC opportunity scan",
+      category: "Research",
+      prompt: "Scan the GCC market for the top 5 business opportunities for FifteenConsult right now. Consider: companies that recently launched in Qatar, brands expanding regionally, sectors seeing increased marketing spend, and companies with obvious marketing gaps. For each opportunity: company type, revenue potential, and outreach angle.",
+    },
+    {
+      id: "west_africa_opportunity",
+      icon: "🌍",
+      label: "West Africa BD analysis",
+      category: "Research",
+      prompt: "Identify the top 3 business development opportunities in West Africa for FifteenConsult. Which country should we enter first? Who are the ideal first clients? What's the revenue potential? What partnerships would accelerate market entry? Give a clear go/no-go recommendation with reasoning.",
+    },
+    {
+      id: "revenue_model",
+      icon: "💰",
+      label: "Revenue model — next quarter",
+      category: "Analysis",
+      prompt: "Build FifteenConsult's revenue model for next quarter. Model 3 scenarios: conservative (1-2 new clients), base (3-4 new clients), optimistic (5+ new clients). For each scenario: expected MRR, ARR, and what needs to happen to achieve it. Include retainer vs project revenue mix.",
+    },
+    {
+      id: "competitor_analysis",
+      icon: "🕵️",
+      label: "Competitive analysis",
+      category: "Analysis",
+      prompt: "Using the competitor intelligence available, conduct a full competitive analysis. For our direct competitors: where are we stronger? Where are we weaker? What's our most defensible differentiation? Where should we avoid competing head-to-head? Give a clear competitive positioning recommendation.",
+    },
+    {
+      id: "partnership_strategy",
+      icon: "🤝",
+      label: "Partnership opportunities",
+      category: "BD",
+      prompt: "Identify 5 strategic partnership opportunities for FifteenConsult in GCC and West Africa. Think: tech companies who need a marketing partner, creative agencies who need strategic depth, real estate associations, business councils. For each: the partnership value, how to approach them, and expected revenue impact.",
+    },
+    {
+      id: "document_analysis",
+      icon: "📄",
+      label: "Analyse uploaded documents",
+      category: "Analysis",
+      prompt: "Analyse all uploaded documents in your library. For each document: provide a structured assessment covering strengths, weaknesses, opportunities, and risks. Identify the top 3 actionable recommendations from each document. Cross-reference insights across all documents and identify common themes.",
+    },
+    {
+      id: "client_expansion",
+      icon: "📈",
+      label: "Client expansion plan",
+      category: "BD",
+      prompt: "Build an expansion plan for our 5 existing clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, and African Languages Lab. For each: what additional services could we offer? What's the upsell revenue potential? Draft a specific expansion proposal angle for the most promising one.",
+    },
+  ],
+
+  sofia: [
+    {
+      id: "morning_personal_brief",
+      icon: "☀️",
+      label: "My morning briefing",
+      category: "Daily",
+      prompt: "Give me my complete personal morning briefing. Top 3 news items in marketing and consulting that I need to know. One insight of the day. My skill focus for today. One resource to consume. A competitor spotlight. My action items. And one founder mindset tip.",
+    },
+    {
+      id: "skill_assessment",
+      icon: "📊",
+      label: "Skills assessment",
+      category: "Development",
+      prompt: "Give me an honest assessment of my current skill levels as a marketing consultancy founder. Rate me on: marketing strategy, brand positioning, paid advertising, business development, client management, financial literacy, and leadership. Where are my biggest gaps? What should I focus on first?",
+    },
+    {
+      id: "industry_deep_dive",
+      icon: "📰",
+      label: "Industry deep dive",
+      category: "Intelligence",
+      prompt: "Give me a deep dive into the current state of the marketing consultancy and advertising industry. What are the 5 biggest trends shaping the industry right now? Which trends specifically affect FifteenConsult's positioning in GCC and West Africa? What do I need to know to stay ahead?",
+    },
+    {
+      id: "founder_development",
+      icon: "🚀",
+      label: "Founder development plan",
+      category: "Development",
+      prompt: "Build my personal development roadmap for the next 30 days as a marketing consultancy founder. What specific skills, knowledge, and habits should I be building? What should I be reading, watching, or practising? Make it practical and specific to running FifteenConsult.",
+    },
+    {
+      id: "meeting_prep",
+      icon: "🤝",
+      label: "Meeting prep",
+      category: "Preparation",
+      prompt: "Help me prepare for an important client or prospect meeting. Ask me: who am I meeting, what's the context, and what's my desired outcome? Then give me: key talking points, likely objections and responses, questions to ask, and how to close toward my desired outcome.",
+    },
+    {
+      id: "competitor_learning",
+      icon: "🎓",
+      label: "Learn from competitors",
+      category: "Intelligence",
+      prompt: "Using the competitor intelligence available, help me learn from both our direct competitors and aspirational benchmarks. What specific tactics, positioning strategies, or client approaches can I adopt or adapt for FifteenConsult? Give me 3 concrete things to implement this week.",
+    },
+    {
+      id: "weekly_reflection",
+      icon: "🪞",
+      label: "Weekly reflection",
+      category: "Review",
+      prompt: "Run my weekly personal reflection. Ask me: what were my 3 biggest wins this week? What didn't go well? What did I learn? What's my single most important priority next week? Then give me your honest assessment of how I'm progressing as a founder and what I need to focus on.",
+    },
+  ],
+};
+
 // ── SMART SUGGESTIONS ─────────────────────────────────────────────────────────
 // Context-aware suggestions based on day of week, time of month, alerts
 export function getSmartSuggestions(agentId, dateContext, alerts) {
@@ -367,6 +563,14 @@ export function getSmartSuggestions(agentId, dateContext, alerts) {
     if (agentId === "nadia")  suggestions.push({ text: "Monday — plan the full week's content calendar first", icon: "📅" });
     if (agentId === "kwame")  suggestions.push({ text: "Monday — research new prospects to fill this week's outreach quota", icon: "🔍" });
     if (agentId === "hassan") suggestions.push({ text: "Monday — review weekend ad performance and set this week's targets", icon: "📊" });
+    if (agentId === "amani")  suggestions.push({ text: "Monday — run full department review and set weekly priorities", icon: "👑" });
+    if (agentId === "david")  suggestions.push({ text: "Monday — scan for new business opportunities this week", icon: "🚀" });
+    if (agentId === "sofia")  suggestions.push({ text: "Monday — set your personal development focus for the week", icon: "🌟" });
+    if (agentId === "malik")  suggestions.push({ text: "Monday — review all campaign performance and set weekly ad targets", icon: "📢" });
+    if (agentId === "amani")  suggestions.push({ text: "Monday — run full department review and set weekly priorities", icon: "👑" });
+    if (agentId === "david")  suggestions.push({ text: "Monday — scan for new business opportunities this week", icon: "🚀" });
+    if (agentId === "sofia")  suggestions.push({ text: "Monday — set your personal development focus for the week", icon: "🌟" });
+    if (agentId === "malik")  suggestions.push({ text: "Monday — review all campaign performance and set weekly ad targets", icon: "📢" });
   }
 
   if (isThursday || isFriday) {
