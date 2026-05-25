@@ -1,3 +1,4 @@
+import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState } from "react";
 
 const T = {
@@ -51,6 +52,7 @@ function loadData() {
 
 function saveData(data) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+  if (isFirebaseEnabled()) cloudSave("dashboard", "framework", data).catch(()=>{});
 }
 
 function getPct(current, target) {
@@ -238,4 +240,3 @@ export default function FifteenFramework() {
     </div>
   );
 }
-
