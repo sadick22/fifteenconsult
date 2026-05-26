@@ -293,26 +293,81 @@ function TikTokPanel({ connected }) {
 }
 // ── TRENDS PANEL ─────────────────────────────────────────────────────────────────────
 function TrendsPanel() {
+  const TREND_GROUPS = [
+    {
+      label: "GCC — Broad Terms (Best Data)",
+      color: "#4285f4",
+      note: "Use these first — highest data availability",
+      url: "https://trends.google.com/trends/explore?geo=QA&q=marketing+Qatar,digital+marketing+Qatar,advertising+Qatar",
+      keywords: ["marketing Qatar", "digital marketing Qatar", "advertising Qatar"],
+    },
+    {
+      label: "GCC — Specific Keywords",
+      color: "#34a853",
+      note: "May show limited data — Qatar market is small",
+      url: "https://trends.google.com/trends/explore?geo=QA&q=marketing+agency+Doha,brand+strategy+Qatar,marketing+consultancy",
+      keywords: ["marketing agency Doha", "brand strategy Qatar", "marketing consultancy"],
+    },
+    {
+      label: "West Africa — Nigeria (High Volume)",
+      color: "#C8A96E",
+      note: "Strong data — use for West Africa strategy",
+      url: "https://trends.google.com/trends/explore?geo=NG&q=marketing+agency+Nigeria,digital+marketing+Lagos,brand+strategy+Nigeria",
+      keywords: ["marketing agency Nigeria", "digital marketing Lagos", "brand strategy Nigeria"],
+    },
+    {
+      label: "West Africa — Ghana",
+      color: "#E85D75",
+      note: "Growing market — track for expansion timing",
+      url: "https://trends.google.com/trends/explore?geo=GH&q=marketing+agency+Ghana,digital+marketing+Accra,marketing+consultancy+Ghana",
+      keywords: ["marketing agency Ghana", "digital marketing Accra", "marketing consultancy Ghana"],
+    },
+    {
+      label: "Competitor Brand Monitoring",
+      color: "#8E6EC8",
+      note: "Track competitor visibility vs FifteenConsult",
+      url: "https://trends.google.com/trends/explore?q=BPG+Group,MCN+Middle+East,Elixirr,FifteenConsult",
+      keywords: ["BPG Group", "MCN Middle East", "Elixirr", "FifteenConsult"],
+    },
+  ];
+
   return (
     <div>
-      <div style={{ background:"#4285f418",border:"1px solid #4285f444",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
-        <div style={{ fontSize:11,color:"#4285f4",fontWeight:600,marginBottom:4 }}>📈 Google Trends — Free, No Setup</div>
+      <div style={{ background:"#4285f418",border:"1px solid #4285f444",borderRadius:8,padding:"12px 16px",marginBottom:16 }}>
+        <div style={{ fontSize:11,color:"#4285f4",fontWeight:600,marginBottom:4 }}>📈 Google Trends — Free, No Setup Required</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
-          Google Trends data is available to Tariq and Nadia via web fetch. No API key needed for manual use.
+          GCC-specific keywords often show "not enough data" — Qatar's search volume is small. 
+          Always start with <strong style={{ color:"var(--text)" }}>broad terms</strong> then narrow down. 
+          West Africa keywords have much higher volume.
         </div>
       </div>
-      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginBottom:12 }}>
-        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>How Tariq uses Google Trends:</div>
-        {["Track search interest for 'marketing consultancy Qatar' over time","Compare keyword popularity: 'marketing agency' vs 'marketing consultancy'","Identify seasonal patterns in GCC business searches","Find rising keywords in Nigeria and Ghana for West Africa expansion","Spot trending topics for Nadia's content calendar"].map((item,i) => (
-          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
-            <span style={{ color:"#4285f4" }}>→</span> {item}
+
+      {TREND_GROUPS.map((group, i) => (
+        <div key={i} style={{ marginBottom:10,border:`1px solid ${group.color}33`,borderRadius:8,overflow:"hidden" }}>
+          <div style={{ background:group.color+"18",padding:"10px 14px",borderBottom:`1px solid ${group.color}22` }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+              <div>
+                <div style={{ fontSize:11,fontWeight:700,color:group.color }}>{group.label}</div>
+                <div style={{ fontSize:10,color:"var(--text-dim)",marginTop:2 }}>{group.note}</div>
+              </div>
+              <a href={group.url} target="_blank" rel="noopener noreferrer"
+                style={{ fontSize:10,color:group.color,fontWeight:700,textDecoration:"none",background:group.color+"22",padding:"4px 10px",borderRadius:6,whiteSpace:"nowrap" }}>
+                Open ↗
+              </a>
+            </div>
           </div>
-        ))}
+          <div style={{ padding:"8px 14px",display:"flex",gap:6,flexWrap:"wrap" }}>
+            {group.keywords.map((kw,j) => (
+              <span key={j} style={{ fontSize:10,color:"var(--text-dim)",background:"var(--bg-base)",padding:"2px 8px",borderRadius:10 }}>{kw}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div style={{ marginTop:12,padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+        💡 <strong style={{ color:"var(--text)" }}>How to use with Tariq:</strong> Open a trend group → screenshot or note the data → 
+        paste into Tariq's custom prompt before running. He'll incorporate the trend data into his SEO strategy.
       </div>
-      <a href="https://trends.google.com/trends/explore?geo=QA&q=marketing%20consultancy%20qatar,marketing%20agency%20doha" target="_blank" rel="noopener noreferrer"
-        style={{ display:"block",background:"#4285f418",border:"1px solid #4285f444",borderRadius:8,padding:"10px 14px",fontSize:11,color:"#4285f4",fontWeight:600,textDecoration:"none",textAlign:"center" }}>
-        → Open Google Trends for FifteenConsult Keywords ↗
-      </a>
     </div>
   );
 }
