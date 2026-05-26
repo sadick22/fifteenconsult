@@ -1109,3 +1109,4 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
     </div>
   );
 }
+
