@@ -777,6 +777,56 @@ ${competitorCtx}
 ---`;
     }
 
+    // ── TARIQ: Auto-inject live SEO data ─────────────────────────────────────────
+    if (member.id === "tariq") {
+      try {
+        // Fetch PageSpeed and GSC data in parallel
+        const [psRes, gscRes] = await Promise.allSettled([
+          fetch("/api/pagespeed?url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/searchconsole?action=keywords"),
+        ]);
+
+        let seoContext = "\n\n===\nLIVE SEO DATA (fetched right now — use these exact numbers):\n";
+
+        // PageSpeed
+        if (psRes.status === "fulfilled" && psRes.value.ok) {
+          const ps = await psRes.value.json();
+          if (!ps.error) {
+            seoContext += `\nPAGESPEED INSIGHTS (fifteenconsult.com — Mobile):
+Performance Score: ${ps.scores?.performance}/100
+SEO Score: ${ps.scores?.seo}/100
+Accessibility: ${ps.scores?.accessibility}/100
+Best Practices: ${ps.scores?.bestPractices}/100
+LCP: ${ps.coreWebVitals?.lcp}
+CLS: ${ps.coreWebVitals?.cls}
+FCP: ${ps.coreWebVitals?.fcp}
+TTFB: ${ps.coreWebVitals?.ttfb}
+Top Opportunities: ${(ps.opportunities||[]).map(o => `${o.title} (${o.impact} impact)`).join(", ") || "None detected"}`;
+          }
+        } else {
+          seoContext += "\nPAGESPEED: Could not fetch — report as data unavailable, do not guess.";
+        }
+
+        // GSC Keywords
+        if (gscRes.status === "fulfilled" && gscRes.value.ok) {
+          const gsc = await gscRes.value.json();
+          if (!gsc.error && gsc.keywords) {
+            seoContext += `\n\nGOOGLE SEARCH CONSOLE — Target Keyword Rankings (Last 28 days):`;
+            gsc.keywords.forEach(k => {
+              seoContext += `\n- "${k.keyword}": Position ${k.position}, ${k.clicks} clicks, ${k.impressions} impressions, CTR ${k.ctr}`;
+            });
+          }
+        } else {
+          seoContext += "\n\nGSC KEYWORDS: Not yet configured — remind Sadick to add GSC OAuth credentials to Vercel.";
+        }
+
+        seoContext += "\n\nINSTRUCTION: Base ALL your recommendations on this real data. If a score is low, explain specifically why and what to fix in Webflow. If a keyword is not ranking, give specific on-page actions to target it.\n===";
+        enrichedSystemPrompt += seoContext;
+      } catch (err) {
+        console.warn("Tariq data fetch failed:", err.message);
+      }
+    }
+
     // Inject uploaded documents for David
     if (member.id === "david") {
       const docs = getAgentDocuments("david");
