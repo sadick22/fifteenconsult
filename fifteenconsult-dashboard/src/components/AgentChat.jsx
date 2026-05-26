@@ -197,7 +197,6 @@ export default function AgentChat({ member, lastOutput }) {
   const dateCtx = getDateContext();
   const [messages, setMessages] = useState(() => {
     const fresh = loadChats();
-    console.log(`[AgentChat] Loading ${member.id} — stored keys:`, Object.keys(fresh), '— messages:', (fresh[member.id] || []).length);
     return fresh[member.id] || [];
   });
   const [input, setInput]       = useState("");
@@ -211,7 +210,6 @@ export default function AgentChat({ member, lastOutput }) {
   useEffect(() => {
     switchingRef.current = true;
     const fresh = loadChats();
-    console.log(`[AgentChat] Switching to ${member.id} — stored keys:`, Object.keys(fresh), '— messages:', (fresh[member.id] || []).length);
     setMessages(fresh[member.id] || []);
     setInput("");
     setShowSuggestions(true);
