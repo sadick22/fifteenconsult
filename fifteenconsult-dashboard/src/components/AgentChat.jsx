@@ -196,12 +196,23 @@ function ChatMessage({ msg, color }) {
 export default function AgentChat({ member, lastOutput }) {
   const dateCtx = getDateContext();
   const allChats = loadChats();
-  const [messages, setMessages] = useState(() => allChats[member.id] || []);
+  const [messages, setMessages] = useState(() => {
+    const fresh = loadChats();
+    return fresh[member.id] || [];
+  });
   const [input, setInput]       = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
+
+  // Reload messages when switching between agents
+  useEffect(() => {
+    const fresh = loadChats();
+    setMessages(fresh[member.id] || []);
+    setInput("");
+    setShowSuggestions(true);
+  }, [member.id]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -215,12 +226,7 @@ export default function AgentChat({ member, lastOutput }) {
     saveChats(all);
   }, [messages, member.id]);
 
-  // Reset when switching agents
-  useEffect(() => {
-    const all = loadChats();
-    setMessages(all[member.id] || []);
-    setShowSuggestions(true);
-  }, [member.id]);
+
 
   const ts = () => new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 
