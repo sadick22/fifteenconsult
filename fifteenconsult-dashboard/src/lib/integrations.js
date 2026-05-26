@@ -262,6 +262,8 @@ export function getConnectionStatuses() {
     pagespeed:  true, // Free — no key needed for basic usage
     gsc:        !!(import.meta.env.VITE_GSC_CONFIGURED || import.meta.env.GA4_REFRESH_TOKEN),
     semrush:    true, // Via Claude MCP
+    schema:     true, // Free — scans page directly, no key needed
+    trends:     true, // Free — Google Trends web fetch, no key needed
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
     tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
