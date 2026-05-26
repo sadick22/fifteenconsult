@@ -6,6 +6,7 @@ import {
   fetchInstagramProfile, fetchInstagramPosts,
   fetchTikTokInsights,
   fetchMetaAdsPerformance, fetchMetaAdsAnomalies,
+  fetchPageSpeed, fetchGSCOverview, fetchGSCKeywords,
   getGA4SetupSteps, getMetaSetupSteps,
   getConnectionStatuses,
 } from "../lib/integrations.js";
@@ -19,6 +20,9 @@ const INTEGRATIONS = [
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
   { id:"instagram",  name:"Instagram",              icon:"📸", color:"#E1306C", agentName:"Sara",    description:"Followers · Engagement · Posts", envKeys:["INSTAGRAM_ACCESS_TOKEN","INSTAGRAM_ACCOUNT_ID"] },
   { id:"tiktok",     name:"TikTok Business",        icon:"🎵", color:"#69C9D0", agentName:"Sara/Malik", description:"Views · Engagement · Ads",    envKeys:["TIKTOK_ACCESS_TOKEN"] },
+  { id:"pagespeed",  name:"PageSpeed Insights",      icon:"⚡", color:"#34a853", agentName:"Tariq",   description:"Core Web Vitals · Performance scores" },
+  { id:"gsc",        name:"Google Search Console",   icon:"🔍", color:"#4285f4", agentName:"Tariq",   description:"Keyword rankings · Click data · Impressions" },
+  { id:"semrush",    name:"Semrush",                 icon:"📊", color:"#FF642D", agentName:"Tariq",   description:"Keyword research · Competitor analysis · Backlinks" },
   { id:"adadvisor",  name:"AdAdvisor",              icon:"🎯", color:"#FF6B35", agentName:"Hassan/Malik", description:"Meta Ads Intelligence",      envKeys:["VITE_ADADVISOR_CONNECTED"] },
 ];
 
@@ -285,6 +289,169 @@ function TikTokPanel({ connected }) {
     </div>
   );
 }
+// ── PAGESPEED PANEL ──────────────────────────────────────────────────────────────────
+function PageSpeedPanel() {
+  const [mobile,setMobile]   = useState(null);
+  const [desktop,setDesktop] = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    const [m,d] = await Promise.all([fetchPageSpeed("mobile"), fetchPageSpeed("desktop")]);
+    setMobile(m); setDesktop(d);
+    setLoading(false);
+  };
+  useEffect(() => { load(); },[]);
+
+  const ScoreBox = ({ score, label }) => {
+    const color = score >= 90 ? "#34a853" : score >= 50 ? "#fbbc04" : "#ea4335";
+    return (
+      <div style={{ textAlign:"center",background:"var(--bg-base)",borderRadius:8,padding:"10px 6px",border:`2px solid ${color}44` }}>
+        <div style={{ fontSize:26,fontWeight:700,color }}>{score}</div>
+        <div style={{ fontSize:9,color:"var(--text-dim)",marginTop:2 }}>{label}</div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+        <SectionLabel>fifteenconsult.com — Live Performance Scores</SectionLabel>
+        <button onClick={load} style={{ background:"none",border:"none",color:"#34a853",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
+      </div>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Running PageSpeed analysis on fifteenconsult.com...</div>
+      : mobile?.error ? <div style={{ fontSize:11,color:"#f87171",lineHeight:1.7 }}>⚠ {mobile.error}</div>
+      : mobile ? (
+        <>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginBottom:16 }}>
+            <div>
+              <div style={{ fontSize:10,color:"var(--text-dim)",marginBottom:8 }}>📱 MOBILE</div>
+              <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:6 }}>
+                {Object.entries(mobile.scores||{}).map(([k,v]) => <ScoreBox key={k} score={v} label={k.replace(/([A-Z])/g," $1").trim()}/>)}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize:10,color:"var(--text-dim)",marginBottom:8 }}>🖥 DESKTOP</div>
+              <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:6 }}>
+                {Object.entries(desktop?.scores||{}).map(([k,v]) => <ScoreBox key={k} score={v} label={k.replace(/([A-Z])/g," $1").trim()}/>)}
+              </div>
+            </div>
+          </div>
+          <SectionLabel>Core Web Vitals (Mobile)</SectionLabel>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16 }}>
+            {Object.entries(mobile.coreWebVitals||{}).map(([k,v]) => (
+              <StatBox key={k} label={k.toUpperCase()} value={v} color="var(--text)"/>
+            ))}
+          </div>
+          {(mobile.opportunities||[]).length > 0 && (
+            <>
+              <SectionLabel>🔧 Top Opportunities</SectionLabel>
+              {mobile.opportunities.map((o,i) => (
+                <div key={i} style={{ fontSize:11,padding:"5px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+                  <span style={{ color:o.impact==="high"?"#f87171":"#fbbf24",flexShrink:0 }}>→</span>
+                  <span style={{ color:"var(--text-mid)" }}>{o.title}{o.savings?` (${o.savings})`:""}</span>
+                </div>
+              ))}
+            </>
+          )}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+// ── GSC PANEL ─────────────────────────────────────────────────────────────────────
+function GSCPanel() {
+  const [overview,setOverview] = useState(null);
+  const [keywords,setKeywords] = useState(null);
+  const [tab,setTab]           = useState("keywords");
+  const [loading,setLoading]   = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    const [o,k] = await Promise.all([fetchGSCOverview(), fetchGSCKeywords()]);
+    setOverview(o); setKeywords(k);
+    setLoading(false);
+  };
+  useEffect(() => { load(); },[]);
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+        <SectionLabel>Google Search Console — fifteenconsult.com</SectionLabel>
+        <button onClick={load} style={{ background:"none",border:"none",color:"#4285f4",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
+      </div>
+      <div style={{ display:"flex",gap:6,marginBottom:14 }}>
+        {["keywords","pages"].map(t => (
+          <button key={t} onClick={()=>setTab(t)} style={{ background:tab===t?"#4285f418":"none",border:`1px solid ${tab===t?"#4285f4":"var(--border)"}`,color:tab===t?"#4285f4":"var(--text-dim)",fontSize:10,fontWeight:tab===t?700:400,padding:"5px 14px",borderRadius:7,cursor:"pointer",fontFamily:"var(--font-mono)",textTransform:"uppercase" }}>{t}</button>
+        ))}
+      </div>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading from Search Console...</div>
+      : tab==="keywords" && keywords?.error ? (
+        <div style={{ lineHeight:1.8 }}>
+          <div style={{ fontSize:11,color:"#f87171",marginBottom:8 }}>⚠ {keywords.error}</div>
+          <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",fontSize:11,color:"var(--text-dim)" }}>
+            <strong style={{ color:"var(--text)" }}>To connect Google Search Console:</strong><br/>
+            Add these to Vercel env vars (reuse your GA4 OAuth credentials):<br/>
+            <code style={{ color:"#4ade80" }}>GSC_CLIENT_ID</code> = same as GA4_CLIENT_ID<br/>
+            <code style={{ color:"#4ade80" }}>GSC_CLIENT_SECRET</code> = same as GA4_CLIENT_SECRET<br/>
+            <code style={{ color:"#4ade80" }}>GSC_REFRESH_TOKEN</code> = new token from OAuth Playground with Search Console scope
+          </div>
+        </div>
+      )
+      : tab==="keywords" && keywords?.keywords ? (
+        <>
+          <div style={{ fontSize:10,color:"var(--text-dim)",marginBottom:10 }}>Period: {keywords.period}</div>
+          {keywords.keywords.map((k,i) => (
+            <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:"1px solid var(--border)",fontSize:11 }}>
+              <span style={{ color:"var(--text-mid)",flex:1 }}>{k.keyword}</span>
+              <span style={{ color:typeof k.position==="number"&&k.position<=5?"#4ade80":typeof k.position==="number"&&k.position<=10?"#fbbf24":"#f87171",fontWeight:700,marginLeft:12 }}>
+                {typeof k.position==="number"?`#${k.position}`:k.position}
+              </span>
+              <span style={{ color:"var(--text-dim)",marginLeft:10 }}>{k.clicks} clicks</span>
+            </div>
+          ))}
+        </>
+      )
+      : tab==="pages" && overview?.topPages ? (
+        <>
+          <div style={{ fontSize:10,color:"var(--text-dim)",marginBottom:10 }}>Period: {overview.period}</div>
+          {overview.topPages.map((p,i) => (
+            <div key={i} style={{ padding:"7px 0",borderBottom:"1px solid var(--border)",fontSize:11 }}>
+              <div style={{ color:"#4285f4",marginBottom:3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{p.page}</div>
+              <div style={{ display:"flex",gap:14,color:"var(--text-dim)" }}>
+                <span>{p.clicks} clicks</span><span>{p.impressions.toLocaleString()} impressions</span><span>Pos #{p.position}</span>
+              </div>
+            </div>
+          ))}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+// ── SEMRUSH PANEL ─────────────────────────────────────────────────────────────────
+function SemrushPanel() {
+  return (
+    <div>
+      <div style={{ background:"#FF642D18",border:"1px solid #FF642D44",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#FF642D",fontWeight:600,marginBottom:4 }}>📊 Semrush — Connect via Claude.ai</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Connect your Semrush account in <strong>Claude.ai → Settings → Integrations → Semrush</strong>. Once connected, Tariq uses it directly in briefings for live keyword and competitor data.
+        </div>
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What Tariq gets from Semrush:</div>
+        {["Live keyword rankings for GCC target keywords","Competitor keyword gap — what BPG and MCN rank for","Backlink opportunities and referring domain analysis","Site audit — technical SEO issues","Domain authority tracking","Content gap analysis"].map((item,i) => (
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#FF642D" }}>→</span> {item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 // ── ADADVISOR PANEL ───────────────────────────────────────────────────────────
 function AdAdvisorPanel({ connected }) {
@@ -586,6 +753,9 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
+              {activeId==="pagespeed"  && <PageSpeedPanel  connected={connected}/>}
+              {activeId==="gsc"        && <GSCPanel         connected={connected}/>}
+              {activeId==="semrush"    && <SemrushPanel     connected={connected}/>}
               {activeId==="ga4"        && <GA4Panel connected={connected}/>}
               {activeId==="meta"       && <MetaPanel       connected={connected}/>}
               {activeId==="make"       && <MakePanel/>}
