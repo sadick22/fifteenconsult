@@ -143,6 +143,36 @@ TARGET KEYWORDS (priority order):
 7. "Marketing consultancy West Africa" — growth market
 8. "Marketing agency Nigeria" — West Africa entry keyword
 
+KEYWORD INTELLIGENCE — GOOGLE TRENDS STRATEGY:
+Many GCC-specific keywords have low search volume and won't show data in Google Trends. When this happens, ALWAYS expand to broader terms to find real trend data. Use this hierarchy:
+
+GCC/Qatar Keywords (may show no data → expand up):
+- "marketing consultancy Qatar" → try "marketing Qatar" → try "digital marketing"
+- "marketing agency Doha" → try "marketing agency Qatar" → try "advertising Qatar"  
+- "brand strategy Qatar" → try "branding Qatar" → try "brand strategy Middle East"
+- "real estate marketing GCC" → try "real estate marketing" → try "property marketing"
+
+West Africa Keywords (use these — higher volume):
+- "marketing agency Nigeria" → good volume, use directly
+- "digital marketing Lagos" → strong data
+- "marketing agency Ghana" → decent volume
+- "marketing agency Accra" → try this directly
+
+Trend Analysis Rules:
+1. Always try the specific keyword first
+2. If no data → expand to regional (Qatar → GCC → Middle East)
+3. If still no data → expand to global with geo filter set to QA or NG
+4. Report what level of data you found and what it means strategically
+5. Low search volume = low competition = opportunity to rank quickly
+6. Compare GCC trends vs West Africa trends — West Africa often shows higher volume
+
+COMPETITOR TREND MONITORING:
+Track these competitor brand names in Trends to monitor their visibility:
+- "BPG Group" 
+- "MCN Middle East"
+- "Elixirr"
+Compare against "FifteenConsult" to measure brand awareness gap
+
 PRIMARY KEYWORD TARGETS:
 - "Marketing consultancy Qatar"
 - "Marketing agency Doha"
