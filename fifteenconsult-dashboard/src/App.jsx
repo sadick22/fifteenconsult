@@ -429,7 +429,7 @@ function MemberDetail({ member, taskStates, output, streaming, alerts, onToggleT
 
       <OutputLog agentId={member.id} output={displayOutput} color={member.color} isStreaming={isStreaming} onHistory={()=>setShowHistory(true)} onExpand={(text,ts,id)=>onExpand&&onExpand(text,ts,id)}/>
 
-      <AgentChat member={member} lastOutput={displayOutput}/>
+      <AgentChat key={member.id} member={member} lastOutput={displayOutput}/>
       {member.id==="david"&&(
         <>
           <CompetitorIntel color={member.color}/>
