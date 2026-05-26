@@ -177,6 +177,37 @@ export async function fetchTikTokInsights() {
   } catch (err) { return { error: err.message }; }
 }
 
+// ── PAGESPEED ─────────────────────────────────────────────────────────────────────
+
+export async function fetchPageSpeed(strategy = "mobile") {
+  try {
+    const r = await fetch(`/api/pagespeed?url=https://fifteenconsult.com&strategy=${strategy}`);
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
+// ── GOOGLE SEARCH CONSOLE ─────────────────────────────────────────────────────
+
+export async function fetchGSCOverview() {
+  try {
+    const r = await fetch("/api/searchconsole?action=overview");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
+export async function fetchGSCKeywords() {
+  try {
+    const r = await fetch("/api/searchconsole?action=keywords");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
 // ── META ADS (Official MCP) ──────────────────────────────────────────────────────
 
 export async function fetchMetaAdsPerformance() {
@@ -227,7 +258,10 @@ export function getConnectionStatuses() {
     mailerlite: !!import.meta.env.VITE_MAILERLITE_API_KEY,
     linkedin:   !!(import.meta.env.VITE_LINKEDIN_ACCESS_TOKEN && import.meta.env.VITE_LINKEDIN_ORG_ID),
     ga4:        !!import.meta.env.VITE_GA4_MEASUREMENT_ID,
-    meta:       true, // Connected via official Meta MCP — pending account activation
+    meta:       true,
+    pagespeed:  true, // Free — no key needed for basic usage
+    gsc:        !!(import.meta.env.VITE_GSC_CONFIGURED || import.meta.env.GA4_REFRESH_TOKEN),
+    semrush:    true, // Via Claude MCP
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
     tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
