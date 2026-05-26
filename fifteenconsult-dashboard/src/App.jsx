@@ -780,10 +780,11 @@ ${competitorCtx}
     // ── TARIQ: Auto-inject live SEO data ─────────────────────────────────────────
     if (member.id === "tariq") {
       try {
-        // Fetch PageSpeed and GSC data in parallel
-        const [psRes, gscRes] = await Promise.allSettled([
+        // Fetch all SEO data in parallel
+        const [psRes, gscRes, schemaRes] = await Promise.allSettled([
           fetch("/api/pagespeed?url=https://fifteenconsult.com&strategy=mobile"),
           fetch("/api/searchconsole?action=keywords"),
+          fetch("/api/schematest?url=https://fifteenconsult.com"),
         ]);
 
         let seoContext = "\n\n===\nLIVE SEO DATA (fetched right now — use these exact numbers):\n";
@@ -818,6 +819,22 @@ Top Opportunities: ${(ps.opportunities||[]).map(o => `${o.title} (${o.impact} im
           }
         } else {
           seoContext += "\n\nGSC KEYWORDS: Not yet configured — remind Sadick to add GSC OAuth credentials to Vercel.";
+        }
+
+        // Schema/Structured Data
+        if (schemaRes.status === "fulfilled" && schemaRes.value.ok) {
+          const schema = await schemaRes.value.json();
+          if (!schema.error) {
+            seoContext += `\n\nSTRUCTURED DATA & META TAGS (fifteenconsult.com homepage):
+Schema Score: ${schema.score}/100
+Schema Types Found: ${schema.schemas?.types?.join(", ") || "None"}
+Missing Schema: ${schema.schemas?.missing?.join(", ") || "None — good!"}
+Meta Title: "${schema.meta?.title}" (${schema.meta?.titleLength} chars)
+Meta Description: ${schema.meta?.hasMetaDesc ? `"${schema.meta?.description?.slice(0,80)}..."` : "MISSING"}
+Has Canonical: ${schema.meta?.hasCanonical ? "Yes" : "No — missing"}
+Has Open Graph: ${schema.meta?.hasOG ? "Yes" : "No — missing"}
+Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
+          }
         }
 
         seoContext += "\n\nINSTRUCTION: Base ALL your recommendations on this real data. If a score is low, explain specifically why and what to fix in Webflow. If a keyword is not ranking, give specific on-page actions to target it.\n===";
