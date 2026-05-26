@@ -20,6 +20,8 @@ const INTEGRATIONS = [
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
   { id:"instagram",  name:"Instagram",              icon:"📸", color:"#E1306C", agentName:"Sara",    description:"Followers · Engagement · Posts", envKeys:["INSTAGRAM_ACCESS_TOKEN","INSTAGRAM_ACCOUNT_ID"] },
   { id:"tiktok",     name:"TikTok Business",        icon:"🎵", color:"#69C9D0", agentName:"Sara/Malik", description:"Views · Engagement · Ads",    envKeys:["TIKTOK_ACCESS_TOKEN"] },
+  { id:"trends",     name:"Google Trends",            icon:"📈", color:"#4285f4", agentName:"Tariq/Nadia", description:"Search interest · GCC keyword trends" },
+  { id:"schema",     name:"Structured Data Tester",   icon:"🏷", color:"#34a853", agentName:"Tariq",   description:"Schema markup · Meta tags · Rich results" },
   { id:"pagespeed",  name:"PageSpeed Insights",      icon:"⚡", color:"#34a853", agentName:"Tariq",   description:"Core Web Vitals · Performance scores" },
   { id:"gsc",        name:"Google Search Console",   icon:"🔍", color:"#4285f4", agentName:"Tariq",   description:"Keyword rankings · Click data · Impressions" },
   { id:"semrush",    name:"Semrush",                 icon:"📊", color:"#FF642D", agentName:"Tariq",   description:"Keyword research · Competitor analysis · Backlinks" },
@@ -289,6 +291,91 @@ function TikTokPanel({ connected }) {
     </div>
   );
 }
+// ── TRENDS PANEL ─────────────────────────────────────────────────────────────────────
+function TrendsPanel() {
+  return (
+    <div>
+      <div style={{ background:"#4285f418",border:"1px solid #4285f444",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#4285f4",fontWeight:600,marginBottom:4 }}>📈 Google Trends — Free, No Setup</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Google Trends data is available to Tariq and Nadia via web fetch. No API key needed for manual use.
+        </div>
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginBottom:12 }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>How Tariq uses Google Trends:</div>
+        {["Track search interest for 'marketing consultancy Qatar' over time","Compare keyword popularity: 'marketing agency' vs 'marketing consultancy'","Identify seasonal patterns in GCC business searches","Find rising keywords in Nigeria and Ghana for West Africa expansion","Spot trending topics for Nadia's content calendar"].map((item,i) => (
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#4285f4" }}>→</span> {item}
+          </div>
+        ))}
+      </div>
+      <a href="https://trends.google.com/trends/explore?geo=QA&q=marketing%20consultancy%20qatar,marketing%20agency%20doha" target="_blank" rel="noopener noreferrer"
+        style={{ display:"block",background:"#4285f418",border:"1px solid #4285f444",borderRadius:8,padding:"10px 14px",fontSize:11,color:"#4285f4",fontWeight:600,textDecoration:"none",textAlign:"center" }}>
+        → Open Google Trends for FifteenConsult Keywords ↗
+      </a>
+    </div>
+  );
+}
+
+// ── SCHEMA PANEL ─────────────────────────────────────────────────────────────────────
+function SchemaPanel() {
+  const [data,setData]       = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const r = await fetch("/api/schematest?url=https://fifteenconsult.com");
+      setData(await r.json());
+    } catch(e) { setData({ error: e.message }); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); },[]);
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+        <SectionLabel>Structured Data — fifteenconsult.com</SectionLabel>
+        <button onClick={load} style={{ background:"none",border:"none",color:"#34a853",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
+      </div>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Scanning fifteenconsult.com...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
+      : data ? (
+        <>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16 }}>
+            <StatBox label="Schema Score" value={`${data.score}/100`} color={data.score>=70?"#4ade80":data.score>=40?"#fbbf24":"#f87171"}/>
+            <StatBox label="Schemas Found" value={data.schemas?.count||0} color="var(--text)"/>
+          </div>
+          {data.meta && (
+            <>
+              <SectionLabel>Meta Tags</SectionLabel>
+              {[
+                { label:"Title", value: `"${data.meta.title?.slice(0,50)}"`, ok: data.meta.titleLength > 0 && data.meta.titleLength <= 60 },
+                { label:"Description", value: data.meta.hasMetaDesc ? "✓ Present" : "✗ MISSING", ok: data.meta.hasMetaDesc },
+                { label:"Canonical", value: data.meta.hasCanonical ? "✓ Present" : "✗ Missing", ok: data.meta.hasCanonical },
+                { label:"Open Graph", value: data.meta.hasOG ? "✓ Present" : "✗ Missing", ok: data.meta.hasOG },
+              ].map((m,i) => (
+                <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid var(--border)",fontSize:11 }}>
+                  <span style={{ color:"var(--text-dim)" }}>{m.label}</span>
+                  <span style={{ color:m.ok?"#4ade80":"#f87171",fontWeight:600 }}>{m.value}</span>
+                </div>
+              ))}
+            </>
+          )}
+          {data.recommendations?.length > 0 && (
+            <>
+              <SectionLabel style={{ marginTop:14 }}>Recommendations for Tariq</SectionLabel>
+              {data.recommendations.map((r,i) => (
+                <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"5px 0",borderBottom:"1px solid var(--border)" }}>{r}</div>
+              ))}
+            </>
+          )}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 // ── PAGESPEED PANEL ──────────────────────────────────────────────────────────────────
 function PageSpeedPanel() {
   const [mobile,setMobile]   = useState(null);
@@ -754,6 +841,8 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
               {activeId==="pagespeed"  && <PageSpeedPanel  connected={connected}/>}
+              {activeId==="trends"     && <TrendsPanel/>}
+              {activeId==="schema"     && <SchemaPanel/>}
               {activeId==="gsc"        && <GSCPanel         connected={connected}/>}
               {activeId==="semrush"    && <SemrushPanel     connected={connected}/>}
               {activeId==="ga4"        && <GA4Panel connected={connected}/>}
