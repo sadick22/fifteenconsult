@@ -195,7 +195,6 @@ function ChatMessage({ msg, color }) {
 
 export default function AgentChat({ member, lastOutput }) {
   const dateCtx = getDateContext();
-  const allChats = loadChats();
   const [messages, setMessages] = useState(() => {
     const fresh = loadChats();
     return fresh[member.id] || [];
@@ -207,11 +206,15 @@ export default function AgentChat({ member, lastOutput }) {
   const inputRef  = useRef(null);
 
   // Reload messages when switching between agents
+  const switchingRef = useRef(false);
   useEffect(() => {
+    switchingRef.current = true;
     const fresh = loadChats();
     setMessages(fresh[member.id] || []);
     setInput("");
     setShowSuggestions(true);
+    // Allow saves again after state settles
+    setTimeout(() => { switchingRef.current = false; }, 100);
   }, [member.id]);
 
   // Scroll to bottom on new messages
@@ -219,12 +222,20 @@ export default function AgentChat({ member, lastOutput }) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Persist messages
+  // Persist messages — use ref to prevent saving old agent's messages to new agent
+  const memberIdRef = useRef(member.id);
   useEffect(() => {
+    memberIdRef.current = member.id;
+  }, [member.id]);
+
+  useEffect(() => {
+    // Block saves during agent switching or with empty messages on load
+    if (switchingRef.current) return;
+    if (memberIdRef.current !== member.id) return;
     const all = loadChats();
-    all[member.id] = messages.slice(-50); // Keep last 50 messages
+    all[member.id] = messages.slice(-50);
     saveChats(all);
-  }, [messages, member.id]);
+  }, [messages]);
 
 
 
