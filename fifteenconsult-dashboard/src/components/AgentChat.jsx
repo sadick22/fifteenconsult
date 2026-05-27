@@ -204,6 +204,8 @@ export default function AgentChat({ member, lastOutput }) {
   const [showSuggestions, setShowSuggestions] = useState(true);
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
+  const imageRef   = useRef(null);
+  const [pendingImage, setPendingImage] = useState(null);
 
   // Reload messages when switching between agents
   const switchingRef = useRef(false);
@@ -251,6 +253,20 @@ export default function AgentChat({ member, lastOutput }) {
 
     return `${member.systemPrompt}\n\nDATE CONTEXT: ${dateBlock}${outputContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
   }, [member, lastOutput, dateCtx]);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { alert("Please upload an image file."); return; }
+    if (file.size > 5 * 1024 * 1024) { alert("Image must be under 5MB."); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target.result.split(",")[1];
+      setPendingImage({ base64, mediaType: file.type, preview: ev.target.result });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
   const sendMessage = useCallback(async (text) => {
     if (!text.trim() || isTyping) return;
@@ -427,11 +443,19 @@ export default function AgentChat({ member, lastOutput }) {
         </div>
       )}
 
+      {pendingImage && (
+        <div style={{ padding:"8px 14px",borderTop:`1px solid ${T.border}`,display:"flex",alignItems:"center",gap:10,background:T.card,flexShrink:0 }}>
+          <img src={pendingImage.preview} alt="preview" style={{ width:40,height:40,objectFit:"cover",borderRadius:6,border:`1px solid ${T.border}` }}/>
+          <div style={{ flex:1,fontSize:11,color:T.textMid }}>📎 Image ready — sends with your next message</div>
+          <button onClick={()=>setPendingImage(null)} style={{ background:"none",border:"none",color:T.textDim,cursor:"pointer",fontSize:18,lineHeight:1 }}>×</button>
+        </div>
+      )}
       {/* Input area */}
       <div style={{
         padding: "12px 18px", borderTop: `1px solid ${T.border}`,
         display: "flex", gap: 10, flexShrink: 0, background: T.base,
       }}>
+        <input ref={imageRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display:"none" }}/>
         <textarea
           ref={inputRef}
           value={input}
