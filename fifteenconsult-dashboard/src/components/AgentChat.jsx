@@ -283,6 +283,9 @@ export default function AgentChat({ member, lastOutput }) {
 
     history.push({ role: "user", content: text.trim() });
 
+    const imageToSend = pendingImage;
+    if (pendingImage) setPendingImage(null);
+
     try {
       await callClaudeAPI(
         buildSystemPrompt(),
@@ -294,7 +297,8 @@ export default function AgentChat({ member, lastOutput }) {
           setMessages(prev => prev.map(m =>
             m.id === agentMsgId ? { ...m, content: partial } : m
           ));
-        }
+        },
+        imageToSend
       );
       // Mark as done streaming
       setMessages(prev => prev.map(m =>
@@ -452,15 +456,22 @@ export default function AgentChat({ member, lastOutput }) {
           onBlur={e => e.target.style.borderColor = T.border}
         />
         <button
+          onClick={()=>imageRef.current?.click()}
+          title="Upload screenshot or image (JPG, PNG, GIF)"
+          style={{ background:"none",border:`1px solid ${pendingImage?member.color:T.border}`,borderRadius:8,padding:"0 12px",fontSize:16,cursor:"pointer",color:pendingImage?member.color:T.textDim,flexShrink:0,alignSelf:"stretch",transition:"all 0.2s" }}
+          onMouseEnter={e=>e.currentTarget.style.borderColor=member.color}
+          onMouseLeave={e=>{ if(!pendingImage) e.currentTarget.style.borderColor=T.border; }}
+        >📎</button>
+        <button
           onClick={() => sendMessage(input)}
-          disabled={!input.trim() || isTyping}
+          disabled={(!input.trim() && !pendingImage) || isTyping}
           style={{
-            background: !input.trim() || isTyping ? "transparent" : member.color,
-            color: !input.trim() || isTyping ? T.textDim : "#000",
-            border: `1px solid ${!input.trim() || isTyping ? T.border : member.color}`,
+            background: (!input.trim() && !pendingImage) || isTyping ? "transparent" : member.color,
+            color: (!input.trim() && !pendingImage) || isTyping ? T.textDim : "#000",
+            border: `1px solid ${(!input.trim() && !pendingImage) || isTyping ? T.border : member.color}`,
             borderRadius: 8, padding: "0 18px", fontSize: 11,
             fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-            cursor: !input.trim() || isTyping ? "not-allowed" : "pointer",
+            cursor: (!input.trim() && !pendingImage) || isTyping ? "not-allowed" : "pointer",
             fontFamily: "var(--font-mono)", transition: "all 0.2s",
             flexShrink: 0, alignSelf: "stretch",
           }}
