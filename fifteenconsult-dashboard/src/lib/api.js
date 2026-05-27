@@ -2,7 +2,7 @@
  * api.js — Anthropic Claude API with streaming
  * API key loaded from environment variable VITE_ANTHROPIC_API_KEY
  */
-export async function callClaudeAPI(systemPrompt, userMessage, onChunk) {
+export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = null) {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
   if (!apiKey) {
@@ -26,7 +26,15 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk) {
       model: "claude-sonnet-4-20250514",
       max_tokens: 2000,
       system: systemPrompt,
-      messages: [{ role: "user", content: userMessage }],
+      messages: [{
+        role: "user",
+        content: image
+          ? [
+              { type: "image", source: { type: "base64", media_type: image.mediaType, data: image.base64 } },
+              { type: "text", text: userMessage },
+            ]
+          : userMessage,
+      }],
       stream: true,
     }),
   });
