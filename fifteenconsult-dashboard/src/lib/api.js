@@ -67,3 +67,4 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = 
   }
   return fullText;
 }
+
