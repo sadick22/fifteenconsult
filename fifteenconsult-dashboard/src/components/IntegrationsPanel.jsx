@@ -6,6 +6,7 @@ import {
   fetchInstagramProfile, fetchInstagramPosts,
   fetchTikTokInsights,
   fetchMetaAdsPerformance, fetchMetaAdsAnomalies,
+  fetchClarityData, fetchHotjarData, fetchUTMTemplates,
   fetchPageSpeed, fetchGSCOverview, fetchGSCKeywords,
   getGA4SetupSteps, getMetaSetupSteps,
   getConnectionStatuses,
@@ -18,6 +19,9 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"clarity",    name:"Microsoft Clarity",        icon:"👁", color:"#0078d4", agentName:"Zara",    description:"Heatmaps · Rage clicks · Session recordings" },
+  { id:"hotjar",     name:"Hotjar",                   icon:"🔥", color:"#FF3C00", agentName:"Zara",    description:"Recordings · Funnels · User behaviour" },
+  { id:"utm",        name:"UTM Campaign Tracker",     icon:"🔗", color:"#C8A96E", agentName:"Zara",    description:"Campaign attribution · UTM builder · Link generator" },
   { id:"instagram",  name:"Instagram",              icon:"📸", color:"#E1306C", agentName:"Sara",    description:"Followers · Engagement · Posts", envKeys:["INSTAGRAM_ACCESS_TOKEN","INSTAGRAM_ACCOUNT_ID"] },
   { id:"tiktok",     name:"TikTok Business",        icon:"🎵", color:"#69C9D0", agentName:"Sara/Malik", description:"Views · Engagement · Ads",    envKeys:["TIKTOK_ACCESS_TOKEN"] },
   { id:"trends",     name:"Google Trends",            icon:"📈", color:"#4285f4", agentName:"Tariq/Nadia", description:"Search interest · GCC keyword trends" },
@@ -594,6 +598,205 @@ function SemrushPanel() {
   );
 }
 
+// ── CLARITY PANEL ────────────────────────────────────────────────────────────────
+function ClarityPanel() {
+  const [data,setData]       = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => { setLoading(true); setData(await fetchClarityData()); setLoading(false); };
+  useEffect(()=>{ load(); },[]);
+
+  if(!data?.configured) return (
+    <div>
+      <div style={{ background:"#0078d418",border:"1px solid #0078d444",borderRadius:8,padding:"14px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#0078d4",fontWeight:600,marginBottom:6 }}>👁 Microsoft Clarity — Free Setup (5 minutes)</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
+          1. Go to <strong style={{ color:"var(--text)" }}>clarity.microsoft.com</strong> → Sign in with Microsoft account<br/>
+          2. Click <strong style={{ color:"var(--text)" }}>New project</strong> → Name: FifteenConsult → URL: fifteenconsult.com<br/>
+          3. Copy the tracking code snippet<br/>
+          4. In Webflow → Site Settings → Custom Code → Head → paste the snippet → Publish<br/>
+          5. In Clarity → Settings → API → Generate token<br/>
+          6. Add to Vercel: <code style={{ color:"#4ade80" }}>CLARITY_API_TOKEN</code> and <code style={{ color:"#4ade80" }}>CLARITY_PROJECT_ID</code>
+        </div>
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What Zara gets from Clarity:</div>
+        {["Heatmaps — where users click on every page","Session recordings — watch real user journeys","Rage clicks — where users are frustrated","Dead clicks — confusing UI elements","Scroll depth — how far users read","Quick backs — pages that disappoint visitors","Completely free — unlimited sessions"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#0078d4" }}>→</span>{item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+        <SectionLabel>Microsoft Clarity — fifteenconsult.com</SectionLabel>
+        <button onClick={load} style={{ background:"none",border:"none",color:"#0078d4",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
+      </div>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading Clarity data...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
+      : (
+        <>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14 }}>
+            <StatBox label="Sessions" value={data.sessions?.toLocaleString()||"—"} color="#0078d4"/>
+            <StatBox label="Pages/Session" value={data.pagesPerSession||"—"} color="var(--text)"/>
+            <StatBox label="Avg Scroll" value={data.avgScrollDepth||"—"} color="var(--text)"/>
+          </div>
+          <SectionLabel>Behaviour Issues</SectionLabel>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,marginBottom:14 }}>
+            <StatBox label="Rage Clicks" value={data.rageClicks||0} color={data.rageClicks>10?"#f87171":"#4ade80"}/>
+            <StatBox label="Dead Clicks" value={data.deadClicks||0} color={data.deadClicks>20?"#fbbf24":"#4ade80"}/>
+            <StatBox label="Quick Backs" value={data.quickBacks||0} color={data.quickBacks>10?"#f87171":"#4ade80"}/>
+          </div>
+          {data.topPages?.length>0 && (
+            <>
+              <SectionLabel>Top Pages</SectionLabel>
+              {data.topPages.map((p,i)=>(
+                <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:"1px solid var(--border)",fontSize:11 }}>
+                  <span style={{ color:"#0078d4",flex:1 }}>{p.page}</span>
+                  <span style={{ color:"var(--text-dim)",marginLeft:10 }}>{p.sessions} sessions</span>
+                  <span style={{ color:"var(--text-dim)",marginLeft:10 }}>{p.scrollDepth} scroll</span>
+                </div>
+              ))}
+            </>
+          )}
+          <a href={data.clarityDashboard} target="_blank" rel="noopener noreferrer"
+            style={{ display:"block",marginTop:12,background:"#0078d418",border:"1px solid #0078d444",borderRadius:8,padding:"8px 14px",fontSize:11,color:"#0078d4",fontWeight:600,textDecoration:"none",textAlign:"center" }}>
+            → Open Clarity Dashboard ↗
+          </a>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── HOTJAR PANEL ─────────────────────────────────────────────────────────────────
+function HotjarPanel() {
+  const [data,setData]       = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => { setLoading(true); setData(await fetchHotjarData()); setLoading(false); };
+  useEffect(()=>{ load(); },[]);
+
+  return (
+    <div>
+      <div style={{ background:"#FF3C0018",border:"1px solid #FF3C0044",borderRadius:8,padding:"14px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#FF3C00",fontWeight:600,marginBottom:6 }}>🔥 Hotjar — Free Tier (35 sessions/day)</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
+          {!data?.configured ? <>
+            1. Go to <strong style={{ color:"var(--text)" }}>hotjar.com</strong> → Free account → Add fifteenconsult.com<br/>
+            2. Copy tracking code → Webflow Site Settings → Custom Code → Head → Publish<br/>
+            3. Account → Personal API Keys → Generate key<br/>
+            4. Add to Vercel: <code style={{ color:"#4ade80" }}>HOTJAR_API_KEY</code> and <code style={{ color:"#4ade80" }}>HOTJAR_SITE_ID</code>
+          </> : <>Hotjar is tracking fifteenconsult.com — visit dashboard for heatmaps and recordings</>}
+        </div>
+      </div>
+      {data?.configured && (
+        <a href={data.hotjarDashboard} target="_blank" rel="noopener noreferrer"
+          style={{ display:"block",background:"#FF3C0018",border:"1px solid #FF3C0044",borderRadius:8,padding:"10px 14px",fontSize:11,color:"#FF3C00",fontWeight:600,textDecoration:"none",textAlign:"center" }}>
+          → Open Hotjar Dashboard ↗
+        </a>
+      )}
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginTop:12 }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What Zara gets from Hotjar:</div>
+        {["Click heatmaps — see exactly where users click","Move heatmaps — track mouse movement patterns","Scroll heatmaps — how far users read each page","Session recordings — replay individual user journeys","Funnel analysis — where users drop off","Form analysis — which fields cause friction"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#FF3C00" }}>→</span>{item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── UTM PANEL ─────────────────────────────────────────────────────────────────────
+function UTMPanel() {
+  const [templates,setTemplates] = useState(null);
+  const [building,setBuilding]   = useState(false);
+  const [form,setForm]           = useState({ baseUrl:"https://fifteenconsult.com", source:"linkedin", medium:"paid", campaign:"", content:"", term:"" });
+  const [result,setResult]       = useState(null);
+  const [copied,setCopied]       = useState(false);
+
+  useEffect(()=>{ fetchUTMTemplates().then(setTemplates); },[]);
+
+  const buildUTM = async () => {
+    setBuilding(true);
+    try {
+      const r = await fetch("/api/utm?action=build", {
+        method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(form),
+      });
+      const d = await r.json();
+      setResult(d.utmUrl || d.error);
+    } catch(e) { setResult("Error: " + e.message); }
+    setBuilding(false);
+  };
+
+  const copyResult = () => {
+    navigator.clipboard.writeText(result);
+    setCopied(true);
+    setTimeout(()=>setCopied(false), 2000);
+  };
+
+  return (
+    <div>
+      <div style={{ fontSize:12,color:"var(--text-mid)",marginBottom:16,lineHeight:1.7 }}>
+        Build properly formatted UTM URLs for all FifteenConsult campaigns. Zara uses UTM data to track which channels drive traffic and leads.
+      </div>
+
+      {/* UTM Builder */}
+      <SectionLabel>UTM URL Builder</SectionLabel>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginBottom:16 }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10 }}>
+          {[
+            { key:"source",   label:"Source *",   placeholder:"linkedin, google, mailerlite" },
+            { key:"medium",   label:"Medium *",   placeholder:"paid, organic, email, referral" },
+            { key:"campaign", label:"Campaign *", placeholder:"linkedin-leadgen-q3-2026" },
+            { key:"content",  label:"Content",    placeholder:"ad-variant-a (optional)" },
+          ].map(f=>(
+            <div key={f.key}>
+              <div style={{ fontSize:9,color:"var(--text-dim)",marginBottom:4,textTransform:"uppercase",letterSpacing:"0.1em" }}>{f.label}</div>
+              <input value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))}
+                placeholder={f.placeholder}
+                style={{ width:"100%",background:"var(--bg-card)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",fontSize:11,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none" }}
+                onFocus={e=>e.target.style.borderColor="var(--gold)"}
+                onBlur={e=>e.target.style.borderColor="var(--border)"}
+              />
+            </div>
+          ))}
+        </div>
+        <button onClick={buildUTM} disabled={!form.source||!form.medium||!form.campaign||building}
+          style={{ background:"var(--gold)22",border:"1px solid var(--gold)",color:"var(--gold)",borderRadius:7,padding:"7px 18px",fontSize:10,fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-mono)" }}>
+          {building?"Building...":"Generate UTM URL"}
+        </button>
+        {result && (
+          <div style={{ marginTop:12,background:"var(--bg-card)",borderRadius:7,padding:"10px 14px",display:"flex",gap:10,alignItems:"center" }}>
+            <div style={{ flex:1,fontSize:10,color:"#4ade80",fontFamily:"var(--font-mono)",wordBreak:"break-all" }}>{result}</div>
+            <button onClick={copyResult} style={{ background:"none",border:"1px solid var(--border)",color:copied?"#4ade80":"var(--text-dim)",borderRadius:6,padding:"4px 10px",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",flexShrink:0 }}>
+              {copied?"✓ Copied":"Copy"}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Templates */}
+      {templates?.templates && (
+        <>
+          <SectionLabel>FifteenConsult UTM Templates</SectionLabel>
+          {templates.templates.map((t,i)=>(
+            <div key={i} style={{ padding:"8px 0",borderBottom:"1px solid var(--border)" }}>
+              <div style={{ fontSize:11,fontWeight:600,color:"var(--text)",marginBottom:3 }}>{t.campaign}</div>
+              <div style={{ fontSize:10,color:"var(--text-dim)",fontFamily:"var(--font-mono)",wordBreak:"break-all" }}>{t.example}</div>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
 
 // ── ADADVISOR PANEL ───────────────────────────────────────────────────────────
 function AdAdvisorPanel({ connected }) {
@@ -895,6 +1098,9 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
+              {activeId==="clarity"    && <ClarityPanel/>}
+              {activeId==="hotjar"     && <HotjarPanel/>}
+              {activeId==="utm"        && <UTMPanel/>}
               {activeId==="pagespeed"  && <PageSpeedPanel  connected={connected}/>}
               {activeId==="trends"     && <TrendsPanel/>}
               {activeId==="schema"     && <SchemaPanel/>}
