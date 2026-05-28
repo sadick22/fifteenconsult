@@ -19,6 +19,8 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"socialblade",  name:"Social Blade Analytics",  icon:"📈", color:"#34D399", agentName:"Sara",        description:"Competitor social tracking · Growth analytics" },
+  { id:"latelyai",     name:"Content Hashtag Tools",   icon:"#️⃣", color:"#C8A96E", agentName:"Sara/Nadia",   description:"GCC hashtag strategy · Trending topics · Best times" },
   { id:"metalibrary",  name:"Meta Ad Library",         icon:"📚", color:"#1877F2", agentName:"Hassan/Malik", description:"Competitor ads · Creative intelligence · GCC market" },
   { id:"linkedinads",  name:"LinkedIn Ad Library",      icon:"💼", color:"#0A66C2", agentName:"Hassan/Malik", description:"B2B competitor ads · Sponsored content research" },
   { id:"googleads",    name:"Google Ads",               icon:"🔍", color:"#34a853", agentName:"Hassan",       description:"Search campaigns · Keyword targeting · QAR bidding" },
@@ -603,6 +605,100 @@ function SemrushPanel() {
         {["Live keyword rankings for GCC target keywords","Competitor keyword gap — what BPG and MCN rank for","Backlink opportunities and referring domain analysis","Site audit — technical SEO issues","Domain authority tracking","Content gap analysis"].map((item,i) => (
           <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
             <span style={{ color:"#FF642D" }}>→</span> {item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── SOCIAL BLADE PANEL ───────────────────────────────────────────────────────────
+function SocialBladePanel() {
+  const COMPETITORS = [
+    { name:"BPG Group LinkedIn", url:"https://www.linkedin.com/company/bpg-group/", platform:"LinkedIn" },
+    { name:"MCN Middle East LinkedIn", url:"https://www.linkedin.com/company/mcn-mena/", platform:"LinkedIn" },
+    { name:"Elixirr LinkedIn", url:"https://www.linkedin.com/company/elixirr/", platform:"LinkedIn" },
+    { name:"BPG Group Instagram", url:"https://www.instagram.com/bpggroup/", platform:"Instagram" },
+    { name:"Social Blade — Track any account", url:"https://socialblade.com", platform:"Social Blade" },
+  ];
+
+  const HASHTAGS = {
+    "Qatar/GCC": ["#QatarMarketing", "#GCCBusiness", "#MarketingQatar", "#DohaMarketing", "#QatarBusiness", "#GCCMarketing"],
+    "West Africa": ["#NigeriaStartups", "#NairaMarketing", "#GhanaMarketing", "#AfricanMarketing", "#LagosMarketing", "#AfricaBusiness"],
+    "Marketing": ["#MarketingStrategy", "#B2BMarketing", "#ContentMarketing", "#DigitalMarketing", "#MarketingTips"],
+    "FifteenConsult": ["#FifteenConsult", "#TheFifteenFramework", "#MarketingConsultancy", "#ChallengerMarketing"],
+  };
+
+  return (
+    <div>
+      <SectionLabel>Competitor Social Profiles</SectionLabel>
+      <div style={{ display:"flex",flexDirection:"column",gap:8,marginBottom:16 }}>
+        {COMPETITORS.map((c,i)=>(
+          <a key={i} href={c.url} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,textDecoration:"none",transition:"all 0.15s" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor="#34D399"; e.currentTarget.style.background="#34D39908"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--bg-base)"; }}
+          >
+            <div>
+              <div style={{ fontSize:11,color:"var(--text)" }}>{c.name}</div>
+              <div style={{ fontSize:10,color:"var(--text-dim)" }}>{c.platform}</div>
+            </div>
+            <span style={{ fontSize:10,color:"#34D399",fontWeight:600 }}>View ↗</span>
+          </a>
+        ))}
+      </div>
+
+      <SectionLabel>FifteenConsult Hashtag Strategy</SectionLabel>
+      {Object.entries(HASHTAGS).map(([cat,tags])=>(
+        <div key={cat} style={{ marginBottom:12 }}>
+          <div style={{ fontSize:10,color:"var(--gold)",fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:6 }}>{cat}</div>
+          <div style={{ display:"flex",flexWrap:"wrap",gap:6 }}>
+            {tags.map((t,i)=>(
+              <span key={i} style={{ fontSize:10,color:"var(--text-dim)",background:"var(--bg-base)",padding:"3px 8px",borderRadius:10,border:"1px solid var(--border)" }}>{t}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── LATELY AI / CONTENT TOOLS PANEL ──────────────────────────────────────────────
+function LatelyAIPanel() {
+  const BEST_TIMES = [
+    { platform:"LinkedIn", day:"Sunday-Tuesday", time:"8-9am & 12-1pm", timezone:"Doha GMT+3", note:"Start of GCC working week" },
+    { platform:"Instagram", day:"Thursday-Friday", time:"7-9pm", timezone:"Doha GMT+3", note:"Pre-weekend browsing" },
+    { platform:"TikTok (Nigeria)", day:"Monday-Wednesday", time:"7-9pm", timezone:"WAT GMT+1", note:"Evening engagement peak" },
+    { platform:"Facebook", day:"Sunday-Monday", time:"9-11am", timezone:"Doha GMT+3", note:"Business hours browsing" },
+  ];
+
+  const CONTENT_IDEAS = [
+    "Myth: GCC companies need big agency budgets. Truth: [The Fifteen Framework shows why 15 minutes changes everything]",
+    "3 signs your marketing isn't working (and what to do about it)",
+    "How we helped [client type] go from 0 to [result] in [timeframe]",
+    "The most common marketing mistake Qatar SMEs make in Q[current quarter]",
+    "Nigeria vs Qatar: How marketing strategies differ and why it matters",
+    "What BIG agencies won't tell you about marketing consultancy fees",
+  ];
+
+  return (
+    <div>
+      <SectionLabel>Best Posting Times (GCC + West Africa)</SectionLabel>
+      {BEST_TIMES.map((t,i)=>(
+        <div key={i} style={{ padding:"8px 0",borderBottom:"1px solid var(--border)" }}>
+          <div style={{ display:"flex",justifyContent:"space-between",fontSize:11 }}>
+            <span style={{ color:"var(--gold)",fontWeight:600 }}>{t.platform}</span>
+            <span style={{ color:"var(--text)",fontFamily:"var(--font-mono)" }}>{t.time} {t.timezone}</span>
+          </div>
+          <div style={{ fontSize:10,color:"var(--text-dim)",marginTop:2 }}>{t.day} — {t.note}</div>
+        </div>
+      ))}
+
+      <div style={{ marginTop:16 }}>
+        <SectionLabel>Evergreen Content Ideas</SectionLabel>
+        {CONTENT_IDEAS.map((idea,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"6px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"var(--gold)",flexShrink:0 }}>{i+1}.</span>{idea}
           </div>
         ))}
       </div>
@@ -1602,6 +1698,10 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
+              {activeId==="socialblade"  && <SocialBladePanel/>}
+              {activeId==="latelyai"    && <LatelyAIPanel/>}
+              {activeId==="socialblade"  && <SocialBladePanel/>}
+              {activeId==="latelyai"    && <LatelyAIPanel/>}
               {activeId==="metalibrary"  && <MetaLibraryPanel/>}
               {activeId==="linkedinads"  && <LinkedInAdsPanel/>}
               {activeId==="googleads"    && <GoogleAdsPanel/>}
