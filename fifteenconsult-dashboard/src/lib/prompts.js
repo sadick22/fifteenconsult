@@ -521,7 +521,6 @@ export const AGENT_PRESETS = {
       prompt: "Generate FifteenConsult's monthly marketing performance report for Sadick. Using all available live data: summarise the month's key achievements, metrics against targets (pipeline, social growth, content output, ad performance), lessons learned, what we're changing next month, and the 3 biggest opportunities ahead. Format as an executive summary Sadick could share with advisors or investors.",
     },
   ],
-},
 };
 
 // ── SMART SUGGESTIONS ─────────────────────────────────────────────────────────
