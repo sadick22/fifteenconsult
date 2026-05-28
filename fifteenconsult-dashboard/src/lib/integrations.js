@@ -316,7 +316,11 @@ export function getConnectionStatuses() {
     crunchbase: true,
     canva:      true,
     figma:      true,
-    gmail:      true, // Connected via Claude.ai MCP
+    gmail:      true,
+    gcalendar:  true,
+    metalibrary: true, // Free — no setup needed
+    linkedinads: true, // Free — no setup needed
+    googleads:   false, // Needs active Google Ads account
     gcalendar:  true, // Connected via Claude.ai MCP
     figma:      true, // Connected via Claude.ai MCP
     coolors:    true, // Free colour tool — no setup needed
