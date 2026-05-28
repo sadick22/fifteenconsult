@@ -19,6 +19,8 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"apollo",     name:"Apollo.io",                icon:"🚀", color:"#7c3aed", agentName:"Kwame",   description:"275M+ contacts · Prospect research · Email finder" },
+  { id:"crunchbase", name:"Crunchbase",               icon:"💰", color:"#0288d1", agentName:"Kwame",   description:"Startup funding · West Africa · GCC company data" },
   { id:"news",       name:"News & Trends Feed",       icon:"📰", color:"#C8A96E", agentName:"Nadia/Sofia", description:"Marketing Week · Campaign ME · TechCabal · Gulf Business" },
   { id:"clarity",    name:"Microsoft Clarity",        icon:"👁", color:"#0078d4", agentName:"Zara",    description:"Heatmaps · Rage clicks · Session recordings" },
   { id:"hotjar",     name:"Hotjar",                   icon:"🔥", color:"#FF3C00", agentName:"Zara",    description:"Recordings · Funnels · User behaviour" },
@@ -599,6 +601,96 @@ function SemrushPanel() {
   );
 }
 
+// ── APOLLO PANEL ─────────────────────────────────────────────────────────────────
+function ApolloPanel() {
+  const SEARCHES = [
+    { label:"Real Estate Qatar", url:"https://app.apollo.io/#/people?personTitles[]=Marketing%20Director&personTitles[]=CMO&personTitles[]=Head%20of%20Marketing&organizationIndustryTagNames[]=Real%20Estate&personLocations[]=Qatar", color:"#7c3aed" },
+    { label:"SaaS Companies Qatar/UAE", url:"https://app.apollo.io/#/people?personTitles[]=Founder&personTitles[]=CEO&personTitles[]=CMO&organizationIndustryTagNames[]=Software&personLocations[]=Qatar&personLocations[]=United%20Arab%20Emirates", color:"#7c3aed" },
+    { label:"Nigeria Tech Startups", url:"https://app.apollo.io/#/people?personTitles[]=Founder&personTitles[]=CEO&personTitles[]=Head%20of%20Growth&organizationIndustryTagNames[]=Technology&personLocations[]=Nigeria", color:"#7c3aed" },
+    { label:"Ghana Business Leaders", url:"https://app.apollo.io/#/people?personTitles[]=CEO&personTitles[]=Founder&personTitles[]=Marketing%20Manager&personLocations[]=Ghana", color:"#7c3aed" },
+    { label:"Hospitality Qatar", url:"https://app.apollo.io/#/people?personTitles[]=General%20Manager&personTitles[]=Marketing%20Director&organizationIndustryTagNames[]=Hospitality&personLocations[]=Qatar", color:"#7c3aed" },
+  ];
+
+  return (
+    <div>
+      <div style={{ background:"#7c3aed18",border:"1px solid #7c3aed44",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#7c3aed",fontWeight:600,marginBottom:4 }}>🚀 Apollo.io — Free Tier (275M+ Contacts)</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Free account gives access to the full contact database with basic search filters. 
+          Use it to find decision makers at target companies. 
+          Copy results and paste to Kwame's chat for analysis and outreach drafting.
+        </div>
+      </div>
+      <SectionLabel>Quick Prospect Searches for Kwame</SectionLabel>
+      <div style={{ display:"flex",flexDirection:"column",gap:8,marginBottom:16 }}>
+        {SEARCHES.map((s,i)=>(
+          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,textDecoration:"none",transition:"all 0.15s" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor="#7c3aed"; e.currentTarget.style.background="#7c3aed08"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--bg-base)"; }}
+          >
+            <span style={{ fontSize:11,color:"var(--text)" }}>{s.label}</span>
+            <span style={{ fontSize:10,color:"#7c3aed",fontWeight:600 }}>Search ↗</span>
+          </a>
+        ))}
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>How Kwame uses Apollo:</div>
+        {["Search target companies and find decision maker names and emails","Use Chrome extension on LinkedIn to enrich profiles instantly","Copy prospect data → paste into Kwame's chat → get personalised outreach drafted","Free: 50 email credits/month + full database search"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#7c3aed" }}>→</span>{item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── CRUNCHBASE PANEL ──────────────────────────────────────────────────────────────
+function CrunchbasePanel() {
+  const SEARCHES = [
+    { label:"Nigeria Recent Funding", url:"https://www.crunchbase.com/discover/organization.companies/field/organizations/location_identifiers/lagos-lagos-nigeria", color:"#0288d1" },
+    { label:"Ghana Startups", url:"https://www.crunchbase.com/discover/organization.companies/field/organizations/location_identifiers/accra-greater-accra-ghana", color:"#0288d1" },
+    { label:"Qatar Companies", url:"https://www.crunchbase.com/discover/organization.companies/field/organizations/location_identifiers/doha-ad-dawhah-qatar", color:"#0288d1" },
+    { label:"GCC Tech Startups", url:"https://www.crunchbase.com/discover/organization.companies/field/organizations/location_identifiers/middle-east", color:"#0288d1" },
+    { label:"West Africa Series A (2026)", url:"https://www.crunchbase.com/discover/funding_rounds/field/funding_rounds/location_identifiers/nigeria?date=2026-01-01~&fundingRoundType=series_a", color:"#0288d1" },
+  ];
+
+  return (
+    <div>
+      <div style={{ background:"#0288d118",border:"1px solid #0288d144",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#0288d1",fontWeight:600,marginBottom:4 }}>💰 Crunchbase — Free Funding Intelligence</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Track startup funding rounds in West Africa and GCC. 
+          Companies that just raised Series A are Kwame's best outreach targets — 
+          they have budget and urgency to build marketing infrastructure.
+        </div>
+      </div>
+      <SectionLabel>Funding Intelligence Searches</SectionLabel>
+      <div style={{ display:"flex",flexDirection:"column",gap:8,marginBottom:16 }}>
+        {SEARCHES.map((s,i)=>(
+          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,textDecoration:"none",transition:"all 0.15s" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor="#0288d1"; e.currentTarget.style.background="#0288d108"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--bg-base)"; }}
+          >
+            <span style={{ fontSize:11,color:"var(--text)" }}>{s.label}</span>
+            <span style={{ fontSize:10,color:"#0288d1",fontWeight:600 }}>Search ↗</span>
+          </a>
+        ))}
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>Kwame's funding trigger workflow:</div>
+        {["Find company that raised Series A in last 30 days","Copy company name + funding details","Paste into Kwame's chat: 'Research this company and draft outreach'","Kwame writes a personalised challenger email referencing the funding","Add to HubSpot pipeline immediately"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#0288d1" }}>{i+1}.</span>{item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── NEWS PANEL ───────────────────────────────────────────────────────────────────
 function NewsPanel() {
   const [data,setData]       = useState(null);
@@ -1148,6 +1240,10 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
+              {activeId==="apollo"     && <ApolloPanel/>}
+              {activeId==="crunchbase" && <CrunchbasePanel/>}
+              {activeId==="apollo"     && <ApolloPanel/>}
+              {activeId==="crunchbase" && <CrunchbasePanel/>}
               {activeId==="news"       && <NewsPanel/>}
               {activeId==="news"       && <NewsPanel/>}
               {activeId==="clarity"    && <ClarityPanel/>}
