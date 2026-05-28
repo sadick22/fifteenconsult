@@ -6,7 +6,7 @@ import {
   fetchInstagramProfile, fetchInstagramPosts,
   fetchTikTokInsights,
   fetchMetaAdsPerformance, fetchMetaAdsAnomalies,
-  fetchClarityData, fetchHotjarData, fetchUTMTemplates,
+  fetchClarityData, fetchHotjarData, fetchUTMTemplates, fetchNewsFeeds,
   fetchPageSpeed, fetchGSCOverview, fetchGSCKeywords,
   getGA4SetupSteps, getMetaSetupSteps,
   getConnectionStatuses,
@@ -19,6 +19,7 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"news",       name:"News & Trends Feed",       icon:"📰", color:"#C8A96E", agentName:"Nadia/Sofia", description:"Marketing Week · Campaign ME · TechCabal · Gulf Business" },
   { id:"clarity",    name:"Microsoft Clarity",        icon:"👁", color:"#0078d4", agentName:"Zara",    description:"Heatmaps · Rage clicks · Session recordings" },
   { id:"hotjar",     name:"Hotjar",                   icon:"🔥", color:"#FF3C00", agentName:"Zara",    description:"Recordings · Funnels · User behaviour" },
   { id:"utm",        name:"UTM Campaign Tracker",     icon:"🔗", color:"#C8A96E", agentName:"Zara",    description:"Campaign attribution · UTM builder · Link generator" },
@@ -598,6 +599,55 @@ function SemrushPanel() {
   );
 }
 
+// ── NEWS PANEL ───────────────────────────────────────────────────────────────────
+function NewsPanel() {
+  const [data,setData]       = useState(null);
+  const [loading,setLoading] = useState(false);
+
+  const load = async () => { setLoading(true); setData(await fetchNewsFeeds()); setLoading(false); };
+  useEffect(()=>{ load(); },[]);
+
+  const CATEGORY_COLORS = {
+    "Marketing":        "#C8A96E",
+    "GCC Marketing":    "#6EB5C8",
+    "West Africa Tech": "#34D399",
+    "GCC Business":     "#8E6EC8",
+  };
+
+  return (
+    <div>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+        <SectionLabel>Live News — Marketing · GCC · West Africa</SectionLabel>
+        <button onClick={load} style={{ background:"none",border:"none",color:"var(--gold)",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
+      </div>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Fetching latest news...</div>
+      : data?.error ? <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
+      : data?.articles ? (
+        <>
+          <div style={{ fontSize:10,color:"var(--text-dim)",marginBottom:12 }}>
+            {data.total} articles from {data.sources?.join(", ")} · Auto-injected into Nadia and Sofia's briefings
+          </div>
+          {Object.entries(data.byCategory||{}).map(([cat,articles])=>(
+            <div key={cat} style={{ marginBottom:16 }}>
+              <div style={{ fontSize:10,color:CATEGORY_COLORS[cat]||"var(--gold)",fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:8 }}>{cat}</div>
+              {articles.slice(0,3).map((a,i)=>(
+                <div key={i} style={{ padding:"8px 0",borderBottom:"1px solid var(--border)" }}>
+                  <a href={a.link} target="_blank" rel="noopener noreferrer"
+                    style={{ fontSize:12,color:"var(--text)",textDecoration:"none",lineHeight:1.5,display:"block",marginBottom:3 }}
+                    onMouseEnter={e=>e.currentTarget.style.color=CATEGORY_COLORS[cat]||"var(--gold)"}
+                    onMouseLeave={e=>e.currentTarget.style.color="var(--text)"}
+                  >{a.title}</a>
+                  {a.excerpt && <div style={{ fontSize:10,color:"var(--text-dim)",lineHeight:1.5 }}>{a.excerpt}...</div>}
+                </div>
+              ))}
+            </div>
+          ))}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 // ── CLARITY PANEL ────────────────────────────────────────────────────────────────
 function ClarityPanel() {
   const [data,setData]       = useState(null);
@@ -1098,6 +1148,8 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
+              {activeId==="news"       && <NewsPanel/>}
+              {activeId==="news"       && <NewsPanel/>}
               {activeId==="clarity"    && <ClarityPanel/>}
               {activeId==="hotjar"     && <HotjarPanel/>}
               {activeId==="utm"        && <UTMPanel/>}
