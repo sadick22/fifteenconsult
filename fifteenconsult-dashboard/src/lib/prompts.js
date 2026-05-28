@@ -71,8 +71,6 @@ export const AGENT_PRESETS = {
     },
   ],
 
-  tariq:,
-
   tariq: [
     {
       id: "technical_audit",
