@@ -1191,3 +1191,4 @@ Quick Backs: ${clarity.quickBacks || 0}`;
     </div>
   );
 }
+
