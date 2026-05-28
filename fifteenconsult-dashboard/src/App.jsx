@@ -844,6 +844,130 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
       }
     }
 
+    // ── SARA: Auto-inject Instagram + News data ─────────────────────────────────────
+    if (member.id === "sara") {
+      try {
+        const [instRes, newsRes] = await Promise.allSettled([
+          fetch("/api/instagram"),
+          fetch("/api/news"),
+        ]);
+
+        let saraContext = "\n\n===\nLIVE SOCIAL MEDIA DATA:\n";
+
+        // Instagram
+        if (instRes.status === "fulfilled" && instRes.value.ok) {
+          const inst = await instRes.value.json();
+          if (inst.configured && !inst.error) {
+            saraContext += `\nINSTAGRAM (live):
+Followers: ${inst.followersCount || 0}
+Following: ${inst.followingCount || 0}
+Posts: ${inst.mediaCount || 0}
+Recent posts engagement: ${inst.recentEngagement || "Check Instagram Insights"}`;
+          } else {
+            saraContext += "\nINSTAGRAM: Tokens not configured — current follower count: ~120. Use screenshot upload for Instagram Insights data.";
+          }
+        }
+
+        saraContext += "\nLINKEDIN: ~6 followers — API pending. Use screenshot upload for LinkedIn Analytics data.";
+        saraContext += "\nTIKTOK: Tokens pending — use screenshot upload for TikTok analytics.";
+
+        // News for content inspiration
+        if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+          const news = await newsRes.value.json();
+          if (news.articles?.length > 0) {
+            saraContext += "\n\nTRENDING CONTENT OPPORTUNITIES (from news feed):";
+            news.articles.slice(0, 6).forEach(a => {
+              saraContext += `\n- [${a.source}] ${a.title}`;
+            });
+            saraContext += "\n\nUse these headlines to create timely, relevant social content. Connect each to GCC or West Africa marketing context.";
+          }
+        }
+
+        saraContext += "\n\nINSTRUCTION: Base social media strategy on real follower counts above. Use news headlines for content inspiration. Flag any data that needs verification.\n===";
+        enrichedSystemPrompt += saraContext;
+      } catch (err) { console.warn("Sara data fetch failed:", err.message); }
+    }
+
+    // ── AMANI: Auto-inject ALL live data ──────────────────────────────────────────
+    if (member.id === "amani") {
+      try {
+        const [hsRes, mlRes, psRes, newsRes] = await Promise.allSettled([
+          fetch("/api/hubspot?action=pipeline"),
+          fetch("/api/mailerlite"),
+          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/news"),
+        ]);
+
+        let amaniContext = "\n\n===\nCMO EXECUTIVE INTELLIGENCE BRIEF (all live data):\n";
+
+        // HubSpot
+        if (hsRes.status === "fulfilled" && hsRes.value.ok) {
+          const hs = await hsRes.value.json();
+          if (!hs.error) {
+            amaniContext += `\nPIPELINE (HubSpot live):
+Total Contacts: ${hs.totalContacts || 0}
+Open Deals: ${hs.openDeals || 0}
+Won Deals: ${hs.wonDeals || 0}
+Pipeline Health: ${hs.openDeals > 3 ? "✅ Healthy" : hs.openDeals > 0 ? "🟡 Needs attention" : "🔴 Critical — no open deals"}`;
+          }
+        }
+
+        // MailerLite
+        if (mlRes.status === "fulfilled" && mlRes.value.ok) {
+          const ml = await mlRes.value.json();
+          if (!ml.error) {
+            amaniContext += `\n\nEMAIL MARKETING (MailerLite live):
+Subscribers: ${ml.subscriberCount || ml.total || 0}
+Open Rate: ${ml.openRate || "No recent campaigns"}
+Click Rate: ${ml.clickRate || "No recent campaigns"}`;
+          }
+        }
+
+        // PageSpeed
+        if (psRes.status === "fulfilled" && psRes.value.ok) {
+          const ps = await psRes.value.json();
+          if (!ps.error) {
+            amaniContext += `\n\nWEBSITE (PageSpeed live):
+Mobile Performance: ${ps.scores?.performance}/100 ${ps.scores?.performance < 70 ? "🔴 Below paid ads threshold" : "✅"}
+SEO Score: ${ps.scores?.seo}/100`;
+          }
+        }
+
+        // Social (manual data)
+        amaniContext += `\n\nSOCIAL MEDIA (current baseline):
+LinkedIn: ~6 followers (early stage)
+Instagram: ~120 followers (early stage)
+TikTok: Starting
+Status: All channels in growth phase — consistency is the priority`;
+
+        // News top items
+        if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+          const news = await newsRes.value.json();
+          if (news.articles?.length > 0) {
+            amaniContext += "\n\nMARKET INTELLIGENCE (top headlines):";
+            news.articles.slice(0, 4).forEach(a => {
+              amaniContext += `\n- [${a.source}] ${a.title}`;
+            });
+          }
+        }
+
+        amaniContext += `\n\nDEPARTMENT STATUS:
+- Tariq (SEO): PageSpeed + Schema + Semrush connected. GSC pending OAuth fix.
+- Zara (Analytics): HubSpot + MailerLite + Clarity + UTM connected. GA4 OAuth parked.
+- Nadia (Content): MailerLite + News feeds connected. Publishing framework set.
+- Kwame (Lead Gen): HubSpot + News + Apollo + Crunchbase connected.
+- Amara (Brand): Canva MCP + Figma MCP connected.
+- Hassan (Paid Ads): Meta Ads MCP connected, pending account activation.
+- Malik (Advertising): Meta Ads MCP + Ad Library connected.
+- David (BD): HubSpot + News + Gmail + Calendar connected.
+- Sofia (PA): Gmail + Calendar + News connected.
+- Sara (Social): News connected. Instagram/TikTok tokens pending.
+
+\nINSTRUCTION: Use all injected data to produce a genuine CMO executive briefing. Be honest about what data is real vs pending. Identify the single most important strategic priority based on the live pipeline data.\n===`;
+        enrichedSystemPrompt += amaniContext;
+      } catch (err) { console.warn("Amani data fetch failed:", err.message); }
+    }
+
     // ── HASSAN + MALIK: Auto-inject Meta Ads + News + PageSpeed ────────────────────
     if (member.id === "hassan" || member.id === "malik") {
       try {
