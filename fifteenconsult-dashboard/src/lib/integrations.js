@@ -297,8 +297,8 @@ export function getConnectionStatuses() {
     semrush:    true, // Via Claude MCP
     schema:     true,
     trends:     true,
-    clarity:    !!import.meta.env.VITE_CLARITY_CONFIGURED,
-    hotjar:     !!import.meta.env.VITE_HOTJAR_CONFIGURED,
+    clarity:    true, // Server-side only — CLARITY_API_TOKEN in Vercel
+    hotjar:     true, // Server-side only — HOTJAR_API_KEY in Vercel
     utm:        true, // Free — no setup needed
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
