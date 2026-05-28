@@ -19,6 +19,8 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"gmail",     name:"Gmail",                    icon:"📧", color:"#EA4335", agentName:"David/Sofia", description:"Email triage · Draft replies · Prospect follow-ups" },
+  { id:"gcalendar", name:"Google Calendar",          icon:"📅", color:"#4285f4", agentName:"David/Sofia", description:"Schedule · Call slots · Weekly planning" },
   { id:"canva",      name:"Canva",                    icon:"🎨", color:"#7D2AE8", agentName:"Amara",   description:"Design creation · Brand templates · Social assets" },
   { id:"figma",      name:"Figma",                    icon:"✏️", color:"#F24E1E", agentName:"Amara",   description:"UI/UX design · Components · Developer specs" },
   { id:"coolors",    name:"Coolors / Brand Tools",    icon:"🎨", color:"#C8A96E", agentName:"Amara",   description:"Colour palette · Brand consistency · Contrast check" },
@@ -598,6 +600,66 @@ function SemrushPanel() {
         {["Live keyword rankings for GCC target keywords","Competitor keyword gap — what BPG and MCN rank for","Backlink opportunities and referring domain analysis","Site audit — technical SEO issues","Domain authority tracking","Content gap analysis"].map((item,i) => (
           <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
             <span style={{ color:"#FF642D" }}>→</span> {item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── GMAIL PANEL ──────────────────────────────────────────────────────────────────
+function GmailPanel() {
+  return (
+    <div>
+      <div style={{ background:"#EA433518",border:"1px solid #EA433544",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#EA4335",fontWeight:600,marginBottom:4 }}>📧 Gmail — Connected via Claude.ai MCP</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          David and Sofia use Gmail MCP directly in their chats — no setup needed. They can read, triage, and draft emails on your behalf.
+        </div>
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginBottom:12 }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What David does with Gmail:</div>
+        {["Check for prospect replies every morning","Draft personalised follow-up emails","Flag urgent client messages","Monitor for buying signals in email threads","Draft BD introduction emails"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#EA4335" }}>→</span>{item}
+          </div>
+        ))}
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What Sofia does with Gmail:</div>
+        {["Triage inbox into Urgent / Important / FYI","Draft replies in Sadick's voice","Flag emails from clients needing same-day response","Identify follow-ups Sadick promised but hasn't sent","Summarise long email threads"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#EA4335" }}>→</span>{item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── GOOGLE CALENDAR PANEL ─────────────────────────────────────────────────────────
+function GCalendarPanel() {
+  return (
+    <div>
+      <div style={{ background:"#4285f418",border:"1px solid #4285f444",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#4285f4",fontWeight:600,marginBottom:4 }}>📅 Google Calendar — Connected via Claude.ai MCP</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          David and Sofia access your Google Calendar directly in their chats. They can read your schedule, identify available slots, and help plan your week.
+        </div>
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginBottom:12 }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What David does with Calendar:</div>
+        {["Identify 3 available slots per week for discovery calls","Block Tuesday/Thursday mornings for outreach","Schedule follow-up reminders after prospect contact","Align BD activities with GCC working week (Sun-Thu)","Avoid scheduling during prayer times (1-2pm Doha)"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#4285f4" }}>→</span>{item}
+          </div>
+        ))}
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What Sofia does with Calendar:</div>
+        {["Show today's full schedule with Doha timezone","Flag scheduling conflicts before they happen","Suggest focus blocks for deep work","Plan the week ahead every Sunday morning","Remind about client deliverable deadlines"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#4285f4" }}>→</span>{item}
           </div>
         ))}
       </div>
@@ -1423,6 +1485,10 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
+              {activeId==="gmail"      && <GmailPanel/>}
+              {activeId==="gcalendar" && <GCalendarPanel/>}
+              {activeId==="gmail"      && <GmailPanel/>}
+              {activeId==="gcalendar" && <GCalendarPanel/>}
               {activeId==="canva"      && <CanvaPanel/>}
               {activeId==="figma"      && <FigmaPanel/>}
               {activeId==="coolors"    && <CoolorsPanel/>}
