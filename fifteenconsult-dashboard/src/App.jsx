@@ -844,6 +844,54 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
       }
     }
 
+    // ── HASSAN + MALIK: Auto-inject Meta Ads + News + PageSpeed ────────────────────
+    if (member.id === "hassan" || member.id === "malik") {
+      try {
+        const [psRes, newsRes] = await Promise.allSettled([
+          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/news"),
+        ]);
+
+        const role = member.id === "hassan" ? "PAID ADS" : "ADVERTISING STRATEGY";
+        let adsContext = `\n\n===\nLIVE ${role} INTELLIGENCE:\n`;
+
+        // PageSpeed — landing page health
+        if (psRes.status === "fulfilled" && psRes.value.ok) {
+          const ps = await psRes.value.json();
+          if (!ps.error) {
+            const perfScore = ps.scores?.performance || 0;
+            const alert = perfScore < 70 ? "🔴 CRITICAL — Fix before running ads" : perfScore < 85 ? "🟡 Needs improvement" : "✅ Good";
+            adsContext += `\nLANDING PAGE PERFORMANCE (fifteenconsult.com):
+Mobile Performance Score: ${perfScore}/100 ${alert}
+SEO Score: ${ps.scores?.seo}/100
+LCP: ${ps.coreWebVitals?.lcp}
+${perfScore < 70 ? "WARNING: Do not run paid campaigns until mobile score is above 70. Poor landing page will waste ad budget." : "Landing page is ready for paid traffic."}`;
+          }
+        }
+
+        // News for advertising intelligence
+        if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+          const news = await newsRes.value.json();
+          if (news.articles?.length > 0) {
+            adsContext += "\n\nADVERTISING INTELLIGENCE — Latest News:";
+            news.articles.slice(0, 5).forEach(a => {
+              adsContext += `\n- [${a.source}] ${a.title}`;
+            });
+          }
+        }
+
+        // Meta Ads status
+        adsContext += `\n\nMETA ADS STATUS:
+Account ID: 932655362719996
+MCP Status: Connected — use Meta Ads MCP tools directly in this chat for live campaign data
+Note: If MCP returns no data, account may still be pending activation`;
+
+        adsContext += "\n\nINSTRUCTION: Use Meta Ads MCP to pull live campaign performance. Check landing page score — flag if below 70. Monitor competitor ads via Meta Ad Library (facebook.com/ads/library).\n===";
+        enrichedSystemPrompt += adsContext;
+
+      } catch (err) { console.warn("Hassan/Malik data fetch failed:", err.message); }
+    }
+
     // ── DAVID: Auto-inject HubSpot + News data ──────────────────────────────────────
     if (member.id === "david") {
       try {
