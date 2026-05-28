@@ -782,9 +782,9 @@ ${competitorCtx}
       try {
         // Fetch all SEO data in parallel
         const [psRes, gscRes, schemaRes] = await Promise.allSettled([
-          fetch("/api/pagespeed?url=https://fifteenconsult.com&strategy=mobile"),
-          fetch("/api/searchconsole?action=keywords"),
-          fetch("/api/schematest?url=https://fifteenconsult.com"),
+          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/seo?tool=gsc&action=keywords"),
+          fetch("/api/seo?tool=schema&url=https://fifteenconsult.com"),
         ]);
 
         let seoContext = "\n\n===\nLIVE SEO DATA (fetched right now — use these exact numbers):\n";
@@ -844,14 +844,56 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
       }
     }
 
+    // ── NADIA: Auto-inject MailerLite + News data ───────────────────────────────────
+    if (member.id === "nadia") {
+      try {
+        const [mlRes, newsRes] = await Promise.allSettled([
+          fetch("/api/mailerlite"),
+          fetch("/api/news"),
+        ]);
+
+        let nadiaContext = "\n\n===\nLIVE CONTENT INTELLIGENCE (use to inform today's content):\n";
+
+        // MailerLite performance
+        if (mlRes.status === "fulfilled" && mlRes.value.ok) {
+          const ml = await mlRes.value.json();
+          if (!ml.error) {
+            nadiaContext += `\nEMAIL PERFORMANCE (MailerLite):
+Subscribers: ${ml.subscriberCount || ml.total || 0}
+Last Campaign Open Rate: ${ml.openRate || "No recent campaigns"}
+Click Rate: ${ml.clickRate || "No recent campaigns"}
+Best Performing Topic: ${ml.bestCampaign || "Check MailerLite dashboard"}`;
+          }
+        }
+
+        // News feeds
+        if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+          const news = await newsRes.value.json();
+          if (news.articles?.length > 0) {
+            nadiaContext += "\n\nLATEST NEWS HEADLINES (use for topical content ideas):";
+            news.articles.slice(0, 8).forEach(a => {
+              nadiaContext += `\n- [${a.source}] ${a.title}`;
+            });
+            nadiaContext += "\n\nUse 1-2 of these headlines as content inspiration for today's posts. Make the connection to FifteenConsult's expertise.";
+          }
+        }
+
+        nadiaContext += "\n\nINSTRUCTION: Reference the email performance data when creating newsletter content. Use news headlines to create timely, relevant posts. Always connect news to GCC/West Africa marketing context.\n===";
+        enrichedSystemPrompt += nadiaContext;
+
+      } catch (err) {
+        console.warn("Nadia data fetch failed:", err.message);
+      }
+    }
+
     // ── ZARA: Auto-inject live analytics data ────────────────────────────────────
     if (member.id === "zara") {
       try {
         const [hsRes, mlRes, psRes, clarityRes] = await Promise.allSettled([
           fetch("/api/hubspot?action=pipeline"),
           fetch(`/api/mailerlite`),
-          fetch("/api/pagespeed?url=https://fifteenconsult.com&strategy=mobile"),
-          fetch("/api/clarity"),
+          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/analytics?tool=clarity"),
         ]);
 
         let zaraContext = "\n\n===\nLIVE ANALYTICS DATA (use these exact numbers — do not invent any metrics):\n";
@@ -1191,4 +1233,3 @@ Quick Backs: ${clarity.quickBacks || 0}`;
     </div>
   );
 }
-
