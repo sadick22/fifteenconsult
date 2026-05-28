@@ -45,8 +45,16 @@ async function handlePageSpeed(req, res) {
 // ── SCHEMA TEST ───────────────────────────────────────────────────────────────
 async function handleSchema(req, res) {
   const { url = "https://fifteenconsult.com" } = req.query;
-  const pageRes = await fetch(url, { headers: { "User-Agent": "FifteenConsult-Dashboard/1.0" } });
-  const html    = await pageRes.text();
+  const pageRes = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (compatible; FifteenConsult-Dashboard/1.0)",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    },
+    redirect: "follow",
+  });
+  if (!pageRes.ok) return res.status(200).json({ error: `Could not fetch ${url}: ${pageRes.status} ${pageRes.statusText}` });
+  const html = await pageRes.text();
+  if (!html.includes("<html") && !html.includes("<!DOCTYPE")) return res.status(200).json({ error: "Response does not appear to be an HTML page." });
 
   const schemaMatches = html.match(/<script[^>]+type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi) || [];
   const schemas = schemaMatches.map(s => {
