@@ -844,6 +844,88 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
       }
     }
 
+    // ── ZARA: Auto-inject live analytics data ────────────────────────────────────
+    if (member.id === "zara") {
+      try {
+        const [hsRes, mlRes, psRes, clarityRes] = await Promise.allSettled([
+          fetch("/api/hubspot?action=pipeline"),
+          fetch(`/api/mailerlite`),
+          fetch("/api/pagespeed?url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/clarity"),
+        ]);
+
+        let zaraContext = "\n\n===\nLIVE ANALYTICS DATA (use these exact numbers — do not invent any metrics):\n";
+
+        // HubSpot
+        if (hsRes.status === "fulfilled" && hsRes.value.ok) {
+          const hs = await hsRes.value.json();
+          if (!hs.error) {
+            zaraContext += `\nHUBSPOT CRM (live):
+Total Contacts: ${hs.totalContacts || 0}
+Total Deals: ${hs.totalDeals || 0}
+Open Deals: ${hs.openDeals || 0}
+Won Deals: ${hs.wonDeals || 0}`;
+          }
+        } else {
+          zaraContext += "\nHUBSPOT: Connection error — flag as data unavailable";
+        }
+
+        // MailerLite
+        if (mlRes.status === "fulfilled" && mlRes.value.ok) {
+          const ml = await mlRes.value.json();
+          if (!ml.error) {
+            zaraContext += `\n\nMAILERLITE EMAIL (live):
+Total Subscribers: ${ml.subscriberCount || ml.total || 0}
+Active Subscribers: ${ml.activeCount || 0}
+Recent Campaign Open Rate: ${ml.openRate || "No campaigns yet"}
+Click Rate: ${ml.clickRate || "No campaigns yet"}`;
+          }
+        } else {
+          zaraContext += "\n\nMAILERLITE: Connection error — flag as data unavailable";
+        }
+
+        // PageSpeed
+        if (psRes.status === "fulfilled" && psRes.value.ok) {
+          const ps = await psRes.value.json();
+          if (!ps.error) {
+            zaraContext += `\n\nWEBSITE PERFORMANCE (PageSpeed — live):
+Mobile Performance: ${ps.scores?.performance}/100
+Mobile SEO Score: ${ps.scores?.seo}/100
+LCP: ${ps.coreWebVitals?.lcp}
+CLS: ${ps.coreWebVitals?.cls}
+FCP: ${ps.coreWebVitals?.fcp}`;
+          }
+        }
+
+        // Microsoft Clarity
+        if (clarityRes.status === "fulfilled" && clarityRes.value.ok) {
+          const clarity = await clarityRes.value.json();
+          if (clarity.configured && !clarity.error) {
+            zaraContext += `\n\nMICROSOFT CLARITY BEHAVIOUR (live):
+Sessions (30 days): ${clarity.sessions || 0}
+Pages Per Session: ${clarity.pagesPerSession || "—"}
+Avg Scroll Depth: ${clarity.avgScrollDepth || "—"}
+Rage Clicks: ${clarity.rageClicks || 0}
+Dead Clicks: ${clarity.deadClicks || 0}
+Quick Backs: ${clarity.quickBacks || 0}`;
+          } else if (!clarity.configured) {
+            zaraContext += "\n\nMICROSOFT CLARITY: Not yet configured — add CLARITY_API_TOKEN and CLARITY_PROJECT_ID to Vercel";
+          }
+        }
+
+        // GA4 status
+        zaraContext += "\n\nGA4 WEBSITE TRAFFIC: OAuth pending — use screenshot upload for GA4 data";
+        zaraContext += "\n\nSOCIAL MEDIA: Instagram/TikTok/LinkedIn integrations pending — flag as data unavailable";
+        zaraContext += "\n\nPAID ADS: Meta Ads MCP connected but pending account activation";
+
+        zaraContext += "\n\nINSTRUCTION: Build your report using ONLY the live data above. Clearly flag every missing data source as 'Data pending — [source]'. Never estimate or invent numbers.\n===";
+        enrichedSystemPrompt += zaraContext;
+
+      } catch (err) {
+        console.warn("Zara data fetch failed:", err.message);
+      }
+    }
+
     // Inject uploaded documents for David
     if (member.id === "david") {
       const docs = getAgentDocuments("david");
@@ -1109,4 +1191,3 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
     </div>
   );
 }
-
