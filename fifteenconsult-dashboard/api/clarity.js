@@ -30,36 +30,55 @@ export default async function handler(req, res) {
   }
 
   try {
-    const endDate   = new Date().toISOString().split("T")[0];
-    const startDate = new Date(Date.now() - 30 * 86400 * 1000).toISOString().split("T")[0];
-
-    const r = await fetch(`${BASE}/projects/${projectId}/traffic?startDate=${startDate}&endDate=${endDate}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    // Clarity Data Export API — correct endpoint from Microsoft docs
+    // numOfDays: 1, 2, or 3 (max 3 days per request)
+    const EXPORT_BASE = "https://www.clarity.ms/export-data/api/v1";
+    
+    const r = await fetch(
+      `${EXPORT_BASE}/project-live-insights?numOfDays=3`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!r.ok) {
-      const err = await r.json();
-      return res.status(200).json({ error: err.message || "Clarity API error", configured: true });
+      const errText = await r.text();
+      let errMsg = "Clarity API error";
+      try { errMsg = JSON.parse(errText)?.message || errMsg; } catch {}
+      return res.status(200).json({ 
+        error: `${r.status}: ${errMsg}`, 
+        configured: true,
+        clarityDashboard: `https://clarity.microsoft.com/projects/view/${projectId}`,
+      });
     }
 
     const data = await r.json();
+    const summary = data?.summary || data || {};
 
     return res.status(200).json({
       configured: true,
-      period: `${startDate} to ${endDate}`,
-      sessions:       data.totalSessions || 0,
-      pagesPerSession: data.pagesPerSession?.toFixed(1) || "—",
-      avgScrollDepth: data.avgScrollDepth ? `${Math.round(data.avgScrollDepth * 100)}%` : "—",
-      engagedSessions: data.engagedSessions || 0,
-      rageClicks:     data.rageClicks || 0,
-      deadClicks:     data.deadClicks || 0,
-      quickBacks:     data.quickBacks || 0,
-      topPages: (data.topPages || []).slice(0, 5).map(p => ({
-        page:     p.url?.replace("https://fifteenconsult.com", "") || "/",
-        sessions: p.sessions || 0,
-        scrollDepth: p.avgScrollDepth ? `${Math.round(p.avgScrollDepth * 100)}%` : "—",
+      period: "Last 3 days",
+      sessions:        summary.totalSessions       || summary.sessions        || 0,
+      pagesPerSession: summary.pagesPerSession?.toFixed?.(1) || "—",
+      avgScrollDepth:  summary.avgScrollDepth 
+        ? `${Math.round(summary.avgScrollDepth * 100)}%` 
+        : summary.scrollDepth || "—",
+      engagedSessions: summary.engagedSessions     || 0,
+      rageClicks:      summary.rageClickCount      || summary.rageClicks      || 0,
+      deadClicks:      summary.deadClickCount      || summary.deadClicks      || 0,
+      quickBacks:      summary.quickBackCount      || summary.quickBacks      || 0,
+      topPages: (summary.topUrls || summary.topPages || []).slice(0, 5).map(p => ({
+        page:        (p.url || p.page || "/").replace("https://fifteenconsult.com", ""),
+        sessions:    p.sessions || p.totalSessions || 0,
+        scrollDepth: p.avgScrollDepth 
+          ? `${Math.round(p.avgScrollDepth * 100)}%` 
+          : "—",
       })),
       clarityDashboard: `https://clarity.microsoft.com/projects/view/${projectId}`,
+      rawData: Object.keys(summary).slice(0, 10), // debug: show available fields
     });
 
   } catch (err) {
