@@ -844,6 +844,60 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
       }
     }
 
+    // ── DAVID: Auto-inject HubSpot + News data ──────────────────────────────────────
+    if (member.id === "david") {
+      try {
+        const [hsRes, newsRes] = await Promise.allSettled([
+          fetch("/api/hubspot?action=pipeline"),
+          fetch("/api/news"),
+        ]);
+
+        let davidContext = "\n\n===\nLIVE BD INTELLIGENCE:\n";
+
+        if (hsRes.status === "fulfilled" && hsRes.value.ok) {
+          const hs = await hsRes.value.json();
+          if (!hs.error) {
+            davidContext += `\nHUBSPOT PIPELINE (live):
+Total Contacts: ${hs.totalContacts || 0}
+Open Deals: ${hs.openDeals || 0}
+Won Deals: ${hs.wonDeals || 0}
+Pipeline Health: ${hs.openDeals > 0 ? "Active deals in progress" : "No open deals — critical gap"}`;
+          }
+        }
+
+        if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+          const news = await newsRes.value.json();
+          if (news.articles?.length > 0) {
+            davidContext += "\n\nMARKET INTELLIGENCE (scan for BD opportunities):";
+            news.articles.slice(0, 6).forEach(a => {
+              davidContext += `\n- [${a.source}] ${a.title}`;
+            });
+          }
+        }
+
+        davidContext += "\n\nINSTRUCTION: Use Gmail MCP to check for prospect replies. Use Google Calendar MCP to identify available call slots. Use HubSpot MCP to update pipeline. Always verify news items before referencing in outreach.\n===";
+        enrichedSystemPrompt += davidContext;
+      } catch (err) { console.warn("David data fetch failed:", err.message); }
+    }
+
+    // ── SOFIA: Auto-inject News data ──────────────────────────────────────────────
+    if (member.id === "sofia") {
+      try {
+        const newsRes = await fetch("/api/news");
+        if (newsRes.ok) {
+          const news = await newsRes.json();
+          if (news.articles?.length > 0) {
+            let sofiaContext = "\n\n===\nLIVE NEWS FOR TODAY'S BRIEFING:\n";
+            news.articles.slice(0, 10).forEach(a => {
+              sofiaContext += `\n- [${a.source} · ${a.category}] ${a.title}`;
+            });
+            sofiaContext += "\n\nINSTRUCTION: Use Google Calendar MCP for today's schedule. Use Gmail MCP to check priority emails. Select the 3 most relevant news items for Sadick's morning briefing based on GCC business, West Africa tech, and marketing industry relevance.\n===";
+            enrichedSystemPrompt += sofiaContext;
+          }
+        }
+      } catch (err) { console.warn("Sofia data fetch failed:", err.message); }
+    }
+
     // ── KWAME: Auto-inject HubSpot + News data ──────────────────────────────────────
     if (member.id === "kwame") {
       try {
