@@ -312,8 +312,12 @@ export function getConnectionStatuses() {
     hotjar:     true, // Server-side only — HOTJAR_API_KEY in Vercel
     utm:        true,
     news:       true,
-    apollo:     true, // Free tier — manual use, no API needed
-    crunchbase: true, // Free tier — manual use, no API needed
+    apollo:     true,
+    crunchbase: true,
+    canva:      true, // Connected via Claude.ai MCP
+    figma:      true, // Connected via Claude.ai MCP
+    coolors:    true, // Free colour tool — no setup needed
+    brandfetch:  true, // Free brand/logo research tool
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
     tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
