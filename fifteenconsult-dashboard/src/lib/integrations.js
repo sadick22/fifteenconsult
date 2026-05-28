@@ -318,7 +318,11 @@ export function getConnectionStatuses() {
     figma:      true,
     gmail:      true,
     gcalendar:  true,
-    metalibrary: true, // Free — no setup needed
+    metalibrary: true,
+    linkedinads: true,
+    googleads:   false,
+    socialblade: true, // Free — no setup needed
+    latelyai:    true, // Free reference — no setup needed
     linkedinads: true, // Free — no setup needed
     googleads:   false, // Needs active Google Ads account
     gcalendar:  true, // Connected via Claude.ai MCP
