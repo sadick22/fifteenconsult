@@ -19,6 +19,10 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"canva",      name:"Canva",                    icon:"🎨", color:"#7D2AE8", agentName:"Amara",   description:"Design creation · Brand templates · Social assets" },
+  { id:"figma",      name:"Figma",                    icon:"✏️", color:"#F24E1E", agentName:"Amara",   description:"UI/UX design · Components · Developer specs" },
+  { id:"coolors",    name:"Coolors / Brand Tools",    icon:"🎨", color:"#C8A96E", agentName:"Amara",   description:"Colour palette · Brand consistency · Contrast check" },
+  { id:"brandfetch", name:"Competitor Brand Research", icon:"🔍", color:"#0288d1", agentName:"Amara",   description:"Competitor visual identity · Logo research · Brand audit" },
   { id:"apollo",     name:"Apollo.io",                icon:"🚀", color:"#7c3aed", agentName:"Kwame",   description:"275M+ contacts · Prospect research · Email finder" },
   { id:"crunchbase", name:"Crunchbase",               icon:"💰", color:"#0288d1", agentName:"Kwame",   description:"Startup funding · West Africa · GCC company data" },
   { id:"news",       name:"News & Trends Feed",       icon:"📰", color:"#C8A96E", agentName:"Nadia/Sofia", description:"Marketing Week · Campaign ME · TechCabal · Gulf Business" },
@@ -596,6 +600,185 @@ function SemrushPanel() {
             <span style={{ color:"#FF642D" }}>→</span> {item}
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ── CANVA PANEL ──────────────────────────────────────────────────────────────────
+function CanvaPanel() {
+  const BRAND = {
+    colors: [
+      { name:"Primary Background", hex:"#151c33", use:"All backgrounds" },
+      { name:"Gold Accent",        hex:"#C8A96E", use:"Headlines, CTAs, key elements" },
+      { name:"Warm White",         hex:"#e8e4d9", use:"Body text" },
+      { name:"Near-Black",         hex:"#080808", use:"Dashboard contexts" },
+      { name:"Muted Text",         hex:"#888888", use:"Captions, metadata" },
+    ],
+    fonts: [
+      { name:"Cormorant Garamond", weight:"700-900", use:"Display headlines" },
+      { name:"DM Mono",            weight:"300-500", use:"Body, data, captions" },
+    ],
+    templates: [
+      { name:"LinkedIn Post",     size:"1200×1200px", format:"Square" },
+      { name:"LinkedIn Carousel", size:"1080×1350px", format:"Portrait" },
+      { name:"Instagram Post",    size:"1080×1080px", format:"Square" },
+      { name:"Instagram Story",   size:"1080×1920px", format:"Vertical" },
+      { name:"Pitch Deck Slide",  size:"1920×1080px", format:"16:9" },
+    ],
+  };
+
+  return (
+    <div>
+      <div style={{ background:"#7D2AE818",border:"1px solid #7D2AE844",borderRadius:8,padding:"12px 16px",marginBottom:16 }}>
+        <div style={{ fontSize:11,color:"#7D2AE8",fontWeight:600,marginBottom:4 }}>🎨 Canva — Connected via Claude.ai MCP</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Amara can create real Canva designs directly in her chat. Open Amara's chat, use a design preset, and she'll generate actual Canva files using your connected account.
+        </div>
+      </div>
+
+      <SectionLabel>FifteenConsult Brand Colours</SectionLabel>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16 }}>
+        {BRAND.colors.map((c,i)=>(
+          <div key={i} style={{ borderRadius:8,overflow:"hidden",border:"1px solid var(--border)" }}>
+            <div style={{ height:40,background:c.hex }}/>
+            <div style={{ padding:"6px 8px",background:"var(--bg-base)" }}>
+              <div style={{ fontSize:10,color:"var(--text)",fontWeight:600,fontFamily:"var(--font-mono)" }}>{c.hex}</div>
+              <div style={{ fontSize:9,color:"var(--text-dim)",marginTop:1 }}>{c.name}</div>
+              <div style={{ fontSize:9,color:"var(--text-dim)",opacity:0.7 }}>{c.use}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <SectionLabel>Brand Typography</SectionLabel>
+      <div style={{ marginBottom:16 }}>
+        {BRAND.fonts.map((f,i)=>(
+          <div key={i} style={{ padding:"8px 12px",borderBottom:"1px solid var(--border)",display:"flex",justifyContent:"space-between",fontSize:11 }}>
+            <span style={{ color:"var(--text)",fontWeight:600 }}>{f.name}</span>
+            <span style={{ color:"var(--gold)" }}>{f.weight}</span>
+            <span style={{ color:"var(--text-dim)" }}>{f.use}</span>
+          </div>
+        ))}
+      </div>
+
+      <SectionLabel>Standard Design Sizes</SectionLabel>
+      <div style={{ marginBottom:16 }}>
+        {BRAND.templates.map((t,i)=>(
+          <div key={i} style={{ padding:"7px 12px",borderBottom:"1px solid var(--border)",display:"flex",justifyContent:"space-between",fontSize:11 }}>
+            <span style={{ color:"var(--text)" }}>{t.name}</span>
+            <span style={{ color:"var(--gold)",fontFamily:"var(--font-mono)" }}>{t.size}</span>
+            <span style={{ color:"var(--text-dim)" }}>{t.format}</span>
+          </div>
+        ))}
+      </div>
+
+      <a href="https://www.canva.com" target="_blank" rel="noopener noreferrer"
+        style={{ display:"block",background:"#7D2AE818",border:"1px solid #7D2AE844",borderRadius:8,padding:"10px 14px",fontSize:11,color:"#7D2AE8",fontWeight:600,textDecoration:"none",textAlign:"center" }}>
+        → Open Canva ↗
+      </a>
+    </div>
+  );
+}
+
+// ── FIGMA PANEL ───────────────────────────────────────────────────────────────────
+function FigmaPanel() {
+  return (
+    <div>
+      <div style={{ background:"#F24E1E18",border:"1px solid #F24E1E44",borderRadius:8,padding:"12px 16px",marginBottom:16 }}>
+        <div style={{ fontSize:11,color:"#F24E1E",fontWeight:600,marginBottom:4 }}>✏️ Figma — Connected via Claude.ai MCP</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Amara uses Figma for website mockups, component libraries, and developer-ready specs. Connected to sadick@mycoreo.com (paid plan).
+        </div>
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginBottom:12 }}>
+        <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What Amara does in Figma:</div>
+        {["Website section mockups for Webflow implementation","Component library — buttons, cards, nav, footer","The Fifteen Framework visual system diagram","Pitch deck master template with brand tokens","Mobile-responsive layout specs","Developer handoff with exact colour/spacing values"].map((item,i)=>(
+          <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
+            <span style={{ color:"#F24E1E" }}>→</span>{item}
+          </div>
+        ))}
+      </div>
+      <a href="https://www.figma.com" target="_blank" rel="noopener noreferrer"
+        style={{ display:"block",background:"#F24E1E18",border:"1px solid #F24E1E44",borderRadius:8,padding:"10px 14px",fontSize:11,color:"#F24E1E",fontWeight:600,textDecoration:"none",textAlign:"center" }}>
+        → Open Figma ↗
+      </a>
+    </div>
+  );
+}
+
+// ── COOLORS PANEL ─────────────────────────────────────────────────────────────────
+function CoolorsPanel() {
+  const TOOLS = [
+    { name:"Coolors Palette Generator", url:"https://coolors.co/151c33-c8a96e-e8e4d9-080808-888888", desc:"FifteenConsult palette — save and share", color:"#C8A96E" },
+    { name:"Contrast Checker", url:"https://webaim.org/resources/contrastchecker/?fcolor=C8A96E&bcolor=151c33", desc:"Gold on navy — verify accessibility", color:"#C8A96E" },
+    { name:"Adobe Color Wheel", url:"https://color.adobe.com/create/color-wheel", desc:"Explore brand colour harmonies", color:"#FF0000" },
+    { name:"Brand New (Inspiration)", url:"https://www.underconsideration.com/brandnew/", desc:"Brand identity news and case studies", color:"#333" },
+    { name:"Dribbble Design Inspiration", url:"https://dribbble.com/search/B2B-consulting-brand", desc:"Premium B2B brand design examples", color:"#ea4c89" },
+    { name:"Behance Brand Identity", url:"https://www.behance.net/search/projects?field=branding&search=consulting", desc:"Professional branding portfolios", color:"#1769ff" },
+  ];
+
+  return (
+    <div>
+      <SectionLabel>Brand & Colour Tools</SectionLabel>
+      <div style={{ display:"flex",flexDirection:"column",gap:8,marginBottom:16 }}>
+        {TOOLS.map((t,i)=>(
+          <a key={i} href={t.url} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,textDecoration:"none",transition:"all 0.15s" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor="var(--gold)"; e.currentTarget.style.background="var(--gold)08"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--bg-base)"; }}
+          >
+            <div>
+              <div style={{ fontSize:11,color:"var(--text)",marginBottom:2 }}>{t.name}</div>
+              <div style={{ fontSize:10,color:"var(--text-dim)" }}>{t.desc}</div>
+            </div>
+            <span style={{ fontSize:10,color:"var(--gold)",fontWeight:600,flexShrink:0,marginLeft:10 }}>Open ↗</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── BRANDFETCH PANEL ──────────────────────────────────────────────────────────────
+function BrandfetchPanel() {
+  const COMPETITORS = [
+    { name:"BPG Group",      url:"https://bpggroup.com",    note:"Large GCC agency network" },
+    { name:"MCN Middle East", url:"https://mcnme.com",       note:"Regional creative network" },
+    { name:"Elixirr",        url:"https://elixirr.com",     note:"Challenger consultancy — direct competitor" },
+    { name:"Leo Burnett MEA", url:"https://leoburnett.com",  note:"Global agency, GCC presence" },
+    { name:"Impact BBDO",    url:"https://impactbbdo.com",  note:"Major regional creative agency" },
+  ];
+
+  return (
+    <div>
+      <div style={{ background:"#0288d118",border:"1px solid #0288d144",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#0288d1",fontWeight:600,marginBottom:4 }}>🔍 Competitor Brand Research</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Amara audits competitor visual identities by fetching their websites directly in chat. 
+          Use the preset "Competitor brand audit" to get a full analysis with recommendations.
+        </div>
+      </div>
+      <SectionLabel>GCC Competitor Websites</SectionLabel>
+      <div style={{ display:"flex",flexDirection:"column",gap:8,marginBottom:16 }}>
+        {COMPETITORS.map((c,i)=>(
+          <a key={i} href={c.url} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,textDecoration:"none",transition:"all 0.15s" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor="#0288d1"; e.currentTarget.style.background="#0288d108"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--bg-base)"; }}
+          >
+            <div>
+              <div style={{ fontSize:11,color:"var(--text)",marginBottom:2 }}>{c.name}</div>
+              <div style={{ fontSize:10,color:"var(--text-dim)" }}>{c.note}</div>
+            </div>
+            <span style={{ fontSize:10,color:"#0288d1",fontWeight:600,flexShrink:0,marginLeft:10 }}>Visit ↗</span>
+          </a>
+        ))}
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+        💡 <strong style={{ color:"var(--text)" }}>How to use:</strong> Click any competitor link → note their visual style → 
+        come back to Amara's chat and say "I just looked at [competitor] — here's what I saw: [paste observations]. 
+        How should FifteenConsult position visually against them?"
       </div>
     </div>
   );
@@ -1240,6 +1423,14 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
+              {activeId==="canva"      && <CanvaPanel/>}
+              {activeId==="figma"      && <FigmaPanel/>}
+              {activeId==="coolors"    && <CoolorsPanel/>}
+              {activeId==="brandfetch" && <BrandfetchPanel/>}
+              {activeId==="canva"      && <CanvaPanel/>}
+              {activeId==="figma"      && <FigmaPanel/>}
+              {activeId==="coolors"    && <CoolorsPanel/>}
+              {activeId==="brandfetch" && <BrandfetchPanel/>}
               {activeId==="apollo"     && <ApolloPanel/>}
               {activeId==="crunchbase" && <CrunchbasePanel/>}
               {activeId==="apollo"     && <ApolloPanel/>}
