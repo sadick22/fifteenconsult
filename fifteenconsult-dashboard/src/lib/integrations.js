@@ -181,7 +181,7 @@ export async function fetchTikTokInsights() {
 
 export async function fetchPageSpeed(strategy = "mobile") {
   try {
-    const r = await fetch(`/api/pagespeed?url=https://fifteenconsult.com&strategy=${strategy}`);
+    const r = await fetch(`/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=${strategy}`);
     const d = await r.json();
     if (!r.ok) return { error: d.error };
     return d;
@@ -192,7 +192,7 @@ export async function fetchPageSpeed(strategy = "mobile") {
 
 export async function fetchGSCOverview() {
   try {
-    const r = await fetch("/api/searchconsole?action=overview");
+    const r = await fetch("/api/seo?tool=gsc&action=overview");
     const d = await r.json();
     if (!r.ok) return { error: d.error };
     return d;
@@ -201,7 +201,18 @@ export async function fetchGSCOverview() {
 
 export async function fetchGSCKeywords() {
   try {
-    const r = await fetch("/api/searchconsole?action=keywords");
+    const r = await fetch("/api/seo?tool=gsc&action=keywords");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
+// ── NEWS FEEDS ────────────────────────────────────────────────────────────────────
+
+export async function fetchNewsFeeds() {
+  try {
+    const r = await fetch("/api/news");
     const d = await r.json();
     if (!r.ok) return { error: d.error };
     return d;
@@ -212,7 +223,7 @@ export async function fetchGSCKeywords() {
 
 export async function fetchClarityData() {
   try {
-    const r = await fetch("/api/clarity");
+    const r = await fetch("/api/analytics?tool=clarity");
     const d = await r.json();
     if (!r.ok) return { error: d.error };
     return d;
@@ -223,7 +234,7 @@ export async function fetchClarityData() {
 
 export async function fetchHotjarData() {
   try {
-    const r = await fetch("/api/hotjar");
+    const r = await fetch("/api/analytics?tool=hotjar");
     const d = await r.json();
     if (!r.ok) return { error: d.error };
     return d;
@@ -234,7 +245,7 @@ export async function fetchHotjarData() {
 
 export async function fetchUTMTemplates() {
   try {
-    const r = await fetch("/api/utm?action=templates");
+    const r = await fetch("/api/analytics?tool=utm&action=templates");
     const d = await r.json();
     if (!r.ok) return { error: d.error };
     return d;
@@ -299,7 +310,8 @@ export function getConnectionStatuses() {
     trends:     true,
     clarity:    true, // Server-side only — CLARITY_API_TOKEN in Vercel
     hotjar:     true, // Server-side only — HOTJAR_API_KEY in Vercel
-    utm:        true, // Free — no setup needed
+    utm:        true,
+    news:       true, // Free RSS feeds — no setup needed
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
     tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
