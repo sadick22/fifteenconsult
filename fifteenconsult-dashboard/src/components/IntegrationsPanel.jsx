@@ -385,7 +385,7 @@ function SchemaPanel() {
   const load = async () => {
     setLoading(true);
     try {
-      const r = await fetch("/api/schematest?url=https://fifteenconsult.com");
+      const r = await fetch("/api/seo?tool=schema&url=https://fifteenconsult.com");
       setData(await r.json());
     } catch(e) { setData({ error: e.message }); }
     setLoading(false);
@@ -775,7 +775,7 @@ function UTMPanel() {
   const buildUTM = async () => {
     setBuilding(true);
     try {
-      const r = await fetch("/api/utm?action=build", {
+      const r = await fetch("/api/analytics?tool=utm&action=build", {
         method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(form),
       });
       const d = await r.json();
