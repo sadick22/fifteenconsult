@@ -19,6 +19,9 @@ const INTEGRATIONS = [
   { id:"ga4",        name:"Google Analytics 4",     icon:"📊", color:"#4285f4", agentName:"Zara",    description:"Traffic · Conversions",        envKeys:["VITE_GA4_MEASUREMENT_ID","VITE_GA4_API_SECRET"], setupGuide:true },
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
+  { id:"metalibrary",  name:"Meta Ad Library",         icon:"📚", color:"#1877F2", agentName:"Hassan/Malik", description:"Competitor ads · Creative intelligence · GCC market" },
+  { id:"linkedinads",  name:"LinkedIn Ad Library",      icon:"💼", color:"#0A66C2", agentName:"Hassan/Malik", description:"B2B competitor ads · Sponsored content research" },
+  { id:"googleads",    name:"Google Ads",               icon:"🔍", color:"#34a853", agentName:"Hassan",       description:"Search campaigns · Keyword targeting · QAR bidding" },
   { id:"gmail",     name:"Gmail",                    icon:"📧", color:"#EA4335", agentName:"David/Sofia", description:"Email triage · Draft replies · Prospect follow-ups" },
   { id:"gcalendar", name:"Google Calendar",          icon:"📅", color:"#4285f4", agentName:"David/Sofia", description:"Schedule · Call slots · Weekly planning" },
   { id:"canva",      name:"Canva",                    icon:"🎨", color:"#7D2AE8", agentName:"Amara",   description:"Design creation · Brand templates · Social assets" },
@@ -602,6 +605,120 @@ function SemrushPanel() {
             <span style={{ color:"#FF642D" }}>→</span> {item}
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ── META AD LIBRARY PANEL ────────────────────────────────────────────────────────
+function MetaLibraryPanel() {
+  const SEARCHES = [
+    { label:"BPG Group ads", url:"https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=QA&q=BPG+Group&search_type=keyword_unordered", color:"#1877F2" },
+    { label:"MCN Middle East ads", url:"https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=QA&q=MCN&search_type=keyword_unordered", color:"#1877F2" },
+    { label:"Elixirr ads", url:"https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&q=Elixirr&search_type=keyword_unordered", color:"#1877F2" },
+    { label:"Marketing consultancy Qatar ads", url:"https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=QA&q=marketing+consultancy&search_type=keyword_unordered", color:"#1877F2" },
+    { label:"Marketing agency Doha ads", url:"https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=QA&q=marketing+agency&search_type=keyword_unordered", color:"#1877F2" },
+    { label:"Nigeria marketing agency ads", url:"https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=NG&q=marketing+agency&search_type=keyword_unordered", color:"#1877F2" },
+  ];
+
+  return (
+    <div>
+      <div style={{ background:"#1877F218",border:"1px solid #1877F244",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#1877F2",fontWeight:600,marginBottom:4 }}>📚 Meta Ad Library — Free Competitor Intelligence</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Every active ad on Facebook and Instagram is publicly searchable. Hassan and Malik use this to monitor competitor campaigns and identify winning creative angles in the GCC market.
+        </div>
+      </div>
+      <SectionLabel>Quick Competitor Searches</SectionLabel>
+      <div style={{ display:"flex",flexDirection:"column",gap:8,marginBottom:16 }}>
+        {SEARCHES.map((s,i)=>(
+          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,textDecoration:"none",transition:"all 0.15s" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor="#1877F2"; e.currentTarget.style.background="#1877F208"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--bg-base)"; }}
+          >
+            <span style={{ fontSize:11,color:"var(--text)" }}>{s.label}</span>
+            <span style={{ fontSize:10,color:"#1877F2",fontWeight:600 }}>Search ↗</span>
+          </a>
+        ))}
+      </div>
+      <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+        💡 <strong style={{ color:"var(--text)" }}>Workflow:</strong> Open a search → screenshot interesting competitor ads → 
+        paste into Hassan or Malik's chat: "Analyse these competitor ads and tell me how FifteenConsult should respond."
+      </div>
+    </div>
+  );
+}
+
+// ── LINKEDIN ADS LIBRARY PANEL ────────────────────────────────────────────────────
+function LinkedInAdsPanel() {
+  const SEARCHES = [
+    { label:"BPG Group sponsored content", url:"https://www.linkedin.com/company/bpg-group/posts/?feedView=ads", color:"#0A66C2" },
+    { label:"MCN Middle East sponsored content", url:"https://www.linkedin.com/company/mcn-mena/posts/?feedView=ads", color:"#0A66C2" },
+    { label:"Elixirr sponsored content", url:"https://www.linkedin.com/company/elixirr/posts/?feedView=ads", color:"#0A66C2" },
+    { label:"LinkedIn Ad Library search", url:"https://www.linkedin.com/ad-library/", color:"#0A66C2" },
+  ];
+
+  return (
+    <div>
+      <div style={{ background:"#0A66C218",border:"1px solid #0A66C244",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#0A66C2",fontWeight:600,marginBottom:4 }}>💼 LinkedIn Ad Library — B2B Competitor Intelligence</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          LinkedIn's ad transparency feature shows all active sponsored content. Critical for Hassan since LinkedIn is FifteenConsult's primary B2B ad channel.
+        </div>
+      </div>
+      <SectionLabel>Competitor LinkedIn Ads</SectionLabel>
+      <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
+        {SEARCHES.map((s,i)=>(
+          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer"
+            style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,textDecoration:"none",transition:"all 0.15s" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor="#0A66C2"; e.currentTarget.style.background="#0A66C208"; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.background="var(--bg-base)"; }}
+          >
+            <span style={{ fontSize:11,color:"var(--text)" }}>{s.label}</span>
+            <span style={{ fontSize:10,color:"#0A66C2",fontWeight:600 }}>View ↗</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── GOOGLE ADS PANEL ──────────────────────────────────────────────────────────────
+function GoogleAdsPanel() {
+  const KEYWORDS = [
+    { kw:"marketing consultancy Qatar", intent:"High — exact service" },
+    { kw:"marketing agency Doha", intent:"High — location specific" },
+    { kw:"brand strategy Qatar", intent:"Medium — service specific" },
+    { kw:"digital marketing Qatar", intent:"Medium — broad service" },
+    { kw:"marketing consultant Qatar", intent:"High — individual hire" },
+    { kw:"marketing agency Nigeria", intent:"High — West Africa" },
+    { kw:"marketing consultancy Ghana", intent:"Medium — West Africa" },
+  ];
+
+  return (
+    <div>
+      <div style={{ background:"#34a85318",border:"1px solid #34a85344",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
+        <div style={{ fontSize:11,color:"#34a853",fontWeight:600,marginBottom:4 }}>🔍 Google Ads — Search Campaign Framework</div>
+        <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+          Google Ads setup ready. Create a Google Ads account at ads.google.com with fifteenconsult@gmail.com to activate. 
+          Start with a small search campaign targeting high-intent keywords below.
+        </div>
+      </div>
+      <SectionLabel>Target Keywords — Priority Order</SectionLabel>
+      {KEYWORDS.map((k,i)=>(
+        <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:"1px solid var(--border)",fontSize:11 }}>
+          <span style={{ color:"var(--text)",fontFamily:"var(--font-mono)" }}>{k.kw}</span>
+          <span style={{ color:k.intent.startsWith("High")?"#4ade80":"#fbbf24",fontSize:10 }}>{k.intent}</span>
+        </div>
+      ))}
+      <div style={{ marginTop:14,background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
+        <strong style={{ color:"var(--text)" }}>Setup steps:</strong><br/>
+        1. Create account at ads.google.com with fifteenconsult@gmail.com<br/>
+        2. Set billing to QAR (credit card or bank transfer)<br/>
+        3. Start with QAR 500/month on top 3 keywords<br/>
+        4. Landing page: fifteenconsult.com/contact<br/>
+        5. Conversion tracking: contact form submission
       </div>
     </div>
   );
@@ -1485,7 +1602,13 @@ export default function IntegrationsPanel({ onClose }) {
               {activeId==="instagram"  && <InstagramPanel  connected={connected}/>}
               {activeId==="tiktok"     && <TikTokPanel     connected={connected}/>}
               {activeId==="adadvisor"  && <AdAdvisorPanel  connected={connected}/>}
-              {activeId==="gmail"      && <GmailPanel/>}
+              {activeId==="metalibrary"  && <MetaLibraryPanel/>}
+              {activeId==="linkedinads"  && <LinkedInAdsPanel/>}
+              {activeId==="googleads"    && <GoogleAdsPanel/>}
+              {activeId==="metalibrary"  && <MetaLibraryPanel/>}
+              {activeId==="linkedinads"  && <LinkedInAdsPanel/>}
+              {activeId==="googleads"    && <GoogleAdsPanel/>}
+              {activeId==="gmail"        && <GmailPanel/>}
               {activeId==="gcalendar" && <GCalendarPanel/>}
               {activeId==="gmail"      && <GmailPanel/>}
               {activeId==="gcalendar" && <GCalendarPanel/>}
