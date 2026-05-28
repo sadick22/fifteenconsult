@@ -14,62 +14,64 @@ export const AGENT_PRESETS = {
 
   nadia: [
     {
-      id: "re_content",
-      icon: "🏗",
-      label: "Real Estate focus",
-      category: "Industry",
-      prompt: "Focus entirely on Real Estate content today. Write a LinkedIn post targeting property developers and real estate agencies in Qatar — lead with a market insight, not a pitch. Reference current Qatar real estate market conditions.",
+      id: "linkedin_insight",
+      icon: "💡",
+      label: "Write LinkedIn insight post",
+      category: "LinkedIn",
+      prompt: "Write a high-performing LinkedIn post for FifteenConsult using the challenger approach. Lead with a bold, counterintuitive insight about marketing in GCC or West Africa. Include a specific data point. Use the format: Hook (1-2 lines) → Insight (3-5 lines) → Proof or example (2-3 lines) → Question CTA. 150-250 words. No generic phrases. Start with something other than 'I'.",
     },
     {
-      id: "saas_content",
-      icon: "💻",
-      label: "SaaS/Tech focus",
-      category: "Industry",
-      prompt: "Focus on SaaS and tech companies entering the GCC market. Write a LinkedIn post about a common marketing mistake B2B tech companies make when launching in Qatar/UAE.",
+      id: "linkedin_framework",
+      icon: "15",
+      label: "Fifteen Framework LinkedIn post",
+      category: "LinkedIn",
+      prompt: "Write a LinkedIn post explaining one specific aspect of The Fifteen Framework. Make it educational and actionable — show how 15 minutes of executive attention, or one of the 15 key metrics, or one of the 15 strategic pillars can transform a company's marketing. Use a real-world GCC example. End with a question about their current marketing measurement.",
     },
     {
-      id: "hospitality_content",
-      icon: "🏨",
-      label: "Hospitality focus",
-      category: "Industry",
-      prompt: "Focus on hospitality and tourism content. Qatar is a major destination post-World Cup. Write content targeting hotel and tourism brand marketing decision makers.",
+      id: "linkedin_west_africa",
+      icon: "🌍",
+      label: "West Africa market post",
+      category: "LinkedIn",
+      prompt: "Write a LinkedIn post about a marketing opportunity or insight specific to West Africa — focusing on Nigeria, Ghana, or pan-African trends. Position FifteenConsult as a consultancy that understands both GCC and African markets. This should differentiate us from typical Qatar/GCC agencies. Use the news headlines from today's feed if relevant.",
+    },
+    {
+      id: "newsletter_draft",
+      icon: "📧",
+      label: "Draft weekly newsletter",
+      category: "Email",
+      prompt: "Draft this week's FifteenConsult email newsletter for our MailerLite subscribers. Use the email performance data to understand what our audience engages with. Include: one strong marketing insight relevant to GCC/West Africa, one tip from The Fifteen Framework, one piece of FifteenConsult news or client win, and one clear CTA. Subject line under 50 chars. Total length: 300-400 words.",
+    },
+    {
+      id: "blog_brief",
+      icon: "📝",
+      label: "Write SEO blog article",
+      category: "Blog",
+      prompt: "Write a full SEO-optimised blog article for fifteenconsult.com (800-1200 words). Target keyword: 'marketing consultancy Qatar' or 'real estate marketing GCC'. Structure: compelling intro, 4-5 key sections with subheadings, practical takeaways, and CTA to book a strategy call. Include The Fifteen Framework naturally. Use the news feed headlines for a topical angle if relevant.",
     },
     {
       id: "case_study",
-      icon: "📋",
-      label: "Case study update",
-      category: "Content Type",
-      prompt: "Draft an update or new case study for one of our existing clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, or African Languages Lab. Choose the one most likely to attract similar clients.",
+      icon: "🏆",
+      label: "Write client case study",
+      category: "Case Study",
+      prompt: "Write a case study for one of our clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, or African Languages Lab. Format: Challenge (what problem did they face) → Approach (how FifteenConsult applied the Fifteen Framework) → Results (specific metrics and outcomes) → Key Lesson (what other brands can learn). 400-600 words. Professional but engaging tone.",
     },
     {
-      id: "fifteen_framework",
-      icon: "15",
-      label: "Fifteen Framework",
-      category: "Content Type",
-      prompt: "Create content specifically about The Fifteen Framework — FifteenConsult's proprietary approach built around 15 minutes of executive attention, 15 key metrics, and 15 strategic pillars. This is our primary differentiator and needs more visibility.",
+      id: "instagram_carousel",
+      icon: "📱",
+      label: "Instagram carousel content",
+      category: "Instagram",
+      prompt: "Create content for a 6-slide Instagram carousel for FifteenConsult. Topic: a practical marketing tip relevant to GCC SMEs or startups. Slide 1: Bold hook/problem statement. Slides 2-5: One tip per slide with brief explanation. Slide 6: CTA to book a strategy call. Keep each slide to 15-20 words max. Make it visually structured with clear hierarchy.",
     },
     {
-      id: "newsletter",
-      icon: "📧",
-      label: "Write newsletter",
-      category: "Content Type",
-      prompt: "Draft this week's email newsletter for FifteenConsult. Angle: one actionable marketing insight for GCC businesses. Keep it under 400 words. Strong subject line. Clear CTA to book a strategy call.",
-    },
-    {
-      id: "thought_leadership",
-      icon: "💡",
-      label: "Thought leadership",
-      category: "Content Type",
-      prompt: "Write a bold, opinionated LinkedIn post from FifteenConsult's POV — something that challenges conventional marketing wisdom in the GCC market. Challenger brand tone. No fluff.",
-    },
-    {
-      id: "end_of_month",
-      icon: "📅",
-      label: "End of month push",
-      category: "Timing",
-      prompt: "End of month is approaching. Create content that drives urgency — position FifteenConsult as the partner businesses need to hit their Q targets. Focus on lead generation messaging.",
+      id: "news_content",
+      icon: "📰",
+      label: "News-inspired content",
+      category: "LinkedIn",
+      prompt: "Using the latest news headlines from the live feed, identify the most relevant story for FifteenConsult's audience and write a LinkedIn post that connects it to a marketing lesson for GCC or West Africa businesses. Position FifteenConsult as the expert voice on this topic. Be specific and add genuine insight beyond what the headline says.",
     },
   ],
+
+  tariq:,
 
   tariq: [
     {
@@ -635,4 +637,3 @@ export function deleteSavedPrompt(agentId, prompt) {
     localStorage.setItem(SAVED_PROMPTS_KEY, JSON.stringify(all));
   } catch {}
 }
-
