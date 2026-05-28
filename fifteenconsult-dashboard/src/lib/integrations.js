@@ -208,6 +208,39 @@ export async function fetchGSCKeywords() {
   } catch (err) { return { error: err.message }; }
 }
 
+// ── MICROSOFT CLARITY ────────────────────────────────────────────────────────────
+
+export async function fetchClarityData() {
+  try {
+    const r = await fetch("/api/clarity");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
+// ── HOTJAR ────────────────────────────────────────────────────────────────────────
+
+export async function fetchHotjarData() {
+  try {
+    const r = await fetch("/api/hotjar");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
+// ── UTM TEMPLATES ─────────────────────────────────────────────────────────────────
+
+export async function fetchUTMTemplates() {
+  try {
+    const r = await fetch("/api/utm?action=templates");
+    const d = await r.json();
+    if (!r.ok) return { error: d.error };
+    return d;
+  } catch (err) { return { error: err.message }; }
+}
+
 // ── META ADS (Official MCP) ──────────────────────────────────────────────────────
 
 export async function fetchMetaAdsPerformance() {
@@ -262,8 +295,11 @@ export function getConnectionStatuses() {
     pagespeed:  true, // Free — no key needed for basic usage
     gsc:        !!(import.meta.env.VITE_GSC_CONFIGURED || import.meta.env.GA4_REFRESH_TOKEN),
     semrush:    true, // Via Claude MCP
-    schema:     true, // Free — scans page directly, no key needed
-    trends:     true, // Free — Google Trends web fetch, no key needed
+    schema:     true,
+    trends:     true,
+    clarity:    !!import.meta.env.VITE_CLARITY_CONFIGURED,
+    hotjar:     !!import.meta.env.VITE_HOTJAR_CONFIGURED,
+    utm:        true, // Free — no setup needed
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
     tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
