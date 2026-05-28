@@ -311,7 +311,9 @@ export function getConnectionStatuses() {
     clarity:    true, // Server-side only — CLARITY_API_TOKEN in Vercel
     hotjar:     true, // Server-side only — HOTJAR_API_KEY in Vercel
     utm:        true,
-    news:       true, // Free RSS feeds — no setup needed
+    news:       true,
+    apollo:     true, // Free tier — manual use, no API needed
+    crunchbase: true, // Free tier — manual use, no API needed
     make:       !!import.meta.env.VITE_MAKE_WEBHOOK_URL,
     instagram:  !!import.meta.env.VITE_INSTAGRAM_CONNECTED,
     tiktok:     !!import.meta.env.VITE_TIKTOK_CONNECTED,
