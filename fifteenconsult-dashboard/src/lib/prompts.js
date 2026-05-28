@@ -355,8 +355,6 @@ export const AGENT_PRESETS = {
     },
   ],
 
-  malik:,
-
   malik: [
     {
       id: "gccc_campaign_plan",
