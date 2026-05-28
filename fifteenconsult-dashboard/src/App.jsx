@@ -844,6 +844,57 @@ Top Recommendations: ${(schema.recommendations||[]).join(" | ") || "None"}`;
       }
     }
 
+    // ── KWAME: Auto-inject HubSpot + News data ──────────────────────────────────────
+    if (member.id === "kwame") {
+      try {
+        const [hsRes, newsRes] = await Promise.allSettled([
+          fetch("/api/hubspot?action=pipeline"),
+          fetch("/api/news"),
+        ]);
+
+        let kwameContext = "\n\n===\nLIVE PIPELINE & INTELLIGENCE DATA:\n";
+
+        // HubSpot pipeline
+        if (hsRes.status === "fulfilled" && hsRes.value.ok) {
+          const hs = await hsRes.value.json();
+          if (!hs.error) {
+            kwameContext += `\nHUBSPOT PIPELINE (live):
+Total Contacts: ${hs.totalContacts || 0}
+Open Deals: ${hs.openDeals || 0}
+Won Deals: ${hs.wonDeals || 0}
+Total Deals: ${hs.totalDeals || 0}
+
+PIPELINE HEALTH: ${hs.totalContacts > 0 ? "Active" : "Pipeline is empty — focus on prospecting today"}
+PRIORITY: ${hs.openDeals > 0 ? `${hs.openDeals} deals need attention` : "No open deals — need to book discovery calls"}`;
+          }
+        } else {
+          kwameContext += "\nHUBSPOT: Connection error — check HubSpot integration";
+        }
+
+        // News for market intelligence
+        if (newsRes.status === "fulfilled" && newsRes.value.ok) {
+          const news = await newsRes.value.json();
+          if (news.articles?.length > 0) {
+            kwameContext += "\n\nMARKET INTELLIGENCE — Latest News (scan for prospect triggers):";
+            news.articles.slice(0, 6).forEach(a => {
+              kwameContext += `\n- [${a.source}] ${a.title}`;
+            });
+            kwameContext += "\n\nScan these headlines for: funding announcements, new market entries, leadership changes, expansion plans — these are your outreach triggers.";
+          }
+        }
+
+        kwameContext += `\n\nINSTRUCTION: 
+1. Use the HubSpot data to report real pipeline status — never invent numbers
+2. Use news headlines to identify genuine trigger events for outreach
+3. When drafting outreach, always verify the trigger event is real before referencing it
+4. Flag any intelligence that needs verification with [VERIFY BEFORE USE]\n===`;
+        enrichedSystemPrompt += kwameContext;
+
+      } catch (err) {
+        console.warn("Kwame data fetch failed:", err.message);
+      }
+    }
+
     // ── NADIA: Auto-inject MailerLite + News data ───────────────────────────────────
     if (member.id === "nadia") {
       try {
