@@ -314,7 +314,10 @@ export function getConnectionStatuses() {
     news:       true,
     apollo:     true,
     crunchbase: true,
-    canva:      true, // Connected via Claude.ai MCP
+    canva:      true,
+    figma:      true,
+    gmail:      true, // Connected via Claude.ai MCP
+    gcalendar:  true, // Connected via Claude.ai MCP
     figma:      true, // Connected via Claude.ai MCP
     coolors:    true, // Free colour tool — no setup needed
     brandfetch:  true, // Free brand/logo research tool
