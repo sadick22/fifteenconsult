@@ -229,11 +229,8 @@ export default function CompetitorIntel({ color="#34D399" }) {
         schema.schemas?.count > 0 ? `✓ Schema: ${schema.schemas.types?.join(", ")}` : "✗ No schema markup",
         `SEO Score: ${schema.score}/100`,
         schema.recommendations?.length ? `Issues: ${schema.recommendations.join(" | ")}` : "",
-        `
-→ For full analysis paste into David's chat:
-"Fetch ${url} and analyse ${name}'s ${label} — positioning, messaging, services, and how FifteenConsult should compete."`,
-      ].filter(Boolean).join("
-");
+        `→ Paste into David's chat: "Fetch ${url} and analyse ${name}'s ${label} — positioning, messaging, services, and how FifteenConsult should compete."`,
+      ].filter(Boolean).join("\n");
       return { summary };
     } catch (err) {
       return { error: err.message };
