@@ -18,6 +18,7 @@ import NotificationCentre, { addNotification } from "./components/NotificationCe
 import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNextRun, formatNextRun, markRun } from "./lib/scheduler.js";
 import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
 import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
+import OrbitalCommandCenter from "./components/OrbitalCommandCenter.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
 import DocumentLibrary from "./components/DocumentLibrary.jsx";
 import CompetitorIntel from "./components/CompetitorIntel.jsx";
@@ -722,6 +723,7 @@ export default function App() {
   const [showSettings,setShowSettings]         = useState(false);
   const [expandedOutput,setExpandedOutput]     = useState(null);
   const [showMobileMenu,setShowMobileMenu] = useState(false);
+  const [homeLayout,setHomeLayout] = useState(()=>{ try { return localStorage.getItem("fc_home_layout")||"orbit"; } catch { return "orbit"; } });
 
   const toggleTheme = () => {
     const next = theme==="dark"?"light":"dark";
@@ -749,6 +751,22 @@ export default function App() {
   // Compute alerts live from current KPI data
   const kpiData = useMemo(()=>buildKpiData(TEAM),[]);
   const alerts  = useMemo(()=>evaluateAlerts(kpiData,taskStates,outputs),[kpiData,taskStates,outputs]);
+
+  // Map live team + alerts into the orbital command center's agent shape
+  const ORBIT_RING = { amani:0,david:0,malik:0, kwame:1,hassan:1,sara:1,nadia:1, tariq:2,zara:2,amara:2,sofia:2 };
+  const orbitAgents = useMemo(()=>TEAM.map(m=>{
+    const aa = alerts.filter(a=>a.agent===m.id);
+    const red = aa.find(a=>a.level==="red");
+    const amber = aa.find(a=>a.level==="amber");
+    const states = taskStates[m.id]||[];
+    const open = states.filter(x=>!x).length;
+    let task;
+    if (red) task = red.title;
+    else if (amber) task = amber.title;
+    else if (outputs[m.id]?.text) task = `Last briefing ready · ${open} task${open===1?"":"s"} open`;
+    else task = open>0 ? `${open} task${open===1?"":"s"} open · tap to brief` : "Ready · tap to brief";
+    return { id:m.id, name:m.name, role:m.role, ring:ORBIT_RING[m.id]??2, task, alert:!!(red||amber), level: red?"red":amber?"amber":null };
+  }),[alerts,taskStates,outputs]);
 
   const toggleTask=(memberId,idx)=>{
     setTaskStates(prev=>{ const u=[...(prev[memberId]||[])]; u[idx]=!u[idx]; return{...prev,[memberId]:u}; });
@@ -1407,6 +1425,17 @@ Quick Backs: ${clarity.quickBacks || 0}`;
 
           {!activeMember&&activeTab==="dashboard"&&activeView==="dashboard"&&(
             <div style={{ animation:"fadeUp 0.3s ease" }}>
+              {/* Home layout toggle */}
+              <div style={{ display:"flex",justifyContent:"flex-end",marginBottom:14 }}>
+                <div style={{ display:"inline-flex",background:T.card,border:`1px solid ${T.border}`,borderRadius:9,padding:3,gap:2 }}>
+                  {[{id:"orbit",label:"◎ Orbit"},{id:"grid",label:"▦ Grid"}].map(o=>(
+                    <button key={o.id} onClick={()=>{ setHomeLayout(o.id); try{localStorage.setItem("fc_home_layout",o.id);}catch{} }}
+                      style={{ background:homeLayout===o.id?T.gold:"transparent",color:homeLayout===o.id?"#000":T.textMid,border:"none",borderRadius:7,padding:"6px 14px",fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-mono)",transition:"all 0.18s" }}>
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {/* Critical alert strip */}
               {criticalCount>0&&(
                 <div onClick={()=>setShowAlerts(true)} style={{ background:"#f8717112",border:"1px solid #f8717133",borderRadius:10,padding:"12px 18px",display:"flex",alignItems:"center",gap:13,marginBottom:22,cursor:"pointer" }}>
@@ -1419,6 +1448,11 @@ Quick Backs: ${clarity.quickBacks || 0}`;
                 </div>
               )}
 
+              {homeLayout==="orbit" ? (
+                <div style={{ height:"calc(100vh - 188px)",minHeight:520,margin:"2px -26px -26px" }}>
+                  <OrbitalCommandCenter agents={orbitAgents} onOpenAgent={(a)=>setActiveMember(TEAM.find(m=>m.id===a.id))}/>
+                </div>
+              ) : (<>
               <div className="stat-grid" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:28 }}>
                 <StatCard label="Active Agents"  value={TEAM.length}                  sub="All online"                                        icon="🤖" accent={T.gold}/>
                 <StatCard label="Tasks Complete" value={`${totalDone}/${totalTasks}`} sub={`${Math.round(totalDone/totalTasks*100)}% done`}    icon="✅" accent={T.green}/>
@@ -1426,12 +1460,13 @@ Quick Backs: ${clarity.quickBacks || 0}`;
                 <StatCard label="Alerts"         value={criticalCount>0?`${criticalCount} 🚨`:alerts.filter(a=>a.level==="amber").length>0?`${alerts.filter(a=>a.level==="amber").length} ⚠️`:"All clear ✓"} sub={criticalCount>0?"Action needed today":alerts.filter(a=>a.level==="amber").length>0?"Review this week":"On track"} icon="🔔" accent={criticalCount>0?T.red:alerts.filter(a=>a.level==="amber").length>0?T.amber:T.green}/>
               </div>
 
-              <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:13 }}>Your Team · 7 Agents</div>
+              <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:13 }}>Your Team · {TEAM.length} Agents</div>
               <div className="agent-grid" style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(340px,1fr))",gap:12 }}>
                 {TEAM.map(m=>(
                   <MemberCard key={m.id} member={m} taskStates={taskStates} output={outputs[m.id]} streaming={streaming} historyCount={(histories[m.id]||[]).length} alerts={alerts} schedule={schedules[m.id]} onOpen={()=>setActiveMember(m)} onRun={()=>runBriefing(m,"")}/>
                 ))}
               </div>
+              </>)}
             </div>
           )}
 
