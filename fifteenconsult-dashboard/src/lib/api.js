@@ -4,7 +4,6 @@
  */
 export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = null) {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-
   if (!apiKey) {
     throw new Error(
       "No API key found. Add VITE_ANTHROPIC_API_KEY to your Vercel environment variables.\n\n" +
@@ -13,7 +12,6 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = 
       "Value: your Anthropic API key from console.anthropic.com"
     );
   }
-
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -23,7 +21,7 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = 
       "anthropic-dangerous-direct-browser-access": "true",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 2000,
       system: systemPrompt,
       messages: [{
@@ -38,16 +36,13 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = 
       stream: true,
     }),
   });
-
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(err.error?.message || `API error ${response.status}`);
   }
-
   const reader  = response.body.getReader();
   const decoder = new TextDecoder();
   let fullText  = "";
-
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -67,4 +62,3 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = 
   }
   return fullText;
 }
-
