@@ -19,7 +19,8 @@ import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNex
 import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
 import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
 import OrbitalCommandCenter from "./components/OrbitalCommandCenter.jsx";
-import { loadHandoffs, subscribeHandoffs } from "./lib/handoffs.js";
+import { loadHandoffs, subscribeHandoffs, markHandoffDone } from "./lib/handoffs.js";
+import HandoffFeed from "./components/HandoffFeed.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
 import DocumentLibrary from "./components/DocumentLibrary.jsx";
 import CompetitorIntel from "./components/CompetitorIntel.jsx";
@@ -1464,8 +1465,14 @@ Quick Backs: ${clarity.quickBacks || 0}`;
               )}
 
               {homeLayout==="orbit" ? (
-                <div style={{ height:"calc(100vh - 188px)",minHeight:520,margin:"2px -26px -26px" }}>
-                  <OrbitalCommandCenter agents={orbitAgents} onOpenAgent={(a)=>setActiveMember(TEAM.find(m=>m.id===a.id))}/>
+                <div style={{ display:"flex",gap:16,height:"calc(100vh - 188px)",minHeight:520,margin:"2px -26px -26px" }}>
+                  <style>{`@media (max-width:900px){ .fc-handoff-rail{ display:none !important; } }`}</style>
+                  <div style={{ flex:1,minWidth:0 }}>
+                    <OrbitalCommandCenter agents={orbitAgents} onOpenAgent={(a)=>setActiveMember(TEAM.find(m=>m.id===a.id))}/>
+                  </div>
+                  <div className="fc-handoff-rail" style={{ width:312,flexShrink:0 }}>
+                    <HandoffFeed variant="rail" handoffs={handoffs} onMarkDone={markHandoffDone} onOpenAgent={(id)=>setActiveMember(TEAM.find(m=>m.id===id))}/>
+                  </div>
                 </div>
               ) : (<>
               <div className="stat-grid" style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:28 }}>
@@ -1487,7 +1494,12 @@ Quick Backs: ${clarity.quickBacks || 0}`;
 
           {!activeMember&&activeTab==="summary"&&<WeeklySummary outputs={outputs} streaming={streaming} onRunAll={runAll} histories={histories} alerts={alerts}/>}
           {!activeMember&&activeView==="warroom"&&(
-            <WarRoom alerts={alerts} taskStates={taskStates} outputs={outputs}/>
+            <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
+              <div style={{ height:300 }}>
+                <HandoffFeed variant="panel" handoffs={handoffs} onMarkDone={markHandoffDone} onOpenAgent={(id)=>setActiveMember(TEAM.find(m=>m.id===id))}/>
+              </div>
+              <WarRoom alerts={alerts} taskStates={taskStates} outputs={outputs}/>
+            </div>
           )}
           {!activeMember&&activeView==="framework"&&(
             <FifteenFramework/>
