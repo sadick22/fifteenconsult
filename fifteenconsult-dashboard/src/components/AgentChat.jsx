@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
 import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL } from "../data/team.js";
-import { addHandoff } from "../lib/handoffs.js";
+import { addHandoff, pendingFor, markHandoffDone, subscribeHandoffs } from "../lib/handoffs.js";
 
 const T = {
   base:     "var(--bg-base)", card:     "var(--bg-card)",
@@ -247,6 +247,8 @@ export default function AgentChat({ member, lastOutput }) {
   const [pendingImage, setPendingImage] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const [pendingHandoff, setPendingHandoff] = useState(null);
+  const [pendingInbox, setPendingInbox] = useState(() => pendingFor(member.id));
+  const [expandedHandoffs, setExpandedHandoffs] = useState(() => new Set());
 
   // Reload messages when switching between agents
   const switchingRef = useRef(false);
@@ -258,6 +260,14 @@ export default function AgentChat({ member, lastOutput }) {
     setShowSuggestions(true);
     // Allow saves again after state settles
     setTimeout(() => { switchingRef.current = false; }, 100);
+  }, [member.id]);
+
+  // Keep the inbox (pending handoffs to this agent) live
+  useEffect(() => {
+    setPendingInbox(pendingFor(member.id));
+    setExpandedHandoffs(new Set());
+    const off = subscribeHandoffs(() => setPendingInbox(pendingFor(member.id)));
+    return off;
   }, [member.id]);
 
   // Scroll to bottom on new messages
@@ -292,8 +302,16 @@ export default function AgentChat({ member, lastOutput }) {
       ? `\n\nYOUR LATEST BRIEFING OUTPUT (for context):\n${lastOutput.text.slice(0, 800)}`
       : "";
 
-    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
-  }, [member, lastOutput, dateCtx]);
+    const inboxContext = pendingInbox.length
+      ? `\n\n---\nYOUR INBOX — handoffs routed to you (these stay open until Sadick marks them done):\n${pendingInbox.map((h,i)=>{
+          const from = firstNameOfId(h.from);
+          const full = expandedHandoffs.has(h.id) ? `\n   FULL CONTENT:\n${h.body}` : "";
+          return `${i+1}. From ${from}: ${h.summary}${full}`;
+        }).join("\n")}\nIf Sadick asks for the full content of an item you only have the summary for, tell him to click "Pull full" on that item in your inbox.`
+      : "";
+
+    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+  }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -449,6 +467,41 @@ export default function AgentChat({ member, lastOutput }) {
           </div>
         </div>
       </div>
+
+      {/* Inbox — pending handoffs routed to this agent */}
+      {pendingInbox.length > 0 && (
+        <div style={{ flexShrink: 0, maxHeight: 184, overflowY: "auto", borderBottom: `1px solid ${T.border}`, background: `${member.color}0c` }}>
+          <div style={{ padding: "9px 16px 5px", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: member.color, fontWeight: 700 }}>
+            📥 Inbox · {pendingInbox.length} pending handoff{pendingInbox.length > 1 ? "s" : ""}
+          </div>
+          {pendingInbox.map(h => {
+            const open = expandedHandoffs.has(h.id);
+            return (
+              <div key={h.id} style={{ padding: "4px 16px 11px" }}>
+                <div style={{ fontSize: 11, color: T.text, lineHeight: 1.5 }}>
+                  <span style={{ color: member.color, fontWeight: 600 }}>{firstNameOfId(h.from)}</span>
+                  <span style={{ color: T.textDim }}> sent: </span>{h.summary}
+                </div>
+                {open && (
+                  <pre style={{ fontSize: 11, color: T.textMid, whiteSpace: "pre-wrap", fontFamily: "var(--font-mono)", margin: "7px 0 0", background: T.base, border: `1px solid ${T.border}`, borderRadius: 6, padding: 10, maxHeight: 160, overflowY: "auto" }}>{h.body}</pre>
+                )}
+                <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                  <button onClick={() => setExpandedHandoffs(prev => { const n = new Set(prev); n.has(h.id) ? n.delete(h.id) : n.add(h.id); return n; })}
+                    style={{ background: "none", border: `1px solid ${member.color}55`, color: member.color, fontSize: 9, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", padding: "3px 11px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)" }}>
+                    {open ? "Hide full" : "Pull full"}
+                  </button>
+                  <button onClick={() => markHandoffDone(h.id)}
+                    style={{ background: "none", border: `1px solid ${T.border}`, color: T.textDim, fontSize: 9, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", padding: "3px 11px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)" }}
+                    onMouseEnter={e => { e.currentTarget.style.color = T.green; e.currentTarget.style.borderColor = T.green; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = T.textDim; e.currentTarget.style.borderColor = T.border; }}>
+                    ✓ Mark done
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Messages area */}
       <div style={{ flex: 1, overflowY: "auto", padding: "16px 18px" }}>
