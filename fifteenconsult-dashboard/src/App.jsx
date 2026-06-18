@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES } from "./data/team.js";
+import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL } from "./data/team.js";
 import { callClaudeAPI } from "./lib/api.js";
 import { isFirebaseEnabled, saveRunHistory, saveKPIs, saveSettings, checkFirebaseStatus } from "./lib/firebase.js";
 import { getAgentDocuments } from "./components/DocumentLibrary.jsx";
@@ -19,6 +19,7 @@ import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNex
 import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
 import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
 import OrbitalCommandCenter from "./components/OrbitalCommandCenter.jsx";
+import { loadHandoffs, subscribeHandoffs } from "./lib/handoffs.js";
 import SettingsPanel from "./components/SettingsPanel.jsx";
 import DocumentLibrary from "./components/DocumentLibrary.jsx";
 import CompetitorIntel from "./components/CompetitorIntel.jsx";
@@ -724,6 +725,8 @@ export default function App() {
   const [expandedOutput,setExpandedOutput]     = useState(null);
   const [showMobileMenu,setShowMobileMenu] = useState(false);
   const [homeLayout,setHomeLayout] = useState(()=>{ try { return localStorage.getItem("fc_home_layout")||"orbit"; } catch { return "orbit"; } });
+  const [handoffs,setHandoffs] = useState(()=>loadHandoffs());
+  useEffect(()=>{ setHandoffs(loadHandoffs()); const off=subscribeHandoffs(setHandoffs); return off; },[]);
 
   const toggleTheme = () => {
     const next = theme==="dark"?"light":"dark";
@@ -750,7 +753,16 @@ export default function App() {
 
   // Compute alerts live from current KPI data
   const kpiData = useMemo(()=>buildKpiData(TEAM),[]);
-  const alerts  = useMemo(()=>evaluateAlerts(kpiData,taskStates,outputs),[kpiData,taskStates,outputs]);
+  const firstNameOf = (id)=>{ const m=TEAM.find(x=>x.id===id); return m ? m.name.split(" ")[0] : id; };
+  const alerts  = useMemo(()=>{
+    const base = evaluateAlerts(kpiData,taskStates,outputs);
+    const ho = handoffs.filter(h=>h.status==="pending").map(h=>({
+      agent: h.to, level: "amber", emoji: "📤",
+      title: `Handoff from ${firstNameOf(h.from)}: ${h.summary}`,
+      kind: "handoff", handoffId: h.id,
+    }));
+    return [...ho, ...base];
+  },[kpiData,taskStates,outputs,handoffs]);
 
   // Map live team + alerts into the orbital command center's agent shape
   const ORBIT_RING = { amani:0,david:0,malik:0, kwame:1,hassan:1,sara:1,nadia:1, tariq:2,zara:2,amara:2,sofia:2 };
@@ -785,7 +797,7 @@ export default function App() {
     let enrichedSystemPrompt = member.systemPrompt;
 
     // Shared team awareness + clean-output rules (every agent, every briefing)
-    enrichedSystemPrompt += `\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}`;
+    enrichedSystemPrompt += `\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}`;
 
     // Inject competitor intelligence for David and Sofia
     if (member.id === "david" || member.id === "sofia" || member.id === "amani") {
