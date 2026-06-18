@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { TEAM } from "./data/team.js";
+import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES } from "./data/team.js";
 import { callClaudeAPI } from "./lib/api.js";
 import { isFirebaseEnabled, saveRunHistory, saveKPIs, saveSettings, checkFirebaseStatus } from "./lib/firebase.js";
 import { getAgentDocuments } from "./components/DocumentLibrary.jsx";
@@ -783,6 +783,9 @@ export default function App() {
 
     // Build enriched system prompt with live context
     let enrichedSystemPrompt = member.systemPrompt;
+
+    // Shared team awareness + clean-output rules (every agent, every briefing)
+    enrichedSystemPrompt += `\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}`;
 
     // Inject competitor intelligence for David and Sofia
     if (member.id === "david" || member.id === "sofia" || member.id === "amani") {
