@@ -2,7 +2,8 @@ import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
-import { TEAM_ROSTER, OUTPUT_STYLE_RULES } from "../data/team.js";
+import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL } from "../data/team.js";
+import { addHandoff } from "../lib/handoffs.js";
 
 const T = {
   base:     "var(--bg-base)", card:     "var(--bg-card)",
@@ -106,10 +107,35 @@ const SUGGESTED_QUESTIONS = {
   ],
 };
 
+const HANDOFF_IDS = ["amani","david","malik","hassan","kwame","sara","nadia","tariq","zara","amara","sofia"];
+const firstNameOfId = (id) => { const m = TEAM.find(x => x.id === id); return m ? m.name.split(" ")[0] : id; };
+
+// Detect a [[HANDOFF]] ... [[/HANDOFF]] block at the end of an agent reply.
+function parseHandoff(text) {
+  if (!text) return null;
+  const m = text.match(/\[\[HANDOFF\]\]([\s\S]*?)\[\[\/HANDOFF\]\]/i);
+  if (!m) return null;
+  const inner = m[1];
+  const toMatch = inner.match(/to:\s*([^\n]+)/i);
+  const sumMatch = inner.match(/summary:\s*([\s\S]*?)\s*$/i);
+  if (!toMatch) return null;
+  const recipients = [...new Set(
+    toMatch[1].split(",")
+      .map(p => p.trim().toLowerCase().split(/\s+/)[0])
+      .filter(p => HANDOFF_IDS.includes(p))
+  )];
+  if (!recipients.length) return null;
+  const summary = (sumMatch ? sumMatch[1] : "").trim();
+  const cleanedBody = text.slice(0, m.index).trim();
+  return { recipients, summary, cleanedBody };
+}
+
 // Strip markdown symbols agents sometimes emit so chat reads as clean plain text
 function cleanAgentText(s) {
   if (!s) return s;
   return s
+    .replace(/\[\[HANDOFF\]\][\s\S]*?\[\[\/HANDOFF\]\]/gi, "") // machine handoff block
+    .replace(/\[\[\/?HANDOFF\]\]/gi, "")                       // stray markers
     .replace(/\*\*/g, "")            // bold markers **
     .replace(/__/g, "")              // underscore bold
     .replace(/^#{1,6}\s*/gm, "")      // # headings at line start
@@ -220,6 +246,7 @@ export default function AgentChat({ member, lastOutput }) {
   const imageRef   = useRef(null);
   const [pendingImage, setPendingImage] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const [pendingHandoff, setPendingHandoff] = useState(null);
 
   // Reload messages when switching between agents
   const switchingRef = useRef(false);
@@ -265,7 +292,7 @@ export default function AgentChat({ member, lastOutput }) {
       ? `\n\nYOUR LATEST BRIEFING OUTPUT (for context):\n${lastOutput.text.slice(0, 800)}`
       : "";
 
-    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n\nDATE CONTEXT: ${dateBlock}${outputContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
   }, [member, lastOutput, dateCtx]);
 
   const handleImageUpload = (e) => {
@@ -320,7 +347,7 @@ export default function AgentChat({ member, lastOutput }) {
     if (pendingImage) setPendingImage(null);
 
     try {
-      await callClaudeAPI(
+      const finalReply = await callClaudeAPI(
         buildSystemPrompt(),
         // Pass full conversation as the user message with history context
         history.length > 1
@@ -333,10 +360,14 @@ export default function AgentChat({ member, lastOutput }) {
         },
         imageToSend
       );
-      // Mark as done streaming
+      // Detect a handoff block; if present, strip it from the visible reply
+      const ho = parseHandoff(finalReply);
       setMessages(prev => prev.map(m =>
-        m.id === agentMsgId ? { ...m, streaming: false } : m
+        m.id === agentMsgId ? { ...m, content: ho ? ho.cleanedBody : m.content, streaming: false } : m
       ));
+      if (ho) {
+        setPendingHandoff({ from: member.id, to: ho.recipients, summary: ho.summary, body: ho.cleanedBody });
+      }
     } catch (err) {
       setMessages(prev => prev.map(m =>
         m.id === agentMsgId
@@ -470,6 +501,36 @@ export default function AgentChat({ member, lastOutput }) {
         </div>
       )}
 
+      {pendingHandoff && (
+        <div style={{ padding:"12px 14px",borderTop:`1px solid ${member.color}55`,background:`${member.color}0e`,flexShrink:0 }}>
+          <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8 }}>
+            <div style={{ fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:member.color,fontWeight:700 }}>
+              📤 Ready to hand off → {pendingHandoff.to.map(firstNameOfId).join(", ")}
+            </div>
+            <span style={{ fontSize:9,color:T.textDim }}>review &amp; edit before sending</span>
+          </div>
+          <input
+            value={pendingHandoff.summary}
+            onChange={e=>setPendingHandoff(p=>({ ...p, summary:e.target.value }))}
+            placeholder="One-line summary your colleague will see in their inbox…"
+            style={{ width:"100%",background:T.card,border:`1px solid ${T.border}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:T.text,fontFamily:"var(--font-mono)",outline:"none",marginBottom:8,boxSizing:"border-box" }}
+          />
+          <div style={{ display:"flex",gap:8 }}>
+            <button
+              onClick={()=>{
+                const names = pendingHandoff.to.map(firstNameOfId).join(", ");
+                pendingHandoff.to.forEach(to => addHandoff({ from:pendingHandoff.from, to, type:"note", summary:pendingHandoff.summary, body:pendingHandoff.body }));
+                setPendingHandoff(null);
+                setMessages(prev => [...prev, { role:"system", emoji:"📤", content:`Sent to ${names}. They'll see it in their inbox, and you'll get an alert.`, timestamp:ts(), id:Date.now() }]);
+              }}
+              disabled={!pendingHandoff.summary.trim()}
+              style={{ background:pendingHandoff.summary.trim()?member.color:"transparent",color:pendingHandoff.summary.trim()?"#000":T.textDim,border:`1px solid ${pendingHandoff.summary.trim()?member.color:T.border}`,borderRadius:6,padding:"6px 16px",fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",cursor:pendingHandoff.summary.trim()?"pointer":"not-allowed",fontFamily:"var(--font-mono)" }}>
+              Send to {pendingHandoff.to.map(firstNameOfId).join(", ")}
+            </button>
+            <button onClick={()=>setPendingHandoff(null)} style={{ background:"none",border:`1px solid ${T.border}`,color:T.textDim,borderRadius:6,padding:"6px 14px",fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-mono)" }}>Discard</button>
+          </div>
+        </div>
+      )}
       {pendingImage && (
         <div style={{ padding:"8px 14px",borderTop:`1px solid ${T.border}`,display:"flex",alignItems:"center",gap:10,background:T.card,flexShrink:0 }}>
           {pendingImage.isPdf ? (
