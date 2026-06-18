@@ -1665,3 +1665,18 @@ export function getTeamRoster(currentId) {
   const me = TEAM.find(m => m.id === currentId);
   return TEAM_ROSTER + (me ? `\n\nYou are ${me.name} (${me.role}).` : "");
 }
+
+export const HANDOFF_PROTOCOL = `HANDOFFS — routing work to a colleague:
+When Sadick asks you to send, pass, route, or forward a piece of work to another agent (e.g. "send this to David", "pass the brief to Nadia", "share this with Amani"), first produce the work in full, then end your reply with a handoff block in EXACTLY this format, on its own lines:
+
+[[HANDOFF]]
+to: <first name or id>
+summary: <one tight line describing what you are sending and why it matters>
+[[/HANDOFF]]
+
+Rules:
+- Put the full deliverable ABOVE the block. The block always comes last.
+- summary is ONE line — it is what your colleague sees in their inbox, so make it specific.
+- Valid recipients: Amani, David, Malik, Hassan, Kwame, Sara, Nadia, Tariq, Zara, Amara, Sofia.
+- To send to more than one colleague, list them comma-separated on the "to:" line.
+- ONLY add this block when Sadick actually asks you to hand work off. Never add it to a normal reply.`;
