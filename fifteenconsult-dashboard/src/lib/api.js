@@ -6,6 +6,26 @@
  *   - image  → mediaType like "image/png", "image/jpeg"
  *   - pdf    → mediaType "application/pdf"
  */
+
+// Remove lone/unpaired UTF-16 surrogates (e.g. an emoji cut in half by a
+// .slice()). The Anthropic API rejects these as invalid JSON
+// ("no low surrogate in string"). No lookbehind — safe on all browsers.
+function sanitizeUnicode(str) {
+  if (typeof str !== "string") return str;
+  return str.replace(/[\uD800-\uDFFF]/g, (ch, i, s) => {
+    const code = ch.charCodeAt(0);
+    if (code <= 0xDBFF) {
+      // high surrogate — keep only if immediately followed by a low surrogate
+      const next = s.charCodeAt(i + 1);
+      return (next >= 0xDC00 && next <= 0xDFFF) ? ch : "";
+    } else {
+      // low surrogate — keep only if immediately preceded by a high surrogate
+      const prev = s.charCodeAt(i - 1);
+      return (prev >= 0xD800 && prev <= 0xDBFF) ? ch : "";
+    }
+  });
+}
+
 export async function callClaudeAPI(systemPrompt, userMessage, onChunk, attachment = null) {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
@@ -19,13 +39,14 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, attachme
   }
 
   // Build the user content. If a PDF or image is attached, send a content array.
-  let userContent = userMessage;
+  const safeMessage = sanitizeUnicode(userMessage);
+  let userContent = safeMessage;
   if (attachment && attachment.base64) {
     const isPdf = attachment.mediaType === "application/pdf";
     const block = isPdf
       ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: attachment.base64 } }
       : { type: "image",    source: { type: "base64", media_type: attachment.mediaType, data: attachment.base64 } };
-    userContent = [block, { type: "text", text: userMessage }];
+    userContent = [block, { type: "text", text: safeMessage }];
   }
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -39,7 +60,7 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, attachme
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
       max_tokens: 2000,
-      system: systemPrompt,
+      system: sanitizeUnicode(systemPrompt),
       messages: [{ role: "user", content: userContent }],
       stream: true,
     }),
