@@ -77,6 +77,33 @@ export function getHandoffById(id) {
   return loadHandoffs().find(h => h.id === id) || null;
 }
 
+// Mark a handoff complete (pending → done). Stays in the 7-day feed, then archives.
+export function markHandoffDone(id) {
+  const list = loadHandoffs();
+  let changed = false;
+  const next = list.map(h => {
+    if (h.id === id && h.status !== "done") { changed = true; return { ...h, status: "done", doneAt: Date.now() }; }
+    return h;
+  });
+  if (changed) saveHandoffs(next);
+}
+
+const DAY = 24 * 60 * 60 * 1000;
+
+// Live feed = handoffs from the last `days` days, newest first.
+export function feedHandoffs(days = 7) {
+  const cutoff = Date.now() - days * DAY;
+  return loadHandoffs()
+    .filter(h => (h.createdAt || 0) >= cutoff)
+    .sort((a, b) => b.createdAt - a.createdAt);
+}
+
+// Count of handoffs older than the feed window (archived, still stored).
+export function archivedCount(days = 7) {
+  const cutoff = Date.now() - days * DAY;
+  return loadHandoffs().filter(h => (h.createdAt || 0) < cutoff).length;
+}
+
 export function recentHandoffs(n = 25) {
   return loadHandoffs().slice().sort((a, b) => b.createdAt - a.createdAt).slice(0, n);
 }
