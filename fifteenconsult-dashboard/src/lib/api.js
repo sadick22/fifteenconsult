@@ -1,9 +1,14 @@
 /**
  * api.js — Anthropic Claude API with streaming
  * API key loaded from environment variable VITE_ANTHROPIC_API_KEY
+ * Accepts an optional attachment: an image OR a PDF.
+ *   attachment = { base64, mediaType, name? }
+ *   - image  → mediaType like "image/png", "image/jpeg"
+ *   - pdf    → mediaType "application/pdf"
  */
-export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = null) {
+export async function callClaudeAPI(systemPrompt, userMessage, onChunk, attachment = null) {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
+
   if (!apiKey) {
     throw new Error(
       "No API key found. Add VITE_ANTHROPIC_API_KEY to your Vercel environment variables.\n\n" +
@@ -12,6 +17,17 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = 
       "Value: your Anthropic API key from console.anthropic.com"
     );
   }
+
+  // Build the user content. If a PDF or image is attached, send a content array.
+  let userContent = userMessage;
+  if (attachment && attachment.base64) {
+    const isPdf = attachment.mediaType === "application/pdf";
+    const block = isPdf
+      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: attachment.base64 } }
+      : { type: "image",    source: { type: "base64", media_type: attachment.mediaType, data: attachment.base64 } };
+    userContent = [block, { type: "text", text: userMessage }];
+  }
+
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -24,25 +40,20 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, image = 
       model: "claude-sonnet-4-6",
       max_tokens: 2000,
       system: systemPrompt,
-      messages: [{
-        role: "user",
-        content: image
-          ? [
-              { type: "image", source: { type: "base64", media_type: image.mediaType, data: image.base64 } },
-              { type: "text", text: userMessage },
-            ]
-          : userMessage,
-      }],
+      messages: [{ role: "user", content: userContent }],
       stream: true,
     }),
   });
+
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error(err.error?.message || `API error ${response.status}`);
   }
+
   const reader  = response.body.getReader();
   const decoder = new TextDecoder();
   let fullText  = "";
+
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
