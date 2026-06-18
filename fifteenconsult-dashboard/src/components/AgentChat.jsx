@@ -2,6 +2,7 @@ import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
+import { TEAM_ROSTER, OUTPUT_STYLE_RULES } from "../data/team.js";
 
 const T = {
   base:     "var(--bg-base)", card:     "var(--bg-card)",
@@ -105,13 +106,25 @@ const SUGGESTED_QUESTIONS = {
   ],
 };
 
+// Strip markdown symbols agents sometimes emit so chat reads as clean plain text
+function cleanAgentText(s) {
+  if (!s) return s;
+  return s
+    .replace(/\*\*/g, "")            // bold markers **
+    .replace(/__/g, "")              // underscore bold
+    .replace(/^#{1,6}\s*/gm, "")      // # headings at line start
+    .replace(/^\s*[-=]{3,}\s*$/gm, "")// --- or === divider lines
+    .replace(/`{1,3}/g, "");         // backticks / code fences
+}
+
 function ChatMessage({ msg, color }) {
   const isUser  = msg.role === "user";
   const isError = msg.role === "error";
   const [copied, setCopied] = useState(false);
+  const display = isUser ? msg.content : cleanAgentText(msg.content);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(msg.content).then(() => {
+    navigator.clipboard.writeText(display).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -157,7 +170,7 @@ function ChatMessage({ msg, color }) {
             lineHeight: 1.8, whiteSpace: "pre-wrap", fontFamily: "var(--font-mono)",
             margin: 0,
           }}>
-            {msg.content}
+            {display}
             {msg.streaming && <span style={{ color, animation: "pulse 0.8s infinite" }}>▌</span>}
           </pre>
         </div>
@@ -206,6 +219,7 @@ export default function AgentChat({ member, lastOutput }) {
   const inputRef  = useRef(null);
   const imageRef   = useRef(null);
   const [pendingImage, setPendingImage] = useState(null);
+  const [expanded, setExpanded] = useState(false);
 
   // Reload messages when switching between agents
   const switchingRef = useRef(false);
@@ -251,18 +265,21 @@ export default function AgentChat({ member, lastOutput }) {
       ? `\n\nYOUR LATEST BRIEFING OUTPUT (for context):\n${lastOutput.text.slice(0, 800)}`
       : "";
 
-    return `${member.systemPrompt}\n\nDATE CONTEXT: ${dateBlock}${outputContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n\nDATE CONTEXT: ${dateBlock}${outputContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
   }, [member, lastOutput, dateCtx]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) { alert("Please upload an image file."); return; }
-    if (file.size > 5 * 1024 * 1024) { alert("Image must be under 5MB."); return; }
+    const isPdf = file.type === "application/pdf";
+    const isImg = file.type.startsWith("image/");
+    if (!isPdf && !isImg) { alert("Please upload an image or a PDF file."); return; }
+    const capMB = isPdf ? 10 : 5;
+    if (file.size > capMB * 1024 * 1024) { alert(`File must be under ${capMB}MB.`); return; }
     const reader = new FileReader();
     reader.onload = (ev) => {
       const base64 = ev.target.result.split(",")[1];
-      setPendingImage({ base64, mediaType: file.type, preview: ev.target.result });
+      setPendingImage({ base64, mediaType: file.type, preview: isImg ? ev.target.result : null, name: file.name, isPdf });
     };
     reader.readAsDataURL(file);
     e.target.value = "";
@@ -343,7 +360,11 @@ export default function AgentChat({ member, lastOutput }) {
   const suggestions = SUGGESTED_QUESTIONS[member.id] || [];
 
   return (
-    <div style={{
+    <div style={ expanded ? {
+      position: "fixed", inset: 0, zIndex: 1000, marginTop: 0,
+      background: T.card, border: "none", borderRadius: 0, overflow: "hidden",
+      display: "flex", flexDirection: "column", height: "100vh",
+    } : {
       background: T.card, border: `1px solid ${T.border}`,
       borderRadius: 12, overflow: "hidden", marginTop: 20,
       display: "flex", flexDirection: "column", height: 520,
@@ -369,7 +390,13 @@ export default function AgentChat({ member, lastOutput }) {
             </div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button onClick={()=>setExpanded(v=>!v)} title={expanded?"Collapse chat":"Expand chat"} style={{
+            background: expanded ? member.color : "none", border: `1px solid ${expanded?member.color:T.border}`,
+            color: expanded ? "#000" : T.textDim,
+            fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase",
+            padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)",
+          }}>{expanded ? "✕ Close" : "⛶ Expand"}</button>
           {messages.length > 0 && (
             <button onClick={clearChat} style={{
               background: "none", border: `1px solid ${T.border}`, color: T.textDim,
@@ -445,8 +472,14 @@ export default function AgentChat({ member, lastOutput }) {
 
       {pendingImage && (
         <div style={{ padding:"8px 14px",borderTop:`1px solid ${T.border}`,display:"flex",alignItems:"center",gap:10,background:T.card,flexShrink:0 }}>
-          <img src={pendingImage.preview} alt="preview" style={{ width:40,height:40,objectFit:"cover",borderRadius:6,border:`1px solid ${T.border}` }}/>
-          <div style={{ flex:1,fontSize:11,color:T.textMid }}>📎 Image ready — sends with your next message</div>
+          {pendingImage.isPdf ? (
+            <div style={{ width:40,height:40,borderRadius:6,border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0 }}>📄</div>
+          ) : (
+            <img src={pendingImage.preview} alt="preview" style={{ width:40,height:40,objectFit:"cover",borderRadius:6,border:`1px solid ${T.border}` }}/>
+          )}
+          <div style={{ flex:1,fontSize:11,color:T.textMid,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>
+            📎 {pendingImage.isPdf ? `PDF ready — ${pendingImage.name}` : "Image ready"} — sends with your next message
+          </div>
           <button onClick={()=>setPendingImage(null)} style={{ background:"none",border:"none",color:T.textDim,cursor:"pointer",fontSize:18,lineHeight:1 }}>×</button>
         </div>
       )}
@@ -455,7 +488,7 @@ export default function AgentChat({ member, lastOutput }) {
         padding: "12px 18px", borderTop: `1px solid ${T.border}`,
         display: "flex", gap: 10, flexShrink: 0, background: T.base,
       }}>
-        <input ref={imageRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display:"none" }}/>
+        <input ref={imageRef} type="file" accept=".pdf,image/*" onChange={handleImageUpload} style={{ display:"none" }}/>
         <textarea
           ref={inputRef}
           value={input}
@@ -481,7 +514,7 @@ export default function AgentChat({ member, lastOutput }) {
         />
         <button
           onClick={()=>imageRef.current?.click()}
-          title="Upload screenshot or image (JPG, PNG, GIF)"
+          title="Upload an image or PDF (PNG, JPG, GIF, PDF)"
           style={{ background:"none",border:`1px solid ${pendingImage?member.color:T.border}`,borderRadius:8,padding:"0 12px",fontSize:16,cursor:"pointer",color:pendingImage?member.color:T.textDim,flexShrink:0,alignSelf:"stretch",transition:"all 0.2s" }}
           onMouseEnter={e=>e.currentTarget.style.borderColor=member.color}
           onMouseLeave={e=>{ if(!pendingImage) e.currentTarget.style.borderColor=T.border; }}
