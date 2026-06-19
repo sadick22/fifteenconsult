@@ -2,7 +2,7 @@ import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
-import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL, DESIGN_STUDIO_MODULE } from "../data/team.js";
+import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL, DESIGN_STUDIO_MODULE, ORCHESTRATOR_MODULE } from "../data/team.js";
 import { addHandoff, pendingFor, markHandoffDone, subscribeHandoffs } from "../lib/handoffs.js";
 import { formatMemoryBlock } from "../lib/memory.js";
 
@@ -109,26 +109,40 @@ const SUGGESTED_QUESTIONS = {
 };
 
 const HANDOFF_IDS = ["amani","david","malik","hassan","kwame","sara","nadia","tariq","zara","amara","sofia"];
+const ROLE_VERB = { david:"Draft outreach using this", nadia:"Turn this into content", amara:"Design from this", sara:"Design a post from this", hassan:"Build a campaign brief from this", malik:"Build a campaign brief from this", tariq:"Turn this into an SEO brief", zara:"Analyse this", amani:"Review and direct on this", kwame:"Build a prospect plan from this", sofia:"Organise and schedule this" };
 const firstNameOfId = (id) => { const m = TEAM.find(x => x.id === id); return m ? m.name.split(" ")[0] : id; };
 
 // Detect a [[HANDOFF]] ... [[/HANDOFF]] block at the end of an agent reply.
 function parseHandoff(text) {
   if (!text) return null;
-  const m = text.match(/\[\[HANDOFF\]\]([\s\S]*?)\[\[\/HANDOFF\]\]/i);
-  if (!m) return null;
-  const inner = m[1];
-  const toMatch = inner.match(/to:\s*([^\n]+)/i);
-  const sumMatch = inner.match(/summary:\s*([\s\S]*?)\s*$/i);
-  if (!toMatch) return null;
-  const recipients = [...new Set(
-    toMatch[1].split(",")
-      .map(p => p.trim().toLowerCase().split(/\s+/)[0])
-      .filter(p => HANDOFF_IDS.includes(p))
-  )];
-  if (!recipients.length) return null;
-  const summary = (sumMatch ? sumMatch[1] : "").trim();
-  const cleanedBody = text.slice(0, m.index).trim();
-  return { recipients, summary, cleanedBody };
+  const re = /\[\[HANDOFF\]\]([\s\S]*?)\[\[\/HANDOFF\]\]/gi;
+  const matches = [...text.matchAll(re)];
+  if (!matches.length) return null;
+
+  const draftFrom = (inner) => {
+    const toMatch = inner.match(/to:\s*([^\n]+)/i);
+    const sumMatch = inner.match(/summary:\s*([\s\S]*?)\s*$/i);
+    if (!toMatch) return null;
+    const recipients = [...new Set(
+      toMatch[1].split(",").map(p => p.trim().toLowerCase().split(/\s+/)[0]).filter(p => HANDOFF_IDS.includes(p))
+    )];
+    if (!recipients.length) return null;
+    return { recipients, summary: (sumMatch ? sumMatch[1] : "").trim() };
+  };
+
+  const above = text.slice(0, matches[0].index).trim();
+
+  // Single handoff: the deliverable is everything above the block.
+  if (matches.length === 1) {
+    const d = draftFrom(matches[0][1]);
+    if (!d) return null;
+    return { read: above, drafts: [{ ...d, body: above }] };
+  }
+
+  // Multiple handoffs (orchestration): each directive's body = its own summary.
+  const drafts = matches.map(m => draftFrom(m[1])).filter(Boolean).map(d => ({ ...d, body: d.summary }));
+  if (!drafts.length) return null;
+  return { read: above, drafts };
 }
 
 // Strip markdown symbols agents sometimes emit so chat reads as clean plain text
@@ -251,6 +265,8 @@ export default function AgentChat({ member, lastOutput }) {
   const [pendingInbox, setPendingInbox] = useState(() => pendingFor(member.id));
   const [designMode, setDesignMode] = useState(false);
   const isDesigner = member.id === "sara" || member.id === "amara";
+  const [orchestratorMode, setOrchestratorMode] = useState(false);
+  const isCMO = member.id === "amani";
   const [expandedHandoffs, setExpandedHandoffs] = useState(() => new Set());
 
   // Reload messages when switching between agents
@@ -270,6 +286,7 @@ export default function AgentChat({ member, lastOutput }) {
     setPendingInbox(pendingFor(member.id));
     setExpandedHandoffs(new Set());
     setDesignMode(false);
+    setOrchestratorMode(false);
     const off = subscribeHandoffs(() => setPendingInbox(pendingFor(member.id)));
     return off;
   }, [member.id]);
@@ -317,9 +334,10 @@ export default function AgentChat({ member, lastOutput }) {
     const memBlock = formatMemoryBlock(member.id);
     const memContext = memBlock ? `\n\n---\n${memBlock}` : "";
     const designContext = (designMode && isDesigner) ? `\n\n---\n${DESIGN_STUDIO_MODULE}` : "";
+    const orchestratorContext = (orchestratorMode && isCMO) ? `\n\n---\n${ORCHESTRATOR_MODULE}` : "";
 
-    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
-  }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs, designMode, isDesigner]);
+    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}${orchestratorContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+  }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs, designMode, isDesigner, orchestratorMode, isCMO]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -386,13 +404,13 @@ export default function AgentChat({ member, lastOutput }) {
         },
         imageToSend
       );
-      // Detect a handoff block; if present, strip it from the visible reply
+      // Detect handoff block(s); strip them from the visible reply
       const ho = parseHandoff(finalReply);
       setMessages(prev => prev.map(m =>
-        m.id === agentMsgId ? { ...m, content: ho ? ho.cleanedBody : m.content, streaming: false } : m
+        m.id === agentMsgId ? { ...m, content: ho ? (ho.read || m.content) : m.content, streaming: false } : m
       ));
       if (ho) {
-        setPendingHandoff({ from: member.id, to: ho.recipients, summary: ho.summary, body: ho.cleanedBody });
+        setPendingHandoff({ from: member.id, drafts: ho.drafts });
       }
     } catch (err) {
       setMessages(prev => prev.map(m =>
@@ -458,6 +476,16 @@ export default function AgentChat({ member, lastOutput }) {
                 padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)",
               }}>🎨 Design Studio</button>
           )}
+          {isCMO && (
+            <button onClick={()=>{ const next=!orchestratorMode; setOrchestratorMode(next); if(next&&!input.trim()) setInput("Run the department for this week — review everyone and issue the handoffs we need."); }}
+              title="Run the Department — review everyone and issue coordinated handoffs"
+              style={{
+                background: orchestratorMode ? member.color : "none", border: `1px solid ${orchestratorMode?member.color:T.border}`,
+                color: orchestratorMode ? "#000" : T.textDim,
+                fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)",
+              }}>▶ Run Department</button>
+          )}
           <button onClick={()=>setExpanded(v=>!v)} title={expanded?"Collapse chat":"Expand chat"} style={{
             background: expanded ? member.color : "none", border: `1px solid ${expanded?member.color:T.border}`,
             color: expanded ? "#000" : T.textDim,
@@ -504,6 +532,10 @@ export default function AgentChat({ member, lastOutput }) {
                   <pre style={{ fontSize: 11, color: T.textMid, whiteSpace: "pre-wrap", fontFamily: "var(--font-mono)", margin: "7px 0 0", background: T.base, border: `1px solid ${T.border}`, borderRadius: 6, padding: 10, maxHeight: 160, overflowY: "auto" }}>{h.body}</pre>
                 )}
                 <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                  <button onClick={() => { setExpandedHandoffs(prev => new Set(prev).add(h.id)); setInput(`${ROLE_VERB[member.id] || "Act on this"}: ${h.summary}`); inputRef.current?.focus(); }}
+                    style={{ background: member.color, border: `1px solid ${member.color}`, color: "#000", fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", padding: "3px 11px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)" }}>
+                    ⚡ Use this
+                  </button>
                   <button onClick={() => setExpandedHandoffs(prev => { const n = new Set(prev); n.has(h.id) ? n.delete(h.id) : n.add(h.id); return n; })}
                     style={{ background: "none", border: `1px solid ${member.color}55`, color: member.color, fontSize: 9, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", padding: "3px 11px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)" }}>
                     {open ? "Hide full" : "Pull full"}
@@ -526,6 +558,12 @@ export default function AgentChat({ member, lastOutput }) {
         <div style={{ flexShrink: 0, padding: "9px 16px", borderBottom: `1px solid ${member.color}55`, background: `${member.color}12`, fontSize: 11, color: T.textMid, display: "flex", alignItems: "center", gap: 8 }}>
           <span>🎨</span>
           <span><strong style={{ color: member.color }}>Design Studio on.</strong> Describe a post or carousel — {member.name.split(" ")[0]} will return a full, copy-paste-ready Canva spec (slides, brand tokens, caption, hashtags).</span>
+        </div>
+      )}
+      {orchestratorMode && isCMO && (
+        <div style={{ flexShrink: 0, padding: "9px 16px", borderBottom: `1px solid ${member.color}55`, background: `${member.color}12`, fontSize: 11, color: T.textMid, display: "flex", alignItems: "center", gap: 8 }}>
+          <span>▶</span>
+          <span><strong style={{ color: member.color }}>Run-the-Department mode.</strong> Amani will review the team and propose a coordinated set of handoffs — you approve each one before it sends.</span>
         </div>
       )}
 
@@ -581,30 +619,40 @@ export default function AgentChat({ member, lastOutput }) {
       )}
 
       {pendingHandoff && (
-        <div style={{ padding:"12px 14px",borderTop:`1px solid ${member.color}55`,background:`${member.color}0e`,flexShrink:0 }}>
+        <div style={{ padding:"12px 14px",borderTop:`1px solid ${member.color}55`,background:`${member.color}0e`,flexShrink:0,maxHeight:280,overflowY:"auto" }}>
           <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8 }}>
             <div style={{ fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:member.color,fontWeight:700 }}>
-              📤 Ready to hand off → {pendingHandoff.to.map(firstNameOfId).join(", ")}
+              📤 {pendingHandoff.drafts.length>1 ? `${pendingHandoff.drafts.length} coordinated handoffs` : "Ready to hand off"}
             </div>
             <span style={{ fontSize:9,color:T.textDim }}>review &amp; edit before sending</span>
           </div>
-          <input
-            value={pendingHandoff.summary}
-            onChange={e=>setPendingHandoff(p=>({ ...p, summary:e.target.value }))}
-            placeholder="One-line summary your colleague will see in their inbox…"
-            style={{ width:"100%",background:T.card,border:`1px solid ${T.border}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:T.text,fontFamily:"var(--font-mono)",outline:"none",marginBottom:8,boxSizing:"border-box" }}
-          />
-          <div style={{ display:"flex",gap:8 }}>
+          {pendingHandoff.drafts.map((d,i)=>(
+            <div key={i} style={{ display:"flex",gap:6,alignItems:"center",marginBottom:6 }}>
+              <span style={{ fontSize:10,color:member.color,fontWeight:600,flexShrink:0,minWidth:64 }}>→ {d.to.map(firstNameOfId).join(", ")}</span>
+              <input
+                value={d.summary}
+                onChange={e=>setPendingHandoff(p=>({ ...p, drafts:p.drafts.map((x,j)=>j===i?{ ...x, summary:e.target.value }:x) }))}
+                placeholder="Directive / summary your colleague will see…"
+                style={{ flex:1,background:T.card,border:`1px solid ${T.border}`,borderRadius:6,padding:"7px 10px",fontSize:12,color:T.text,fontFamily:"var(--font-mono)",outline:"none" }}
+              />
+              {pendingHandoff.drafts.length>1 && (
+                <button onClick={()=>setPendingHandoff(p=>{ const drafts=p.drafts.filter((_,j)=>j!==i); return drafts.length?{ ...p, drafts }:null; })}
+                  style={{ background:"none",border:"none",color:T.textDim,cursor:"pointer",fontSize:16,flexShrink:0,lineHeight:1 }}>×</button>
+              )}
+            </div>
+          ))}
+          <div style={{ display:"flex",gap:8,marginTop:8 }}>
             <button
               onClick={()=>{
-                const names = pendingHandoff.to.map(firstNameOfId).join(", ");
-                pendingHandoff.to.forEach(to => addHandoff({ from:pendingHandoff.from, to, type:"note", summary:pendingHandoff.summary, body:pendingHandoff.body }));
+                const sent=[];
+                pendingHandoff.drafts.forEach(d=>{ if(d.summary.trim()){ d.to.forEach(to=>{ addHandoff({ from:pendingHandoff.from, to, type:"note", summary:d.summary, body:d.body }); sent.push(firstNameOfId(to)); }); } });
+                const names=[...new Set(sent)].join(", ");
                 setPendingHandoff(null);
-                setMessages(prev => [...prev, { role:"system", emoji:"📤", content:`Sent to ${names}. They'll see it in their inbox, and you'll get an alert.`, timestamp:ts(), id:Date.now() }]);
+                if(names) setMessages(prev=>[...prev,{ role:"system",emoji:"📤",content:`Sent to ${names}. They'll see it in their inbox, and you'll get an alert.`,timestamp:ts(),id:Date.now() }]);
               }}
-              disabled={!pendingHandoff.summary.trim()}
-              style={{ background:pendingHandoff.summary.trim()?member.color:"transparent",color:pendingHandoff.summary.trim()?"#000":T.textDim,border:`1px solid ${pendingHandoff.summary.trim()?member.color:T.border}`,borderRadius:6,padding:"6px 16px",fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",cursor:pendingHandoff.summary.trim()?"pointer":"not-allowed",fontFamily:"var(--font-mono)" }}>
-              Send to {pendingHandoff.to.map(firstNameOfId).join(", ")}
+              disabled={!pendingHandoff.drafts.some(d=>d.summary.trim())}
+              style={{ background:pendingHandoff.drafts.some(d=>d.summary.trim())?member.color:"transparent",color:pendingHandoff.drafts.some(d=>d.summary.trim())?"#000":T.textDim,border:`1px solid ${pendingHandoff.drafts.some(d=>d.summary.trim())?member.color:T.border}`,borderRadius:6,padding:"6px 16px",fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",cursor:pendingHandoff.drafts.some(d=>d.summary.trim())?"pointer":"not-allowed",fontFamily:"var(--font-mono)" }}>
+              {pendingHandoff.drafts.length>1 ? "Send all" : "Send"}
             </button>
             <button onClick={()=>setPendingHandoff(null)} style={{ background:"none",border:`1px solid ${T.border}`,color:T.textDim,borderRadius:6,padding:"6px 14px",fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-mono)" }}>Discard</button>
           </div>
