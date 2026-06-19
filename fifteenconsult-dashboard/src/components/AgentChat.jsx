@@ -2,8 +2,9 @@ import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
-import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL } from "../data/team.js";
+import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL, DESIGN_STUDIO_MODULE } from "../data/team.js";
 import { addHandoff, pendingFor, markHandoffDone, subscribeHandoffs } from "../lib/handoffs.js";
+import { formatMemoryBlock } from "../lib/memory.js";
 
 const T = {
   base:     "var(--bg-base)", card:     "var(--bg-card)",
@@ -248,6 +249,8 @@ export default function AgentChat({ member, lastOutput }) {
   const [expanded, setExpanded] = useState(false);
   const [pendingHandoff, setPendingHandoff] = useState(null);
   const [pendingInbox, setPendingInbox] = useState(() => pendingFor(member.id));
+  const [designMode, setDesignMode] = useState(false);
+  const isDesigner = member.id === "sara" || member.id === "amara";
   const [expandedHandoffs, setExpandedHandoffs] = useState(() => new Set());
 
   // Reload messages when switching between agents
@@ -266,6 +269,7 @@ export default function AgentChat({ member, lastOutput }) {
   useEffect(() => {
     setPendingInbox(pendingFor(member.id));
     setExpandedHandoffs(new Set());
+    setDesignMode(false);
     const off = subscribeHandoffs(() => setPendingInbox(pendingFor(member.id)));
     return off;
   }, [member.id]);
@@ -310,8 +314,12 @@ export default function AgentChat({ member, lastOutput }) {
         }).join("\n")}\nIf Sadick asks for the full content of an item you only have the summary for, tell him to click "Pull full" on that item in your inbox.`
       : "";
 
-    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
-  }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs]);
+    const memBlock = formatMemoryBlock(member.id);
+    const memContext = memBlock ? `\n\n---\n${memBlock}` : "";
+    const designContext = (designMode && isDesigner) ? `\n\n---\n${DESIGN_STUDIO_MODULE}` : "";
+
+    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+  }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs, designMode, isDesigner]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -440,6 +448,16 @@ export default function AgentChat({ member, lastOutput }) {
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {isDesigner && (
+            <button onClick={()=>{ const next=!designMode; setDesignMode(next); if(next&&!input.trim()) setInput("Design a carousel about: "); }}
+              title="Design Studio — art-director mode for posts & carousels"
+              style={{
+                background: designMode ? member.color : "none", border: `1px solid ${designMode?member.color:T.border}`,
+                color: designMode ? "#000" : T.textDim,
+                fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)",
+              }}>🎨 Design Studio</button>
+          )}
           <button onClick={()=>setExpanded(v=>!v)} title={expanded?"Collapse chat":"Expand chat"} style={{
             background: expanded ? member.color : "none", border: `1px solid ${expanded?member.color:T.border}`,
             color: expanded ? "#000" : T.textDim,
@@ -500,6 +518,14 @@ export default function AgentChat({ member, lastOutput }) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Design Studio mode banner */}
+      {designMode && isDesigner && (
+        <div style={{ flexShrink: 0, padding: "9px 16px", borderBottom: `1px solid ${member.color}55`, background: `${member.color}12`, fontSize: 11, color: T.textMid, display: "flex", alignItems: "center", gap: 8 }}>
+          <span>🎨</span>
+          <span><strong style={{ color: member.color }}>Design Studio on.</strong> Describe a post or carousel — {member.name.split(" ")[0]} will return a full, copy-paste-ready Canva spec (slides, brand tokens, caption, hashtags).</span>
         </div>
       )}
 
