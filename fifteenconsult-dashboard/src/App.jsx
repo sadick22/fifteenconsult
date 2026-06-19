@@ -20,6 +20,7 @@ import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
 import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
 import OrbitalCommandCenter from "./components/OrbitalCommandCenter.jsx";
 import { loadHandoffs, subscribeHandoffs, markHandoffDone } from "./lib/handoffs.js";
+import { addMemoryEntry, distill, formatMemoryBlock } from "./lib/memory.js";
 import HandoffFeed from "./components/HandoffFeed.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
 import DocumentLibrary from "./components/DocumentLibrary.jsx";
@@ -800,6 +801,10 @@ export default function App() {
     // Shared team awareness + clean-output rules (every agent, every briefing)
     enrichedSystemPrompt += `\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}`;
 
+    // Auto-captured working memory (continuity across sessions)
+    const memBlock = formatMemoryBlock(member.id);
+    if (memBlock) enrichedSystemPrompt += `\n---\n${memBlock}`;
+
     // Inject competitor intelligence for David and Sofia
     if (member.id === "david" || member.id === "sofia" || member.id === "amani") {
       const competitorCtx = getCompetitorContext();
@@ -1303,6 +1308,8 @@ Quick Backs: ${clarity.quickBacks || 0}`;
         const newHistory=pushHistory(member.id,{text:finalText,timestamp:t,customPrompt,weekNum:getDateContext().weekNum});
         setHistories(prev=>({...prev,[member.id]:newHistory}));
         addNotification("briefing",`${member.name} briefing complete`,`${member.role} · ${t}`,member.id);
+        // Hands-off memory capture — distilled from the briefing itself (no extra API call)
+        addMemoryEntry(member.id, { date: new Date().toLocaleDateString("en-GB",{ day:"numeric", month:"short" }), summary: distill(finalText) });
       } else if(finalText.startsWith("⚠")) {
         addNotification("error",`${member.name} briefing failed`,finalText.slice(0,80),member.id);
       }
