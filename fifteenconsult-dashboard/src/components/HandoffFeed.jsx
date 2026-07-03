@@ -30,10 +30,10 @@ function timeAgo(ts) {
 
 export default function HandoffFeed({ handoffs = [], onMarkDone, onOpenAgent, variant = "panel" }) {
   const cutoff = Date.now() - 7 * DAY;
-  const feed = handoffs
+  const feed = (handoffs||[])
     .filter(h => (h.createdAt || 0) >= cutoff)
     .sort((a, b) => b.createdAt - a.createdAt);
-  const archived = handoffs.filter(h => (h.createdAt || 0) < cutoff).length;
+  const archived = (handoffs||[]).filter(h => (h.createdAt || 0) < cutoff).length;
   const pendingCount = feed.filter(h => h.status === "pending").length;
 
   const isRail = variant === "rail";
