@@ -520,7 +520,7 @@ export default function AgentChat({ member, lastOutput }) {
           <div style={{ padding: "9px 16px 5px", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: member.color, fontWeight: 700 }}>
             📥 Inbox · {pendingInbox.length} pending handoff{pendingInbox.length > 1 ? "s" : ""}
           </div>
-          {pendingInbox.map(h => {
+          {(pendingInbox||[]).map(h => {
             const open = expandedHandoffs.has(h.id);
             return (
               <div key={h.id} style={{ padding: "4px 16px 11px" }}>
@@ -585,7 +585,7 @@ export default function AgentChat({ member, lastOutput }) {
         )}
 
         {/* Messages */}
-        {messages.map(msg => (
+        {(messages||[]).map(msg => (
           <ChatMessage key={msg.id} msg={msg} color={member.color} />
         ))}
 
@@ -599,7 +599,7 @@ export default function AgentChat({ member, lastOutput }) {
             Suggested questions
           </div>
           <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-            {suggestions.map((q, i) => (
+            {(suggestions||[]).map((q, i) => (
               <button key={i} onClick={() => sendMessage(q)} style={{
                 background: member.color + "0e",
                 border: `1px solid ${member.color}33`,
@@ -622,20 +622,20 @@ export default function AgentChat({ member, lastOutput }) {
         <div style={{ padding:"12px 14px",borderTop:`1px solid ${member.color}55`,background:`${member.color}0e`,flexShrink:0,maxHeight:280,overflowY:"auto" }}>
           <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8 }}>
             <div style={{ fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:member.color,fontWeight:700 }}>
-              📤 {pendingHandoff.drafts.length>1 ? `${pendingHandoff.drafts.length} coordinated handoffs` : "Ready to hand off"}
+              📤 {(pendingHandoff.drafts||[]).length>1 ? `${pendingHandoff.drafts.length} coordinated handoffs` : "Ready to hand off"}
             </div>
             <span style={{ fontSize:9,color:T.textDim }}>review &amp; edit before sending</span>
           </div>
-          {pendingHandoff.drafts.map((d,i)=>(
+          {(pendingHandoff.drafts||[]).map((d,i)=>(
             <div key={i} style={{ display:"flex",gap:6,alignItems:"center",marginBottom:6 }}>
-              <span style={{ fontSize:10,color:member.color,fontWeight:600,flexShrink:0,minWidth:64 }}>→ {d.to.map(firstNameOfId).join(", ")}</span>
+              <span style={{ fontSize:10,color:member.color,fontWeight:600,flexShrink:0,minWidth:64 }}>→ {(d.recipients||d.to||[]).map(firstNameOfId).join(", ")}</span>
               <input
                 value={d.summary}
                 onChange={e=>setPendingHandoff(p=>({ ...p, drafts:p.drafts.map((x,j)=>j===i?{ ...x, summary:e.target.value }:x) }))}
                 placeholder="Directive / summary your colleague will see…"
                 style={{ flex:1,background:T.card,border:`1px solid ${T.border}`,borderRadius:6,padding:"7px 10px",fontSize:12,color:T.text,fontFamily:"var(--font-mono)",outline:"none" }}
               />
-              {pendingHandoff.drafts.length>1 && (
+              {(pendingHandoff.drafts||[]).length>1 && (
                 <button onClick={()=>setPendingHandoff(p=>{ const drafts=p.drafts.filter((_,j)=>j!==i); return drafts.length?{ ...p, drafts }:null; })}
                   style={{ background:"none",border:"none",color:T.textDim,cursor:"pointer",fontSize:16,flexShrink:0,lineHeight:1 }}>×</button>
               )}
@@ -645,14 +645,14 @@ export default function AgentChat({ member, lastOutput }) {
             <button
               onClick={()=>{
                 const sent=[];
-                pendingHandoff.drafts.forEach(d=>{ if(d.summary.trim()){ d.to.forEach(to=>{ addHandoff({ from:pendingHandoff.from, to, type:"note", summary:d.summary, body:d.body }); sent.push(firstNameOfId(to)); }); } });
+                (pendingHandoff.drafts||[]).forEach(d=>{ if(d.summary.trim()){ (d.recipients||d.to||[]).forEach(to=>{ addHandoff({ from:pendingHandoff.from, to, type:"note", summary:d.summary, body:d.body }); sent.push(firstNameOfId(to)); }); } });
                 const names=[...new Set(sent)].join(", ");
                 setPendingHandoff(null);
                 if(names) setMessages(prev=>[...prev,{ role:"system",emoji:"📤",content:`Sent to ${names}. They'll see it in their inbox, and you'll get an alert.`,timestamp:ts(),id:Date.now() }]);
               }}
-              disabled={!pendingHandoff.drafts.some(d=>d.summary.trim())}
-              style={{ background:pendingHandoff.drafts.some(d=>d.summary.trim())?member.color:"transparent",color:pendingHandoff.drafts.some(d=>d.summary.trim())?"#000":T.textDim,border:`1px solid ${pendingHandoff.drafts.some(d=>d.summary.trim())?member.color:T.border}`,borderRadius:6,padding:"6px 16px",fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",cursor:pendingHandoff.drafts.some(d=>d.summary.trim())?"pointer":"not-allowed",fontFamily:"var(--font-mono)" }}>
-              {pendingHandoff.drafts.length>1 ? "Send all" : "Send"}
+              disabled={!(pendingHandoff.drafts||[]).some(d=>d.summary.trim())}
+              style={{ background:(pendingHandoff.drafts||[]).some(d=>d.summary.trim())?member.color:"transparent",color:(pendingHandoff.drafts||[]).some(d=>d.summary.trim())?"#000":T.textDim,border:`1px solid ${(pendingHandoff.drafts||[]).some(d=>d.summary.trim())?member.color:T.border}`,borderRadius:6,padding:"6px 16px",fontSize:10,fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",cursor:(pendingHandoff.drafts||[]).some(d=>d.summary.trim())?"pointer":"not-allowed",fontFamily:"var(--font-mono)" }}>
+              {(pendingHandoff.drafts||[]).length>1 ? "Send all" : "Send"}
             </button>
             <button onClick={()=>setPendingHandoff(null)} style={{ background:"none",border:`1px solid ${T.border}`,color:T.textDim,borderRadius:6,padding:"6px 14px",fontSize:10,letterSpacing:"0.1em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--font-mono)" }}>Discard</button>
           </div>
