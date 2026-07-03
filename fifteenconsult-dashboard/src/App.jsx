@@ -6,7 +6,7 @@ import { getAgentDocuments } from "./components/DocumentLibrary.jsx";
 import { getCompetitorContext } from "./components/CompetitorIntel.jsx";
 import { getDateContext, buildBriefingTrigger } from "./lib/dateContext.js";
 import { evaluateAlerts } from "./lib/alerts.js";
-import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.jsx";
+import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.jsx"; 
 import CustomPrompt from "./components/CustomPrompt.jsx";
 import CopyToolbar from "./components/CopyToolbar.jsx";
 import SchedulerPanel from "./components/SchedulerPanel.jsx";
