@@ -342,7 +342,7 @@ function AgentAlertSummary({ alerts, color }) {
   const ALERT_COLORS = { red:"#f87171", amber:"#fbbf24", green:"#4ade80" };
   return (
     <div style={{ marginBottom:18 }}>
-      {alerts.map(a=>(
+      {(alerts||[]).map(a=>(
         <div key={a.id} style={{ background:ALERT_COLORS[a.level]+"12",border:`1px solid ${ALERT_COLORS[a.level]}33`,borderLeft:`3px solid ${ALERT_COLORS[a.level]}`,borderRadius:8,padding:"10px 14px",marginBottom:8 }}>
           <div style={{ fontSize:11,fontWeight:600,color:ALERT_COLORS[a.level],marginBottom:3 }}>{a.emoji} {a.title}</div>
           <div style={{ fontSize:11,color:T.textMid,lineHeight:1.6 }}>{a.detail}</div>
@@ -489,7 +489,7 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
           {TEAM.map(m=>{
             const out=outputs[m.id];
             const hCount=(histories[m.id]||[]).length;
-            const mAlerts=alerts.filter(a=>a.agent===m.id);
+            const mAlerts=(alerts||[]).filter(a=>a.agent===m.id);
             const hasRed=mAlerts.some(a=>a.level==="red");
             return (
               <div key={m.id} style={{ background:T.card,border:`1px solid ${hasRed?"#f8717133":T.border}`,borderLeft:`3px solid ${m.color}`,borderRadius:12,overflow:"hidden" }}>
@@ -525,8 +525,8 @@ function WeeklySummary({ outputs, streaming, onRunAll, histories, alerts }) {
 
 // ── SIDEBAR ───────────────────────────────────────────────────────────────────
 function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, streaming, histories, alerts, onOpenAlerts, onOpenScheduler, scheduleActiveCount, onOpenMorning, onOpenNotifications, activeView, setActiveView, onOpenIntegrations, connectionCount, onOpenSettings }) {
-  const red   = alerts.filter(a=>a.level==="red").length;
-  const amber = alerts.filter(a=>a.level==="amber").length;
+  const red   = (alerts||[]).filter(a=>a.level==="red").length;
+  const amber = (alerts||[]).filter(a=>a.level==="amber").length;
   const green = alerts.filter(a=>a.level==="green").length;
   const total = alerts.length;
   const worstColor = red>0?"#f87171":amber>0?"#fbbf24":green>0?"#4ade80":"#60a5fa";
@@ -613,7 +613,7 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
           const active=activeMember?.id===m.id;
           const isRunning=streaming===m.id;
           const hCount=(histories[m.id]||[]).length;
-          const mAlerts=alerts.filter(a=>a.agent===m.id);
+          const mAlerts=(alerts||[]).filter(a=>a.agent===m.id);
           const hasRed=mAlerts.some(a=>a.level==="red");
           const hasAmber=mAlerts.some(a=>a.level==="amber")&&!hasRed;
           const dotColor=hasRed?"#f87171":hasAmber?"#fbbf24":null;
@@ -758,7 +758,7 @@ export default function App() {
   const firstNameOf = (id)=>{ const m=TEAM.find(x=>x.id===id); return m ? m.name.split(" ")[0] : id; };
   const alerts  = useMemo(()=>{
     const base = evaluateAlerts(kpiData,taskStates,outputs);
-    const ho = handoffs.filter(h=>h.status==="pending").map(h=>({
+    const ho = (handoffs||[]).filter(h=>h.status==="pending").map(h=>({
       agent: h.to, level: "amber", emoji: "📤",
       title: `Handoff from ${firstNameOf(h.from)}: ${h.summary}`,
       kind: "handoff", handoffId: h.id,
@@ -769,7 +769,7 @@ export default function App() {
   // Map live team + alerts into the orbital command center's agent shape
   const ORBIT_RING = { amani:0,david:0,malik:0, kwame:1,hassan:1,sara:1,nadia:1, tariq:2,zara:2,amara:2,sofia:2 };
   const orbitAgents = useMemo(()=>TEAM.map(m=>{
-    const aa = alerts.filter(a=>a.agent===m.id);
+    const aa = (alerts||[]).filter(a=>a.agent===m.id);
     const red = aa.find(a=>a.level==="red");
     const amber = aa.find(a=>a.level==="amber");
     const states = taskStates[m.id]||[];
@@ -1352,7 +1352,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
   const totalDone   = TEAM.reduce((s,m)=>s+(taskStates[m.id]||[]).filter(Boolean).length,0);
   const totalOutputs= Object.keys(outputs).length;
   const totalHistory= Object.values(histories).reduce((s,h)=>s+h.length,0);
-  const criticalCount = alerts.filter(a=>a.level==="red").length;
+  const criticalCount = (alerts||[]).filter(a=>a.level==="red").length;
 
   return (
     <div style={{ display:"flex",minHeight:"100vh",background:T.base,color:T.text,fontFamily:"var(--font-mono)" }}>
@@ -1465,7 +1465,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
                   <span style={{ fontSize:18,flexShrink:0 }}>🚨</span>
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:12,fontWeight:700,color:"#f87171",marginBottom:2 }}>{criticalCount} critical alert{criticalCount>1?"s":""} — FifteenConsult's new business pipeline needs attention</div>
-                    <div style={{ fontSize:11,color:T.textMid }}>{alerts.filter(a=>a.level==="red").slice(0,2).map(a=>a.title).join(" · ")}</div>
+                    <div style={{ fontSize:11,color:T.textMid }}>{(alerts||[]).filter(a=>a.level==="red").slice(0,2).map(a=>a.title).join(" · ")}</div>
                   </div>
                   <span style={{ fontSize:11,color:"#f87171",fontWeight:600,flexShrink:0 }}>View all →</span>
                 </div>
@@ -1486,7 +1486,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
                 <StatCard label="Active Agents"  value={TEAM.length}                  sub="All online"                                        icon="🤖" accent={T.gold}/>
                 <StatCard label="Tasks Complete" value={`${totalDone}/${totalTasks}`} sub={`${Math.round(totalDone/totalTasks*100)}% done`}    icon="✅" accent={T.green}/>
                 <StatCard label="Briefings Run"  value={totalOutputs}                 sub={`${TEAM.length-totalOutputs} pending`}              icon="📄" accent={T.blue}/>
-                <StatCard label="Alerts"         value={criticalCount>0?`${criticalCount} 🚨`:alerts.filter(a=>a.level==="amber").length>0?`${alerts.filter(a=>a.level==="amber").length} ⚠️`:"All clear ✓"} sub={criticalCount>0?"Action needed today":alerts.filter(a=>a.level==="amber").length>0?"Review this week":"On track"} icon="🔔" accent={criticalCount>0?T.red:alerts.filter(a=>a.level==="amber").length>0?T.amber:T.green}/>
+                <StatCard label="Alerts"         value={criticalCount>0?`${criticalCount} 🚨`:(alerts||[]).filter(a=>a.level==="amber").length>0?`${(alerts||[]).filter(a=>a.level==="amber").length} ⚠️`:"All clear ✓"} sub={criticalCount>0?"Action needed today":(alerts||[]).filter(a=>a.level==="amber").length>0?"Review this week":"On track"} icon="🔔" accent={criticalCount>0?T.red:(alerts||[]).filter(a=>a.level==="amber").length>0?T.amber:T.green}/>
               </div>
 
               <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:13 }}>Your Team · {TEAM.length} Agents</div>
