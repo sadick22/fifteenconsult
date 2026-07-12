@@ -21,6 +21,8 @@ import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
 import OrbitalCommandCenter from "./components/OrbitalCommandCenter.jsx";
 import { loadHandoffs, subscribeHandoffs, markHandoffDone } from "./lib/handoffs.js";
 import { addMemoryEntry, distill, formatMemoryBlock } from "./lib/memory.js";
+import { formatDataHubBlock } from "./lib/datahub.js";
+import DataHub from "./components/DataHub.jsx";
 import HandoffFeed from "./components/HandoffFeed.jsx";
 import SettingsPanel from "./components/SettingsPanel.jsx";
 import DocumentLibrary from "./components/DocumentLibrary.jsx";
@@ -542,11 +544,11 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
       <nav style={{ padding:"12px 10px",flex:1,overflowY:"auto" }}>
         <div style={{ fontSize:9,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:5,padding:"0 8px" }}>Main Menu</div>
 
-        {[{id:"dashboard",label:"Dashboard",icon:"⊞"},{id:"summary",label:"Weekly Summary",icon:"📋"},{id:"warroom",label:"War Room",icon:"🎯"},{id:"framework",label:"15 Framework",icon:"⬡"}].map(item=>{
-          const active=((item.id==="warroom"||item.id==="framework")?activeView===item.id:activeTab===item.id&&activeView==="dashboard")&&!activeMember;
+        {[{id:"dashboard",label:"Dashboard",icon:"⊞"},{id:"summary",label:"Weekly Summary",icon:"📋"},{id:"warroom",label:"War Room",icon:"🎯"},{id:"framework",label:"15 Framework",icon:"⬡"},{id:"datahub",label:"Data Hub",icon:"🗂"}].map(item=>{
+          const active=((item.id==="warroom"||item.id==="framework"||item.id==="datahub")?activeView===item.id:activeTab===item.id&&activeView==="dashboard")&&!activeMember;
           return (
             <button key={item.id} onClick={()=>{
-              if(item.id==="warroom"||item.id==="framework"){
+              if(item.id==="warroom"||item.id==="framework"||item.id==="datahub"){
                 setActiveView(item.id);
                 setActiveTab("dashboard");
               } else {
@@ -684,6 +686,13 @@ export default function App() {
         console.log("☁️ Notifications loaded from Firestore");
       }
 
+      // Sync Data Hub (clients, documents, assets)
+      const cloudHub = await cloudLoad("datahub", "all_data", null).catch(()=>null);
+      if(cloudHub){
+        localStorage.setItem("fc_datahub_v1", JSON.stringify(cloudHub));
+        console.log("☁️ Data Hub loaded from Firestore");
+      }
+
       // Sync documents
       const cloudDocs = await cloudLoad("documents", "all_docs", null).catch(()=>null);
       if(cloudDocs && Object.keys(cloudDocs).length > 0){
@@ -800,6 +809,10 @@ export default function App() {
 
     // Shared team awareness + clean-output rules (every agent, every briefing)
     enrichedSystemPrompt += `\n\n---\n${COMPANY_POSITIONING}\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}`;
+
+    // Data Hub — clients, documents, assets (lean, company-wide)
+    const hubBlock = formatDataHubBlock();
+    if (hubBlock) enrichedSystemPrompt += `\n---\n${hubBlock}`;
 
     // Auto-captured working memory (continuity across sessions)
     const memBlock = formatMemoryBlock(member.id);
@@ -1362,7 +1375,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
         <header style={{ padding:"16px 26px",borderBottom:`1px solid ${T.border}`,display:"flex",justifyContent:"space-between",alignItems:"center",background:T.base,position:"sticky",top:0,zIndex:50 }}>
           <div>
             <div style={{ fontSize:19,fontWeight:700,color:T.text,fontFamily:"var(--font-display)",marginBottom:8 }}>
-              {activeMember?activeMember.name:activeView==="warroom"?"War Room":activeView==="framework"?"The Fifteen Framework":activeTab==="dashboard"?"Dashboard":"Weekly Summary"}
+              {activeMember?activeMember.name:activeView==="warroom"?"War Room":activeView==="framework"?"The Fifteen Framework":activeView==="datahub"?"Data Hub":activeTab==="dashboard"?"Dashboard":"Weekly Summary"}
             </div>
             <DateBadge/>
           </div>
@@ -1510,6 +1523,10 @@ Quick Backs: ${clarity.quickBacks || 0}`;
           )}
           {!activeMember&&activeView==="framework"&&(
             <FifteenFramework/>
+          )}
+
+          {!activeMember&&activeView==="datahub"&&(
+            <DataHub/>
           )}
         </main>
       </div>
