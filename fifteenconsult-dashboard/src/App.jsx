@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL } from "./data/team.js";
+import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL, COMPANY_POSITIONING } from "./data/team.js";
 import { callClaudeAPI } from "./lib/api.js";
 import { isFirebaseEnabled, saveRunHistory, saveKPIs, saveSettings, checkFirebaseStatus } from "./lib/firebase.js";
 import { getAgentDocuments } from "./components/DocumentLibrary.jsx";
 import { getCompetitorContext } from "./components/CompetitorIntel.jsx";
 import { getDateContext, buildBriefingTrigger } from "./lib/dateContext.js";
 import { evaluateAlerts } from "./lib/alerts.js";
-import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.jsx"; 
+import { AlertBadge, AlertsPanel, AlertStrip } from "./components/AlertsPanel.jsx";
 import CustomPrompt from "./components/CustomPrompt.jsx";
 import CopyToolbar from "./components/CopyToolbar.jsx";
 import SchedulerPanel from "./components/SchedulerPanel.jsx";
@@ -799,7 +799,7 @@ export default function App() {
     let enrichedSystemPrompt = member.systemPrompt;
 
     // Shared team awareness + clean-output rules (every agent, every briefing)
-    enrichedSystemPrompt += `\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}`;
+    enrichedSystemPrompt += `\n\n---\n${COMPANY_POSITIONING}\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}`;
 
     // Auto-captured working memory (continuity across sessions)
     const memBlock = formatMemoryBlock(member.id);
