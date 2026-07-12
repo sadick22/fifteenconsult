@@ -5,6 +5,7 @@ import { getDateContext } from "../lib/dateContext.js";
 import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL, DESIGN_STUDIO_MODULE, ORCHESTRATOR_MODULE, COMPANY_POSITIONING } from "../data/team.js";
 import { addHandoff, pendingFor, markHandoffDone, subscribeHandoffs } from "../lib/handoffs.js";
 import { formatMemoryBlock } from "../lib/memory.js";
+import { formatDataHubBlock, formatFullDocuments, loadDataHub, subscribeDataHub } from "../lib/datahub.js";
 
 const T = {
   base:     "var(--bg-base)", card:     "var(--bg-card)",
@@ -264,6 +265,9 @@ export default function AgentChat({ member, lastOutput }) {
   const [pendingHandoff, setPendingHandoff] = useState(null);
   const [pendingInbox, setPendingInbox] = useState(() => pendingFor(member.id));
   const [designMode, setDesignMode] = useState(false);
+  const [hubDocs, setHubDocs] = useState(() => loadDataHub().documents);
+  const [attachedDocs, setAttachedDocs] = useState(() => new Set());
+  const [showDocPicker, setShowDocPicker] = useState(false);
   const isDesigner = member.id === "sara" || member.id === "amara";
   const [orchestratorMode, setOrchestratorMode] = useState(false);
   const isCMO = member.id === "amani";
@@ -287,9 +291,17 @@ export default function AgentChat({ member, lastOutput }) {
     setExpandedHandoffs(new Set());
     setDesignMode(false);
     setOrchestratorMode(false);
+    setAttachedDocs(new Set());
+    setShowDocPicker(false);
     const off = subscribeHandoffs(() => setPendingInbox(pendingFor(member.id)));
     return off;
   }, [member.id]);
+
+  // Keep Data Hub docs list live
+  useEffect(() => {
+    const off = subscribeDataHub((d) => setHubDocs(d.documents || []));
+    return off;
+  }, []);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -335,9 +347,13 @@ export default function AgentChat({ member, lastOutput }) {
     const memContext = memBlock ? `\n\n---\n${memBlock}` : "";
     const designContext = (designMode && isDesigner) ? `\n\n---\n${DESIGN_STUDIO_MODULE}` : "";
     const orchestratorContext = (orchestratorMode && isCMO) ? `\n\n---\n${ORCHESTRATOR_MODULE}` : "";
+    const hubBlock = formatDataHubBlock();
+    const hubContext = hubBlock ? `\n\n---\n${hubBlock}` : "";
+    const fullDocs = formatFullDocuments([...attachedDocs]);
+    const fullDocsContext = fullDocs ? `\n\n---\n${fullDocs}` : "";
 
-    return `${member.systemPrompt}\n\n---\n${COMPANY_POSITIONING}\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}${orchestratorContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
-  }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs, designMode, isDesigner, orchestratorMode, isCMO]);
+    return `${member.systemPrompt}\n\n---\n${COMPANY_POSITIONING}\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}${orchestratorContext}${hubContext}${fullDocsContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+  }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs, designMode, isDesigner, orchestratorMode, isCMO, attachedDocs]);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -466,6 +482,15 @@ export default function AgentChat({ member, lastOutput }) {
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {hubDocs.length > 0 && (
+            <button onClick={()=>setShowDocPicker(v=>!v)} title="Attach a Data Hub document to this chat's context"
+              style={{
+                background: attachedDocs.size ? member.color : "none", border: `1px solid ${attachedDocs.size?member.color:T.border}`,
+                color: attachedDocs.size ? "#000" : T.textDim,
+                fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontFamily: "var(--font-mono)",
+              }}>📚 {attachedDocs.size ? `${attachedDocs.size} doc${attachedDocs.size>1?"s":""}` : "Data"}</button>
+          )}
           {isDesigner && (
             <button onClick={()=>{ const next=!designMode; setDesignMode(next); if(next&&!input.trim()) setInput("Design a carousel about: "); }}
               title="Design Studio — art-director mode for posts & carousels"
@@ -564,6 +589,29 @@ export default function AgentChat({ member, lastOutput }) {
         <div style={{ flexShrink: 0, padding: "9px 16px", borderBottom: `1px solid ${member.color}55`, background: `${member.color}12`, fontSize: 11, color: T.textMid, display: "flex", alignItems: "center", gap: 8 }}>
           <span>▶</span>
           <span><strong style={{ color: member.color }}>Run-the-Department mode.</strong> Amani will review the team and propose a coordinated set of handoffs — you approve each one before it sends.</span>
+        </div>
+      )}
+
+      {/* Data Hub document picker */}
+      {showDocPicker && hubDocs.length > 0 && (
+        <div style={{ flexShrink:0, borderBottom:`1px solid ${T.border}`, background:`${member.color}0a`, padding:"9px 16px", maxHeight:150, overflowY:"auto" }}>
+          <div style={{ fontSize:10, letterSpacing:"0.12em", textTransform:"uppercase", color:member.color, fontWeight:700, marginBottom:6 }}>
+            📚 Attach full documents to {member.name.split(" ")[0]}'s context
+          </div>
+          {hubDocs.map(d => {
+            const on = attachedDocs.has(d.id);
+            return (
+              <label key={d.id} style={{ display:"flex", alignItems:"flex-start", gap:8, padding:"4px 0", cursor:"pointer" }}>
+                <input type="checkbox" checked={on}
+                  onChange={()=>setAttachedDocs(prev=>{ const n=new Set(prev); n.has(d.id)?n.delete(d.id):n.add(d.id); return n; })}
+                  style={{ accentColor: member.color, marginTop:2 }}/>
+                <span style={{ fontSize:11, color:on?T.text:T.textMid, lineHeight:1.5 }}>
+                  <strong>{d.title}</strong> <span style={{ color:T.textDim }}>· {Math.round((d.content||"").length/1000)}k chars{on?" · in context":""}</span>
+                </span>
+              </label>
+            );
+          })}
+          <div style={{ fontSize:9, color:T.textDim, marginTop:5 }}>Attached documents are injected in full — detach when done to keep responses fast and cheap.</div>
         </div>
       )}
 
