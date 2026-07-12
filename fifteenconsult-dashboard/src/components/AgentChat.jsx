@@ -2,7 +2,7 @@ import { isFirebaseEnabled, cloudSave } from "../lib/firebase.js";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { callClaudeAPI } from "../lib/api.js";
 import { getDateContext } from "../lib/dateContext.js";
-import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL, DESIGN_STUDIO_MODULE, ORCHESTRATOR_MODULE } from "../data/team.js";
+import { TEAM, TEAM_ROSTER, OUTPUT_STYLE_RULES, HANDOFF_PROTOCOL, DESIGN_STUDIO_MODULE, ORCHESTRATOR_MODULE, COMPANY_POSITIONING } from "../data/team.js";
 import { addHandoff, pendingFor, markHandoffDone, subscribeHandoffs } from "../lib/handoffs.js";
 import { formatMemoryBlock } from "../lib/memory.js";
 
@@ -336,7 +336,7 @@ export default function AgentChat({ member, lastOutput }) {
     const designContext = (designMode && isDesigner) ? `\n\n---\n${DESIGN_STUDIO_MODULE}` : "";
     const orchestratorContext = (orchestratorMode && isCMO) ? `\n\n---\n${ORCHESTRATOR_MODULE}` : "";
 
-    return `${member.systemPrompt}\n\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}${orchestratorContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+    return `${member.systemPrompt}\n\n---\n${COMPANY_POSITIONING}\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}${orchestratorContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
   }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs, designMode, isDesigner, orchestratorMode, isCMO]);
 
   const handleImageUpload = (e) => {
