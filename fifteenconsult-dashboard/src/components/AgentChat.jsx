@@ -164,6 +164,7 @@ function ChatMessage({ msg, color }) {
   const isError = msg.role === "error";
   const [copied, setCopied] = useState(false);
   const display = isUser ? msg.content : cleanAgentText(msg.content);
+  const looksLikeSpec = !isUser && /GENERATION PROMPT|BRAND TOKENS|SLIDE\s*\d|VIDEO TITLE|HASHTAGS:/i.test(msg.content || "");
 
   const handleCopy = () => {
     navigator.clipboard.writeText(display).then(() => {
@@ -229,6 +230,16 @@ function ChatMessage({ msg, color }) {
               {copied ? "✓ copied" : "copy"}
             </button>
           )}
+          {!isUser && !msg.streaming && looksLikeSpec && (
+            <button onClick={handleCopy} title="Copy this spec, then paste into Canva (Canva Assistant) or Claude Design to generate" style={{
+              background: copied ? color : color + "18", border: `1px solid ${color}`,
+              color: copied ? "#000" : color, fontSize: 9, fontWeight: 700, cursor: "pointer",
+              fontFamily: "var(--font-mono)", letterSpacing: "0.08em", textTransform: "uppercase",
+              padding: "3px 10px", borderRadius: 6, transition: "all 0.2s",
+            }}>
+              {copied ? "✓ copied — paste to generate" : "📋 Copy for Canva / Claude Design"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -268,7 +279,7 @@ export default function AgentChat({ member, lastOutput }) {
   const [hubDocs, setHubDocs] = useState(() => loadDataHub().documents);
   const [attachedDocs, setAttachedDocs] = useState(() => new Set());
   const [showDocPicker, setShowDocPicker] = useState(false);
-  const isDesigner = member.id === "sara" || member.id === "amara";
+  const isDesigner = member.id === "sara" || member.id === "amara" || member.id === "nadia";
   const [orchestratorMode, setOrchestratorMode] = useState(false);
   const isCMO = member.id === "amani";
   const [expandedHandoffs, setExpandedHandoffs] = useState(() => new Set());
