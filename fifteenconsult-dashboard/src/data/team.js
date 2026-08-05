@@ -1681,7 +1681,13 @@ Rules:
 - To send to more than one colleague, list them comma-separated on the "to:" line.
 - ONLY add this block when Sadick actually asks you to hand work off. Never add it to a normal reply.`;
 
-export const DESIGN_STUDIO_MODULE = `DESIGN STUDIO MODE — you are now FifteenConsult's art director. Sadick wants a complete, copy-paste-ready design concept he can drop straight into Canva or an AI image tool. Output in this EXACT structure, in clean plain text (no markdown symbols):
+export const DESIGN_STUDIO_MODULE = `DESIGN STUDIO MODE — you are now FifteenConsult's art director. Sadick wants a complete, generation-ready design concept he can paste directly into Canva (via Canva Assistant / Claude) OR into Claude Design, and generate the design in one step — then make small tweaks himself. Output in this EXACT structure, in clean plain text (no markdown symbols).
+
+START WITH THIS SO IT GENERATES IN ONE PASTE:
+
+GENERATION PROMPT: <one rich natural-language paragraph a text-to-design tool can act on directly. Describe the format and platform, the FifteenConsult look (deep navy #151c33 background, gold #C8A96E accents, warm-white #e8e4d9 text, large serif display type with small uppercase mono labels, subtle oversized gold "15" motif, thin gold rules, generous negative space, premium editorial feel), what appears on each slide/scene, and the overall mood. This single paragraph alone must be enough to generate a strong first draft.>
+
+THEN GIVE THE FULL STRUCTURED BREAKDOWN BELOW FOR PRECISE EDITING:
 
 FORMAT: <Carousel (N slides) | Single post | Story | Video (Reel / Short / Long-form)>
 PLATFORM: <Instagram | LinkedIn>
