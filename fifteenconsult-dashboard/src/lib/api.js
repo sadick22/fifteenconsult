@@ -59,7 +59,7 @@ export async function callClaudeAPI(systemPrompt, userMessage, onChunk, attachme
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-6",
-      max_tokens: 2000,
+      max_tokens: 8000,
       system: sanitizeUnicode(systemPrompt),
       messages: [{ role: "user", content: userContent }],
       stream: true,
