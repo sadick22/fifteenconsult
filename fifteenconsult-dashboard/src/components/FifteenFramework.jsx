@@ -107,7 +107,7 @@ export default function FifteenFramework() {
       {/* Header */}
       <div style={{ marginBottom:28 }}>
         <div style={{ fontSize:10,color:T.textDim,letterSpacing:"0.15em",textTransform:"uppercase",marginBottom:6 }}>
-          FifteenConsult Proprietary Framework
+          Mumin Consult Proprietary Framework
         </div>
         <div style={{ fontFamily:"var(--font-display)",fontSize:32,fontWeight:700,color:T.gold,marginBottom:6 }}>
           The Fifteen Framework

@@ -38,31 +38,31 @@ const SUGGESTED_QUESTIONS = {
     "What content should we post today?",
   ],
   tariq: [
-    "What are the top 3 SEO fixes for fifteenconsult.com?",
+    "What are the top 3 SEO fixes for muminconsult.com?",
     "Write an SEO blog brief for Nadia",
     "Which keywords should we target first?",
-    "How do we rank for 'marketing consultancy Qatar'?",
+    "How do we rank for 'strategic marketing consultancy'?",
     "Check our Core Web Vitals and give recommendations",
   ],
   sara: [
     "Write today's LinkedIn post",
     "Plan this week's content calendar",
-    "What hashtags should we use for GCC audiences?",
+    "What hashtags should we use for our target audiences?",
     "Draft an Instagram carousel about our services",
     "Who should we engage with on LinkedIn today?",
   ],
   kwame: [
-    "Research 5 Real Estate prospects in Qatar",
+    "Research 5 Real Estate prospects in a target market",
     "Write a cold outreach message for a property developer",
     "What's the pipeline status this week?",
     "Draft a follow-up message for a cold lead",
-    "Find 5 SaaS companies entering GCC that need marketing",
+    "Find 5 SaaS companies entering new markets that need marketing",
   ],
   amara: [
     "Design brief for a LinkedIn post template",
     "Brief the Fifteen Framework visual explainer",
     "What's wrong with our current brand consistency?",
-    "Design brief for the FifteenConsult pitch deck cover",
+    "Design brief for the Mumin Consult pitch deck cover",
     "Brief an ad creative for Hassan to test",
   ],
   hassan: [
@@ -73,17 +73,17 @@ const SUGGESTED_QUESTIONS = {
     "A/B test idea for this week",
   ],
   malik: [
-    "Build a media plan for FifteenConsult's lead generation in Qatar",
-    "What advertising platforms should we prioritise in Nigeria?",
+    "Build a media plan for Mumin Consult's lead generation",
+    "What advertising platforms should we prioritise for an emerging market?",
     "Write 3 ad creative briefs for LinkedIn campaigns",
-    "Analyse the advertising landscape for real estate in GCC",
-    "How should we approach Snapchat advertising for B2B in Qatar?",
+    "Analyse the advertising landscape for real estate",
+    "How should we approach Snapchat advertising for B2B?",
   ],
   david: [
-    "What are the top 3 business opportunities for FifteenConsult right now in GCC?",
-    "Analyse our competitive position against the top agencies in Qatar",
-    "Build a revenue model for FifteenConsult for next quarter",
-    "What West African market should we enter first and why?",
+    "What are the top 3 business opportunities for Mumin Consult right now?",
+    "Analyse our competitive position against the top agencies",
+    "Build a revenue model for Mumin Consult for next quarter",
+    "What new market should we enter first and why?",
     "Identify upsell opportunities across our 5 existing clients",
   ],
   sofia: [
@@ -96,9 +96,9 @@ const SUGGESTED_QUESTIONS = {
   amani: [
     "Give me this morning's executive briefing",
     "Review the team's outputs from this week and flag any issues",
-    "What is the single most important marketing priority for FifteenConsult right now?",
+    "What is the single most important marketing priority for Mumin Consult right now?",
     "Are our agents aligned with the Fifteen Framework?",
-    "What strategic opportunities are we missing in GCC and West Africa?",
+    "What strategic opportunities are we missing globally?",
   ],
   zara: [
     "What are our top 3 metrics this week?",
@@ -363,7 +363,7 @@ export default function AgentChat({ member, lastOutput }) {
     const fullDocs = formatFullDocuments([...attachedDocs]);
     const fullDocsContext = fullDocs ? `\n\n---\n${fullDocs}` : "";
 
-    return `${member.systemPrompt}\n\n---\n${COMPANY_POSITIONING}\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}${orchestratorContext}${hubContext}${fullDocsContext}\n\nYou are now in a direct chat with Sadick, the co-founder of FifteenConsult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC, not running campaigns for others.`;
+    return `${member.systemPrompt}\n\n---\n${COMPANY_POSITIONING}\n---\n${TEAM_ROSTER}\n---\n${OUTPUT_STYLE_RULES}\n---\n${HANDOFF_PROTOCOL}\n\nDATE CONTEXT: ${dateBlock}${outputContext}${inboxContext}${memContext}${designContext}${orchestratorContext}${hubContext}${fullDocsContext}\n\nYou are now in a direct chat with Sadick, the co-founder of Mumin Consult. Respond conversationally but stay in character as ${member.name}. Be concise, direct, and actionable. When producing content (posts, emails, briefs), produce it immediately — don't ask for permission. Mumin Consult is a strategic marketing consultancy seeking clients worldwide, not running campaigns for others.`;
   }, [member, lastOutput, dateCtx, pendingInbox, expandedHandoffs, designMode, isDesigner, orchestratorMode, isCMO, attachedDocs]);
 
   const handleImageUpload = (e) => {

@@ -5,7 +5,7 @@
  *
  * Setup:
  * 1. Go to console.firebase.google.com
- * 2. Create project "fifteenconsult-dashboard"
+ * 2. Create project "muminconsult-dashboard"
  * 3. Add Web App → copy config values
  * 4. Enable Firestore Database (start in test mode)
  * 5. Add env vars to Vercel (see below)

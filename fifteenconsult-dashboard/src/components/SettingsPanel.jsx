@@ -114,10 +114,10 @@ function DashboardSettings({ settings, onSave }) {
         Company Information
       </div>
       <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20 }}>
-        <Input label="Company Name"    value={vals.companyName||"FifteenConsult"} onChange={v=>setVals(p=>({...p,companyName:v}))}/>
-        <Input label="Website"         value={vals.website||"fifteenconsult.com"} onChange={v=>setVals(p=>({...p,website:v}))}/>
-        <Input label="Primary Market"  value={vals.primaryMarket||"Doha, Qatar — GCC"} onChange={v=>setVals(p=>({...p,primaryMarket:v}))}/>
-        <Input label="Growth Market"   value={vals.growthMarket||"West Africa"} onChange={v=>setVals(p=>({...p,growthMarket:v}))}/>
+        <Input label="Company Name"    value={vals.companyName||"Mumin Consult"} onChange={v=>setVals(p=>({...p,companyName:v}))}/>
+        <Input label="Website"         value={vals.website||"muminconsult.com"} onChange={v=>setVals(p=>({...p,website:v}))}/>
+        <Input label="Primary Market"  value={vals.primaryMarket||"Global (based in Doha, Qatar)"} onChange={v=>setVals(p=>({...p,primaryMarket:v}))}/>
+        <Input label="Growth Market"   value={vals.growthMarket||"Emerging markets"} onChange={v=>setVals(p=>({...p,growthMarket:v}))}/>
         <Input label="Monthly Ad Budget (QAR)" type="number" value={vals.adBudget||5000} onChange={v=>setVals(p=>({...p,adBudget:v}))}/>
         <Input label="Monthly Revenue Target (QAR)" type="number" value={vals.revenueTarget||50000} onChange={v=>setVals(p=>({...p,revenueTarget:v}))}/>
       </div>
@@ -140,7 +140,7 @@ function DashboardSettings({ settings, onSave }) {
       <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20 }}>
         {[
           { key:"showMorningOnLoad", label:"Show Morning Briefing on Load", type:"toggle" },
-          { key:"gccWeekend",        label:"GCC Weekend Mode (Fri-Sat)",     type:"toggle" },
+          { key:"gccWeekend",        label:"Doha Weekend Mode (Fri-Sat)",    type:"toggle" },
           { key:"notificationsOn",   label:"Enable Notifications",           type:"toggle" },
           { key:"autoRefreshKPIs",   label:"Auto-refresh KPIs (every hour)", type:"toggle" },
         ].map(s=>(
@@ -256,7 +256,7 @@ export default function SettingsPanel({ onClose }) {
               <div style={{ fontSize:12,fontWeight:600,color:"var(--text)",marginBottom:12 }}>Setup (free — 5 minutes)</div>
               {[
                 "Go to console.firebase.google.com",
-                "Click 'Add project' → name it 'fifteenconsult-dashboard'",
+                "Click 'Add project' → name it 'muminconsult-dashboard'",
                 "Click '</> Web' to add a web app → copy the config",
                 "Enable Firestore Database → Start in test mode",
                 "Add these to Vercel env vars (all with VITE_ prefix):",

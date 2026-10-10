@@ -20,8 +20,8 @@ const INTEGRATIONS = [
   { id:"meta",       name:"Meta Ads",               icon:"📱", color:"#1877f2", agentName:"Hassan/Malik", description:"Ad spend · CPL · ROAS",   envKeys:["META_AD_ACCOUNT_ID"] },
   { id:"make",       name:"Make.com",               icon:"⚙️", color:"#6d00cc", agentName:"All",     description:"Automation · Webhooks",        envKeys:["VITE_MAKE_WEBHOOK_URL"], setupGuide:true },
   { id:"socialblade",  name:"Social Blade Analytics",  icon:"📈", color:"#34D399", agentName:"Sara",        description:"Competitor social tracking · Growth analytics" },
-  { id:"latelyai",     name:"Content Hashtag Tools",   icon:"#️⃣", color:"#C8A96E", agentName:"Sara/Nadia",   description:"GCC hashtag strategy · Trending topics · Best times" },
-  { id:"metalibrary",  name:"Meta Ad Library",         icon:"📚", color:"#1877F2", agentName:"Hassan/Malik", description:"Competitor ads · Creative intelligence · GCC market" },
+  { id:"latelyai",     name:"Content Hashtag Tools",   icon:"#️⃣", color:"#C8A96E", agentName:"Sara/Nadia",   description:"Hashtag strategy · Trending topics · Best times" },
+  { id:"metalibrary",  name:"Meta Ad Library",         icon:"📚", color:"#1877F2", agentName:"Hassan/Malik", description:"Competitor ads · Creative intelligence · Global market" },
   { id:"linkedinads",  name:"LinkedIn Ad Library",      icon:"💼", color:"#0A66C2", agentName:"Hassan/Malik", description:"B2B competitor ads · Sponsored content research" },
   { id:"googleads",    name:"Google Ads",               icon:"🔍", color:"#34a853", agentName:"Hassan",       description:"Search campaigns · Keyword targeting · QAR bidding" },
   { id:"gmail",     name:"Gmail",                    icon:"📧", color:"#EA4335", agentName:"David/Sofia", description:"Email triage · Draft replies · Prospect follow-ups" },
@@ -31,14 +31,14 @@ const INTEGRATIONS = [
   { id:"coolors",    name:"Coolors / Brand Tools",    icon:"🎨", color:"#C8A96E", agentName:"Amara",   description:"Colour palette · Brand consistency · Contrast check" },
   { id:"brandfetch", name:"Competitor Brand Research", icon:"🔍", color:"#0288d1", agentName:"Amara",   description:"Competitor visual identity · Logo research · Brand audit" },
   { id:"apollo",     name:"Apollo.io",                icon:"🚀", color:"#7c3aed", agentName:"Kwame",   description:"275M+ contacts · Prospect research · Email finder" },
-  { id:"crunchbase", name:"Crunchbase",               icon:"💰", color:"#0288d1", agentName:"Kwame",   description:"Startup funding · West Africa · GCC company data" },
+  { id:"crunchbase", name:"Crunchbase",               icon:"💰", color:"#0288d1", agentName:"Kwame",   description:"Startup funding · Global company data" },
   { id:"news",       name:"News & Trends Feed",       icon:"📰", color:"#C8A96E", agentName:"Nadia/Sofia", description:"Marketing Week · Campaign ME · TechCabal · Gulf Business" },
   { id:"clarity",    name:"Microsoft Clarity",        icon:"👁", color:"#0078d4", agentName:"Zara",    description:"Heatmaps · Rage clicks · Session recordings" },
   { id:"hotjar",     name:"Hotjar",                   icon:"🔥", color:"#FF3C00", agentName:"Zara",    description:"Recordings · Funnels · User behaviour" },
   { id:"utm",        name:"UTM Campaign Tracker",     icon:"🔗", color:"#C8A96E", agentName:"Zara",    description:"Campaign attribution · UTM builder · Link generator" },
   { id:"instagram",  name:"Instagram",              icon:"📸", color:"#E1306C", agentName:"Sara",    description:"Followers · Engagement · Posts", envKeys:["INSTAGRAM_ACCESS_TOKEN","INSTAGRAM_ACCOUNT_ID"] },
   { id:"tiktok",     name:"TikTok Business",        icon:"🎵", color:"#69C9D0", agentName:"Sara/Malik", description:"Views · Engagement · Ads",    envKeys:["TIKTOK_ACCESS_TOKEN"] },
-  { id:"trends",     name:"Google Trends",            icon:"📈", color:"#4285f4", agentName:"Tariq/Nadia", description:"Search interest · GCC keyword trends" },
+  { id:"trends",     name:"Google Trends",            icon:"📈", color:"#4285f4", agentName:"Tariq/Nadia", description:"Search interest · Keyword trends" },
   { id:"schema",     name:"Structured Data Tester",   icon:"🏷", color:"#34a853", agentName:"Tariq",   description:"Schema markup · Meta tags · Rich results" },
   { id:"pagespeed",  name:"PageSpeed Insights",      icon:"⚡", color:"#34a853", agentName:"Tariq",   description:"Core Web Vitals · Performance scores" },
   { id:"gsc",        name:"Google Search Console",   icon:"🔍", color:"#4285f4", agentName:"Tariq",   description:"Keyword rankings · Click data · Impressions" },
@@ -230,7 +230,7 @@ function InstagramPanel({ connected }) {
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
           1. Go to developers.facebook.com → My Apps → Create App → Business<br/>
           2. Add "Instagram Graph API" product<br/>
-          3. Connect your @fifteenconsult Instagram Business account<br/>
+          3. Connect your @muminconsult Instagram Business account<br/>
           4. Generate a long-lived user access token<br/>
           5. Get your Instagram Business Account ID from the API Explorer<br/>
           6. Add both to Vercel as server-side env vars (no VITE_ prefix)
@@ -241,7 +241,7 @@ function InstagramPanel({ connected }) {
 
   return (
     <div>
-      <SectionLabel>Live Stats — @fifteenconsult
+      <SectionLabel>Live Stats — @muminconsult
         <button onClick={load} style={{ background:"none",border:"none",color:"#E1306C",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button>
       </SectionLabel>
       {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading from Instagram...</div>
@@ -313,39 +313,39 @@ function TikTokPanel({ connected }) {
 function TrendsPanel() {
   const TREND_GROUPS = [
     {
-      label: "GCC — Broad Terms (Best Data)",
+      label: "Service Terms — Global (Best Data)",
       color: "#4285f4",
-      note: "Use these first — highest data availability",
-      url: "https://trends.google.com/trends/explore?geo=QA&q=marketing+Qatar,digital+marketing+Qatar,advertising+Qatar",
-      keywords: ["marketing Qatar", "digital marketing Qatar", "advertising Qatar"],
+      note: "Use these first — service-led, no country lock",
+      url: "https://trends.google.com/trends/explore?q=marketing+consultancy,strategic+marketing,brand+strategy",
+      keywords: ["marketing consultancy", "strategic marketing", "brand strategy"],
     },
     {
-      label: "GCC — Specific Keywords",
+      label: "Buyer Terms — Global",
       color: "#34a853",
-      note: "May show limited data — Qatar market is small",
-      url: "https://trends.google.com/trends/explore?geo=QA&q=marketing+agency+Doha,brand+strategy+Qatar,marketing+consultancy",
-      keywords: ["marketing agency Doha", "brand strategy Qatar", "marketing consultancy"],
+      note: "High-intent category terms worldwide",
+      url: "https://trends.google.com/trends/explore?q=fractional+CMO,marketing+consultant,growth+marketing",
+      keywords: ["fractional CMO", "marketing consultant", "growth marketing"],
     },
     {
-      label: "West Africa — Nigeria (High Volume)",
+      label: "Market Example — Nigeria (High Volume)",
       color: "#C8A96E",
-      note: "Strong data — use for West Africa strategy",
+      note: "Sample: add a market geo only for a specific client",
       url: "https://trends.google.com/trends/explore?geo=NG&q=marketing+agency+Nigeria,digital+marketing+Lagos,brand+strategy+Nigeria",
       keywords: ["marketing agency Nigeria", "digital marketing Lagos", "brand strategy Nigeria"],
     },
     {
-      label: "West Africa — Ghana",
+      label: "Market Example — Qatar",
       color: "#E85D75",
-      note: "Growing market — track for expansion timing",
-      url: "https://trends.google.com/trends/explore?geo=GH&q=marketing+agency+Ghana,digital+marketing+Accra,marketing+consultancy+Ghana",
-      keywords: ["marketing agency Ghana", "digital marketing Accra", "marketing consultancy Ghana"],
+      note: "Sample: our Doha base market — one of many",
+      url: "https://trends.google.com/trends/explore?geo=QA&q=marketing+agency+Doha,brand+strategy+Qatar,marketing+consultancy",
+      keywords: ["marketing agency Doha", "brand strategy Qatar", "marketing consultancy"],
     },
     {
       label: "Competitor Brand Monitoring",
       color: "#8E6EC8",
-      note: "Track competitor visibility vs FifteenConsult",
-      url: "https://trends.google.com/trends/explore?q=BPG+Group,MCN+Middle+East,Elixirr,FifteenConsult",
-      keywords: ["BPG Group", "MCN Middle East", "Elixirr", "FifteenConsult"],
+      note: "Track competitor visibility vs Mumin Consult",
+      url: "https://trends.google.com/trends/explore?q=BPG+Group,MCN+Middle+East,Elixirr,Mumin Consult",
+      keywords: ["BPG Group", "MCN Middle East", "Elixirr", "Mumin Consult"],
     },
   ];
 
@@ -354,9 +354,9 @@ function TrendsPanel() {
       <div style={{ background:"#4285f418",border:"1px solid #4285f444",borderRadius:8,padding:"12px 16px",marginBottom:16 }}>
         <div style={{ fontSize:11,color:"#4285f4",fontWeight:600,marginBottom:4 }}>📈 Google Trends — Free, No Setup Required</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
-          GCC-specific keywords often show "not enough data" — Qatar's search volume is small. 
-          Always start with <strong style={{ color:"var(--text)" }}>broad terms</strong> then narrow down. 
-          West Africa keywords have much higher volume.
+          Lead with <strong style={{ color:"var(--text)" }}>service and category terms</strong> (global), then narrow down.
+          Small single-country markets often show "not enough data" — broaden to Worldwide to find real signal.
+          Add a country geo only for a specific client's market.
         </div>
       </div>
 
@@ -398,7 +398,7 @@ function SchemaPanel() {
   const load = async () => {
     setLoading(true);
     try {
-      const r = await fetch("/api/seo?tool=schema&url=https://fifteenconsult.com");
+      const r = await fetch("/api/seo?tool=schema&url=https://muminconsult.com");
       setData(await r.json());
     } catch(e) { setData({ error: e.message }); }
     setLoading(false);
@@ -408,10 +408,10 @@ function SchemaPanel() {
   return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-        <SectionLabel>Structured Data — fifteenconsult.com</SectionLabel>
+        <SectionLabel>Structured Data — muminconsult.com</SectionLabel>
         <button onClick={load} style={{ background:"none",border:"none",color:"#34a853",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
       </div>
-      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Scanning fifteenconsult.com...</div>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Scanning muminconsult.com...</div>
       : data?.error ? <div style={{ fontSize:11,color:"#f87171" }}>⚠ {data.error}</div>
       : data ? (
         <>
@@ -476,10 +476,10 @@ function PageSpeedPanel() {
   return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-        <SectionLabel>fifteenconsult.com — Live Performance Scores</SectionLabel>
+        <SectionLabel>muminconsult.com — Live Performance Scores</SectionLabel>
         <button onClick={load} style={{ background:"none",border:"none",color:"#34a853",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
       </div>
-      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Running PageSpeed analysis on fifteenconsult.com...</div>
+      {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Running PageSpeed analysis on muminconsult.com...</div>
       : mobile?.error ? <div style={{ fontSize:11,color:"#f87171",lineHeight:1.7 }}>⚠ {mobile.error}</div>
       : mobile ? (
         <>
@@ -538,7 +538,7 @@ function GSCPanel() {
   return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-        <SectionLabel>Google Search Console — fifteenconsult.com</SectionLabel>
+        <SectionLabel>Google Search Console — muminconsult.com</SectionLabel>
         <button onClick={load} style={{ background:"none",border:"none",color:"#4285f4",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
       </div>
       <div style={{ display:"flex",gap:6,marginBottom:14 }}>
@@ -602,7 +602,7 @@ function SemrushPanel() {
       </div>
       <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px" }}>
         <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What Tariq gets from Semrush:</div>
-        {["Live keyword rankings for GCC target keywords","Competitor keyword gap — what BPG and MCN rank for","Backlink opportunities and referring domain analysis","Site audit — technical SEO issues","Domain authority tracking","Content gap analysis"].map((item,i) => (
+        {["Live keyword rankings for target keywords","Competitor keyword gap — what BPG and MCN rank for","Backlink opportunities and referring domain analysis","Site audit — technical SEO issues","Domain authority tracking","Content gap analysis"].map((item,i) => (
           <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
             <span style={{ color:"#FF642D" }}>→</span> {item}
           </div>
@@ -623,10 +623,10 @@ function SocialBladePanel() {
   ];
 
   const HASHTAGS = {
-    "Qatar/GCC": ["#QatarMarketing", "#GCCBusiness", "#MarketingQatar", "#DohaMarketing", "#QatarBusiness", "#GCCMarketing"],
-    "West Africa": ["#NigeriaStartups", "#NairaMarketing", "#GhanaMarketing", "#AfricanMarketing", "#LagosMarketing", "#AfricaBusiness"],
-    "Marketing": ["#MarketingStrategy", "#B2BMarketing", "#ContentMarketing", "#DigitalMarketing", "#MarketingTips"],
-    "FifteenConsult": ["#FifteenConsult", "#TheFifteenFramework", "#MarketingConsultancy", "#ChallengerMarketing"],
+    "Marketing (global default)": ["#MarketingStrategy", "#B2BMarketing", "#ContentMarketing", "#DigitalMarketing", "#MarketingTips", "#GrowthMarketing"],
+    "Mumin Consult": ["#MuminConsult", "#TheFifteenFramework", "#MarketingConsultancy", "#ChallengerMarketing"],
+    "Sample — Gulf markets": ["#QatarMarketing", "#GCCBusiness", "#MarketingQatar", "#DohaMarketing", "#QatarBusiness", "#GCCMarketing"],
+    "Sample — African markets": ["#NigeriaStartups", "#NairaMarketing", "#GhanaMarketing", "#AfricanMarketing", "#LagosMarketing", "#AfricaBusiness"],
   };
 
   return (
@@ -648,7 +648,7 @@ function SocialBladePanel() {
         ))}
       </div>
 
-      <SectionLabel>FifteenConsult Hashtag Strategy</SectionLabel>
+      <SectionLabel>Mumin Consult Hashtag Strategy</SectionLabel>
       {Object.entries(HASHTAGS).map(([cat,tags])=>(
         <div key={cat} style={{ marginBottom:12 }}>
           <div style={{ fontSize:10,color:"var(--gold)",fontWeight:700,letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:6 }}>{cat}</div>
@@ -666,24 +666,24 @@ function SocialBladePanel() {
 // ── LATELY AI / CONTENT TOOLS PANEL ──────────────────────────────────────────────
 function LatelyAIPanel() {
   const BEST_TIMES = [
-    { platform:"LinkedIn", day:"Sunday-Tuesday", time:"8-9am & 12-1pm", timezone:"Doha GMT+3", note:"Start of GCC working week" },
+    { platform:"LinkedIn", day:"Sunday-Tuesday", time:"8-9am & 12-1pm", timezone:"Doha GMT+3", note:"Start of the Doha working week" },
     { platform:"Instagram", day:"Thursday-Friday", time:"7-9pm", timezone:"Doha GMT+3", note:"Pre-weekend browsing" },
     { platform:"TikTok (Nigeria)", day:"Monday-Wednesday", time:"7-9pm", timezone:"WAT GMT+1", note:"Evening engagement peak" },
     { platform:"Facebook", day:"Sunday-Monday", time:"9-11am", timezone:"Doha GMT+3", note:"Business hours browsing" },
   ];
 
   const CONTENT_IDEAS = [
-    "Myth: GCC companies need big agency budgets. Truth: [The Fifteen Framework shows why 15 minutes changes everything]",
+    "Myth: you need a big agency budget. Truth: [The Fifteen Framework shows why 15 minutes changes everything]",
     "3 signs your marketing isn't working (and what to do about it)",
     "How we helped [client type] go from 0 to [result] in [timeframe]",
-    "The most common marketing mistake Qatar SMEs make in Q[current quarter]",
-    "Nigeria vs Qatar: How marketing strategies differ and why it matters",
+    "The most common marketing mistake SMEs make in Q[current quarter]",
+    "How marketing strategy differs across markets — and why it matters",
     "What BIG agencies won't tell you about marketing consultancy fees",
   ];
 
   return (
     <div>
-      <SectionLabel>Best Posting Times (GCC + West Africa)</SectionLabel>
+      <SectionLabel>Best Posting Times (by market)</SectionLabel>
       {BEST_TIMES.map((t,i)=>(
         <div key={i} style={{ padding:"8px 0",borderBottom:"1px solid var(--border)" }}>
           <div style={{ display:"flex",justifyContent:"space-between",fontSize:11 }}>
@@ -722,7 +722,7 @@ function MetaLibraryPanel() {
       <div style={{ background:"#1877F218",border:"1px solid #1877F244",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
         <div style={{ fontSize:11,color:"#1877F2",fontWeight:600,marginBottom:4 }}>📚 Meta Ad Library — Free Competitor Intelligence</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
-          Every active ad on Facebook and Instagram is publicly searchable. Hassan and Malik use this to monitor competitor campaigns and identify winning creative angles in the GCC market.
+          Every active ad on Facebook and Instagram is publicly searchable. Hassan and Malik use this to monitor competitor campaigns and identify winning creative angles in any market.
         </div>
       </div>
       <SectionLabel>Quick Competitor Searches</SectionLabel>
@@ -740,7 +740,7 @@ function MetaLibraryPanel() {
       </div>
       <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
         💡 <strong style={{ color:"var(--text)" }}>Workflow:</strong> Open a search → screenshot interesting competitor ads → 
-        paste into Hassan or Malik's chat: "Analyse these competitor ads and tell me how FifteenConsult should respond."
+        paste into Hassan or Malik's chat: "Analyse these competitor ads and tell me how Mumin Consult should respond."
       </div>
     </div>
   );
@@ -760,7 +760,7 @@ function LinkedInAdsPanel() {
       <div style={{ background:"#0A66C218",border:"1px solid #0A66C244",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
         <div style={{ fontSize:11,color:"#0A66C2",fontWeight:600,marginBottom:4 }}>💼 LinkedIn Ad Library — B2B Competitor Intelligence</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
-          LinkedIn's ad transparency feature shows all active sponsored content. Critical for Hassan since LinkedIn is FifteenConsult's primary B2B ad channel.
+          LinkedIn's ad transparency feature shows all active sponsored content. Critical for Hassan since LinkedIn is Mumin Consult's primary B2B ad channel.
         </div>
       </div>
       <SectionLabel>Competitor LinkedIn Ads</SectionLabel>
@@ -783,13 +783,13 @@ function LinkedInAdsPanel() {
 // ── GOOGLE ADS PANEL ──────────────────────────────────────────────────────────────
 function GoogleAdsPanel() {
   const KEYWORDS = [
-    { kw:"marketing consultancy Qatar", intent:"High — exact service" },
-    { kw:"marketing agency Doha", intent:"High — location specific" },
-    { kw:"brand strategy Qatar", intent:"Medium — service specific" },
-    { kw:"digital marketing Qatar", intent:"Medium — broad service" },
-    { kw:"marketing consultant Qatar", intent:"High — individual hire" },
-    { kw:"marketing agency Nigeria", intent:"High — West Africa" },
-    { kw:"marketing consultancy Ghana", intent:"Medium — West Africa" },
+    { kw:"strategic marketing consultancy", intent:"High — exact service" },
+    { kw:"fractional CMO services", intent:"High — buyer intent" },
+    { kw:"brand strategy consultant", intent:"Medium — service specific" },
+    { kw:"marketing systems consultancy", intent:"Medium — differentiator" },
+    { kw:"growth marketing consultant", intent:"High — individual hire" },
+    { kw:"AI marketing consultancy", intent:"High — emerging demand" },
+    { kw:"marketing strategy for startups", intent:"Medium — ICP intent" },
   ];
 
   return (
@@ -797,7 +797,7 @@ function GoogleAdsPanel() {
       <div style={{ background:"#34a85318",border:"1px solid #34a85344",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
         <div style={{ fontSize:11,color:"#34a853",fontWeight:600,marginBottom:4 }}>🔍 Google Ads — Search Campaign Framework</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
-          Google Ads setup ready. Create a Google Ads account at ads.google.com with fifteenconsult@gmail.com to activate. 
+          Google Ads setup ready. Create a Google Ads account at ads.google.com with sadick@muminconsult.com to activate. 
           Start with a small search campaign targeting high-intent keywords below.
         </div>
       </div>
@@ -810,10 +810,10 @@ function GoogleAdsPanel() {
       ))}
       <div style={{ marginTop:14,background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
         <strong style={{ color:"var(--text)" }}>Setup steps:</strong><br/>
-        1. Create account at ads.google.com with fifteenconsult@gmail.com<br/>
+        1. Create account at ads.google.com with sadick@muminconsult.com<br/>
         2. Set billing to QAR (credit card or bank transfer)<br/>
         3. Start with QAR 500/month on top 3 keywords<br/>
-        4. Landing page: fifteenconsult.com/contact<br/>
+        4. Landing page: muminconsult.com/contact<br/>
         5. Conversion tracking: contact form submission
       </div>
     </div>
@@ -862,7 +862,7 @@ function GCalendarPanel() {
       </div>
       <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"14px 16px",marginBottom:12 }}>
         <div style={{ fontSize:11,color:"var(--text)",fontWeight:600,marginBottom:8 }}>What David does with Calendar:</div>
-        {["Identify 3 available slots per week for discovery calls","Block Tuesday/Thursday mornings for outreach","Schedule follow-up reminders after prospect contact","Align BD activities with GCC working week (Sun-Thu)","Avoid scheduling during prayer times (1-2pm Doha)"].map((item,i)=>(
+        {["Identify 3 available slots per week for discovery calls","Block Tuesday/Thursday mornings for outreach","Schedule follow-up reminders after prospect contact","Align BD activities with the Doha working week (Sun-Thu)","Avoid scheduling during prayer times (1-2pm Doha)"].map((item,i)=>(
           <div key={i} style={{ fontSize:11,color:"var(--text-dim)",padding:"4px 0",borderBottom:"1px solid var(--border)",display:"flex",gap:8 }}>
             <span style={{ color:"#4285f4" }}>→</span>{item}
           </div>
@@ -912,7 +912,7 @@ function CanvaPanel() {
         </div>
       </div>
 
-      <SectionLabel>FifteenConsult Brand Colours</SectionLabel>
+      <SectionLabel>Mumin Consult Brand Colours</SectionLabel>
       <div style={{ display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16 }}>
         {BRAND.colors.map((c,i)=>(
           <div key={i} style={{ borderRadius:8,overflow:"hidden",border:"1px solid var(--border)" }}>
@@ -985,7 +985,7 @@ function FigmaPanel() {
 // ── COOLORS PANEL ─────────────────────────────────────────────────────────────────
 function CoolorsPanel() {
   const TOOLS = [
-    { name:"Coolors Palette Generator", url:"https://coolors.co/151c33-c8a96e-e8e4d9-080808-888888", desc:"FifteenConsult palette — save and share", color:"#C8A96E" },
+    { name:"Coolors Palette Generator", url:"https://coolors.co/151c33-c8a96e-e8e4d9-080808-888888", desc:"Mumin Consult palette — save and share", color:"#C8A96E" },
     { name:"Contrast Checker", url:"https://webaim.org/resources/contrastchecker/?fcolor=C8A96E&bcolor=151c33", desc:"Gold on navy — verify accessibility", color:"#C8A96E" },
     { name:"Adobe Color Wheel", url:"https://color.adobe.com/create/color-wheel", desc:"Explore brand colour harmonies", color:"#FF0000" },
     { name:"Brand New (Inspiration)", url:"https://www.underconsideration.com/brandnew/", desc:"Brand identity news and case studies", color:"#333" },
@@ -1034,7 +1034,7 @@ function BrandfetchPanel() {
           Use the preset "Competitor brand audit" to get a full analysis with recommendations.
         </div>
       </div>
-      <SectionLabel>GCC Competitor Websites</SectionLabel>
+      <SectionLabel>Competitor Websites</SectionLabel>
       <div style={{ display:"flex",flexDirection:"column",gap:8,marginBottom:16 }}>
         {COMPETITORS.map((c,i)=>(
           <a key={i} href={c.url} target="_blank" rel="noopener noreferrer"
@@ -1053,7 +1053,7 @@ function BrandfetchPanel() {
       <div style={{ background:"var(--bg-base)",border:"1px solid var(--border)",borderRadius:8,padding:"12px 14px",fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
         💡 <strong style={{ color:"var(--text)" }}>How to use:</strong> Click any competitor link → note their visual style → 
         come back to Amara's chat and say "I just looked at [competitor] — here's what I saw: [paste observations]. 
-        How should FifteenConsult position visually against them?"
+        How should Mumin Consult position visually against them?"
       </div>
     </div>
   );
@@ -1119,7 +1119,7 @@ function CrunchbasePanel() {
       <div style={{ background:"#0288d118",border:"1px solid #0288d144",borderRadius:8,padding:"12px 16px",marginBottom:14 }}>
         <div style={{ fontSize:11,color:"#0288d1",fontWeight:600,marginBottom:4 }}>💰 Crunchbase — Free Funding Intelligence</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.7 }}>
-          Track startup funding rounds in West Africa and GCC. 
+          Track startup funding rounds across global markets. 
           Companies that just raised Series A are Kwame's best outreach targets — 
           they have budget and urgency to build marketing infrastructure.
         </div>
@@ -1167,7 +1167,7 @@ function NewsPanel() {
   return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-        <SectionLabel>Live News — Marketing · GCC · West Africa</SectionLabel>
+        <SectionLabel>Live News — Marketing · Business · Tech</SectionLabel>
         <button onClick={load} style={{ background:"none",border:"none",color:"var(--gold)",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
       </div>
       {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Fetching latest news...</div>
@@ -1212,7 +1212,7 @@ function ClarityPanel() {
         <div style={{ fontSize:11,color:"#0078d4",fontWeight:600,marginBottom:6 }}>👁 Microsoft Clarity — Free Setup (5 minutes)</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
           1. Go to <strong style={{ color:"var(--text)" }}>clarity.microsoft.com</strong> → Sign in with Microsoft account<br/>
-          2. Click <strong style={{ color:"var(--text)" }}>New project</strong> → Name: FifteenConsult → URL: fifteenconsult.com<br/>
+          2. Click <strong style={{ color:"var(--text)" }}>New project</strong> → Name: Mumin Consult → URL: muminconsult.com<br/>
           3. Copy the tracking code snippet<br/>
           4. In Webflow → Site Settings → Custom Code → Head → paste the snippet → Publish<br/>
           5. In Clarity → Settings → API → Generate token<br/>
@@ -1233,7 +1233,7 @@ function ClarityPanel() {
   return (
     <div>
       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-        <SectionLabel>Microsoft Clarity — fifteenconsult.com</SectionLabel>
+        <SectionLabel>Microsoft Clarity — muminconsult.com</SectionLabel>
         <button onClick={load} style={{ background:"none",border:"none",color:"#0078d4",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)" }}>↻ Refresh</button>
       </div>
       {loading ? <div style={{ fontSize:12,color:"var(--text-dim)" }}>Loading Clarity data...</div>
@@ -1287,11 +1287,11 @@ function HotjarPanel() {
         <div style={{ fontSize:11,color:"#FF3C00",fontWeight:600,marginBottom:6 }}>🔥 Hotjar — Free Tier (35 sessions/day)</div>
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
           {!data?.configured ? <>
-            1. Go to <strong style={{ color:"var(--text)" }}>hotjar.com</strong> → Free account → Add fifteenconsult.com<br/>
+            1. Go to <strong style={{ color:"var(--text)" }}>hotjar.com</strong> → Free account → Add muminconsult.com<br/>
             2. Copy tracking code → Webflow Site Settings → Custom Code → Head → Publish<br/>
             3. Account → Personal API Keys → Generate key<br/>
             4. Add to Vercel: <code style={{ color:"#4ade80" }}>HOTJAR_API_KEY</code> and <code style={{ color:"#4ade80" }}>HOTJAR_SITE_ID</code>
-          </> : <>Hotjar is tracking fifteenconsult.com — visit dashboard for heatmaps and recordings</>}
+          </> : <>Hotjar is tracking muminconsult.com — visit dashboard for heatmaps and recordings</>}
         </div>
       </div>
       {data?.configured && (
@@ -1316,7 +1316,7 @@ function HotjarPanel() {
 function UTMPanel() {
   const [templates,setTemplates] = useState(null);
   const [building,setBuilding]   = useState(false);
-  const [form,setForm]           = useState({ baseUrl:"https://fifteenconsult.com", source:"linkedin", medium:"paid", campaign:"", content:"", term:"" });
+  const [form,setForm]           = useState({ baseUrl:"https://muminconsult.com", source:"linkedin", medium:"paid", campaign:"", content:"", term:"" });
   const [result,setResult]       = useState(null);
   const [copied,setCopied]       = useState(false);
 
@@ -1343,7 +1343,7 @@ function UTMPanel() {
   return (
     <div>
       <div style={{ fontSize:12,color:"var(--text-mid)",marginBottom:16,lineHeight:1.7 }}>
-        Build properly formatted UTM URLs for all FifteenConsult campaigns. Zara uses UTM data to track which channels drive traffic and leads.
+        Build properly formatted UTM URLs for all Mumin Consult campaigns. Zara uses UTM data to track which channels drive traffic and leads.
       </div>
 
       {/* UTM Builder */}
@@ -1384,7 +1384,7 @@ function UTMPanel() {
       {/* Templates */}
       {templates?.templates && (
         <>
-          <SectionLabel>FifteenConsult UTM Templates</SectionLabel>
+          <SectionLabel>Mumin Consult UTM Templates</SectionLabel>
           {templates.templates.map((t,i)=>(
             <div key={i} style={{ padding:"8px 0",borderBottom:"1px solid var(--border)" }}>
               <div style={{ fontSize:11,fontWeight:600,color:"var(--text)",marginBottom:3 }}>{t.campaign}</div>
@@ -1494,7 +1494,7 @@ function GA4Panel({ connected }) {
         <div style={{ fontSize:11,color:"var(--text-dim)",lineHeight:1.8 }}>
           • Live sessions, bounce rate, avg time on page<br/>
           • Traffic sources (organic, social, paid, direct)<br/>
-          • Top pages on fifteenconsult.com<br/>
+          • Top pages on muminconsult.com<br/>
           • Contact form conversion rate
         </div>
       </div>
@@ -1503,7 +1503,7 @@ function GA4Panel({ connected }) {
 
   return (
     <div>
-      <SectionLabel>Live Stats — fifteenconsult.com (Last 30 days)
+      <SectionLabel>Live Stats — muminconsult.com (Last 30 days)
         <button onClick={load} style={{ background:"none",border:"none",color:"#4285f4",fontSize:10,cursor:"pointer",fontFamily:"var(--font-mono)",marginLeft:8 }}>↻ Refresh</button>
       </SectionLabel>
       {loading ? <div style={{ fontSize:12,color:"var(--text-dim)",marginBottom:16 }}>Loading from GA4...</div>
@@ -1609,7 +1609,7 @@ function MakePanel() {
     <div>
       <SectionLabel>Automation Layer</SectionLabel>
       <div style={{ fontSize:12,color:"var(--text-mid)",lineHeight:1.8,marginBottom:16 }}>
-        Make.com connects FifteenConsult's dashboard to any platform via webhooks — automating tasks agents recommend.
+        Make.com connects Mumin Consult's dashboard to any platform via webhooks — automating tasks agents recommend.
       </div>
       {[
         { title:"Kwame books a call", action:"→ HubSpot deal created automatically + calendar invite sent" },

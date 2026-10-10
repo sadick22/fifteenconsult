@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 
 /* ============================================================================
-   FIFTEENCONSULT — ORBITAL COMMAND CENTER
-   The gold core is FifteenConsult; the agents orbit it in three meaningful
+   MUMIN CONSULT — ORBITAL COMMAND CENTER
+   The gold core is Mumin Consult; the agents orbit it in three meaningful
    rings. Hover pauses the system and expands an agent's live readout at the
    planet. Click enters their workspace. Tilted plane gives real depth; agents
    fly out from the core on load; energy pulses run along the lines of agents
@@ -224,7 +224,7 @@ export default function OrbitalCommandCenter({ agents, onOpenAgent }) {
         <div className="oc-core" style={S.core}>
           <div className="oc-sheen" style={S.sheen}/>
           <div style={S.coreNum}>15</div>
-          <div style={S.coreName}>FIFTEENCONSULT</div>
+          <div style={S.coreName}>MUMIN CONSULT</div>
           <div style={S.coreSub}>COMMAND CENTER</div>
         </div>
       </div>
@@ -265,7 +265,7 @@ export default function OrbitalCommandCenter({ agents, onOpenAgent }) {
       )}
 
       <div style={S.hudTL}>
-        <div style={S.wordmark}>FIFTEEN<span style={{ color:GOLD }}>CONSULT</span></div>
+        <div style={S.wordmark}>MUMIN<span style={{ color:GOLD }}> CONSULT</span></div>
         <div style={S.hudSub}>Agent Orchestration · Live</div>
       </div>
       <div style={S.hudTR}><span className="oc-status" /><span style={S.hudStatusTxt}>{SRC.length} AGENTS · ONLINE</span></div>

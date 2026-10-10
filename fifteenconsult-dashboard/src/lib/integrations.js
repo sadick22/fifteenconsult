@@ -1,6 +1,6 @@
 /**
  * integrations.js
- * External platform connections for FifteenConsult dashboard.
+ * External platform connections for Mumin Consult dashboard.
  *
  * Each integration fetches live data via the platform's API.
  * API keys stored as Vercel environment variables.
@@ -97,11 +97,11 @@ export async function createMailerLiteDraft({ subject, content }) {
       name:    `FC Newsletter — ${new Date().toLocaleDateString("en-GB")}`,
       type:    "regular",
       status:  "draft",
-      subject: subject || "FifteenConsult Newsletter",
+      subject: subject || "Mumin Consult Newsletter",
       emails: [{
-        subject: subject || "FifteenConsult Newsletter",
-        from_name:  "FifteenConsult",
-        from:       "fifteenconsult@gmail.com",
+        subject: subject || "Mumin Consult Newsletter",
+        from_name:  "Mumin Consult",
+        from:       "sadick@muminconsult.com",
         content:    content || "",
         type:       "regular",
       }],
@@ -181,7 +181,7 @@ export async function fetchTikTokInsights() {
 
 export async function fetchPageSpeed(strategy = "mobile") {
   try {
-    const r = await fetch(`/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=${strategy}`);
+    const r = await fetch(`/api/seo?tool=pagespeed&url=https://muminconsult.com&strategy=${strategy}`);
     const d = await r.json();
     if (!r.ok) return { error: d.error };
     return d;
@@ -391,7 +391,7 @@ export function getGA4SetupSteps() {
       {
         step: 1,
         title: "Create GA4 Property",
-        detail: "Go to analytics.google.com → Admin → Create Property → Select 'Web' → Enter fifteenconsult.com",
+        detail: "Go to analytics.google.com → Admin → Create Property → Select 'Web' → Enter muminconsult.com",
         done: false,
       },
       {
@@ -444,7 +444,7 @@ export function getMetaSetupSteps() {
       {
         step: 1,
         title: "Create Meta Business Account",
-        detail: "Go to business.facebook.com → Create account for FifteenConsult if not already done",
+        detail: "Go to business.facebook.com → Create account for Mumin Consult if not already done",
         done: false,
       },
       {

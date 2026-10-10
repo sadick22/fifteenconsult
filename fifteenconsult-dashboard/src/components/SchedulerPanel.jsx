@@ -163,7 +163,7 @@ function AgentScheduleRow({ member, schedule, onUpdate }) {
                 })}
               </div>
               <div style={{ fontSize: 9, color: T.textDim, marginTop: 6 }}>
-                Fri/Sat = GCC weekend. Schedules still fire if enabled.
+                Fri/Sat = Doha weekend. Schedules still fire if enabled.
               </div>
             </div>
           )}

@@ -1,28 +1,28 @@
 /**
  * scheduler.js
- * Agent scheduling engine for FifteenConsult AI Marketing Department.
+ * Agent scheduling engine for Mumin Consult AI Marketing Department.
  *
  * Schedules are stored in localStorage and checked on every page load/focus.
  * When a scheduled run is due, the agent fires automatically.
  *
- * GCC-aware: defaults respect the Qatar/GCC working week (Sun–Thu).
+ * Doha-based: defaults respect the Doha working week (Sun–Thu).
  */
 
 const STORAGE_KEY = "fc_schedules_v2";
 
 // ── DEFAULT SCHEDULES ─────────────────────────────────────────────────────────
-// GCC working week: Sunday–Thursday. Friday/Saturday = weekend.
+// Doha working week: Sunday–Thursday. Friday/Saturday = weekend.
 // Times are in 24h format, local browser time.
 
 export const DEFAULT_SCHEDULES = {
   nadia: {
     enabled:   true,
     frequency: "daily",         // daily | weekly | weekdays | custom
-    days:      [0,1,2,3,4],    // Sun–Thu (GCC working week)
+    days:      [0,1,2,3,4],    // Sun–Thu (Doha working week)
     hour:      8,
     minute:    0,
     label:     "Daily 8:00 AM (Sun–Thu)",
-    description: "Morning content standup every GCC working day",
+    description: "Morning content standup every Doha working day",
   },
   tariq: {
     enabled:   true,
@@ -31,7 +31,7 @@ export const DEFAULT_SCHEDULES = {
     hour:      8,
     minute:    30,
     label:     "Daily 8:30 AM (Sun–Thu)",
-    description: "SEO status report every GCC working day",
+    description: "SEO status report every Doha working day",
   },
   sara: {
     enabled:   true,
@@ -40,7 +40,7 @@ export const DEFAULT_SCHEDULES = {
     hour:      8,
     minute:    0,
     label:     "Daily 8:00 AM (Sun–Thu)",
-    description: "Social media morning brief every GCC working day",
+    description: "Social media morning brief every Doha working day",
   },
   kwame: {
     enabled:   true,
@@ -49,16 +49,16 @@ export const DEFAULT_SCHEDULES = {
     hour:      9,
     minute:    0,
     label:     "Daily 9:00 AM (Sun–Thu)",
-    description: "Lead gen update every GCC working day",
+    description: "Lead gen update every Doha working day",
   },
   amara: {
     enabled:   true,
     frequency: "weekly",
-    days:      [0],             // Sunday (start of GCC week)
+    days:      [0],             // Sunday (start of the Doha week)
     hour:      9,
     minute:    0,
     label:     "Weekly — Sunday 9:00 AM",
-    description: "Brand & design brief at start of GCC week",
+    description: "Brand & design brief at start of the Doha week",
   },
   hassan: {
     enabled:   true,
@@ -67,23 +67,23 @@ export const DEFAULT_SCHEDULES = {
     hour:      9,
     minute:    30,
     label:     "Daily 9:30 AM (Sun–Thu)",
-    description: "Ads performance report every GCC working day",
+    description: "Ads performance report every Doha working day",
   },
   zara: {
     enabled:   true,
     frequency: "weekly",
-    days:      [4],             // Thursday (end of GCC working week)
+    days:      [4],             // Thursday (end of Doha working week)
     hour:      16,
     minute:    0,
     label:     "Weekly — Thursday 4:00 PM",
-    description: "Weekly analytics report at end of GCC working week",
+    description: "Weekly analytics report at end of Doha working week",
   },
 };
 
 // ── FREQUENCY OPTIONS ─────────────────────────────────────────────────────────
 export const FREQUENCY_OPTIONS = [
   { value: "daily",    label: "Every day" },
-  { value: "weekdays", label: "GCC working days (Sun–Thu)" },
+  { value: "weekdays", label: "Doha working days (Sun–Thu)" },
   { value: "weekly",   label: "Once a week" },
   { value: "disabled", label: "Manual only" },
 ];
@@ -166,7 +166,7 @@ export function getNextRun(schedule) {
 function getDaysForFrequency(schedule) {
   switch (schedule.frequency) {
     case "daily":    return [0,1,2,3,4,5,6];
-    case "weekdays": return [0,1,2,3,4]; // GCC Sun–Thu
+    case "weekdays": return [0,1,2,3,4]; // Doha Sun–Thu
     case "weekly":   return schedule.days || [0];
     case "custom":   return schedule.days || [];
     default:         return [];

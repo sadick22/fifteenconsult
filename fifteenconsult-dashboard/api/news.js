@@ -36,7 +36,7 @@ const FEEDS = [
 async function fetchRSS(feed) {
   try {
     const r = await fetch(feed.url, {
-      headers: { "User-Agent": "FifteenConsult-Dashboard/1.0" },
+      headers: { "User-Agent": "MuminConsult-Dashboard/1.0" },
       signal: AbortSignal.timeout(5000),
     });
     if (!r.ok) return [];

@@ -2,10 +2,10 @@
  * prompts.js
  * Preset focus directives and smart suggestions for each agent.
  *
- * FifteenConsult is a marketing consultancy seeking clients in Qatar/GCC.
+ * Mumin Consult is a strategic marketing consultancy serving clients worldwide.
  * All directives are framed around: winning new business, staying visible,
  * producing content that attracts Real Estate, SaaS, Hospitality, and SME
- * clients, and building the FifteenConsult brand.
+ * clients, and building the Mumin Consult brand.
  */
 
 // ── PRESET DIRECTIVES PER AGENT ───────────────────────────────────────────────
@@ -18,56 +18,56 @@ export const AGENT_PRESETS = {
       icon: "💡",
       label: "Write LinkedIn insight post",
       category: "LinkedIn",
-      prompt: "Write a high-performing LinkedIn post for FifteenConsult using the challenger approach. Lead with a bold, counterintuitive insight about marketing in GCC or West Africa. Include a specific data point. Use the format: Hook (1-2 lines) → Insight (3-5 lines) → Proof or example (2-3 lines) → Question CTA. 150-250 words. No generic phrases. Start with something other than 'I'.",
+      prompt: "Write a high-performing LinkedIn post for Mumin Consult using the challenger approach. Lead with a bold, counterintuitive insight about marketing that holds true across markets. Include a specific data point. Use the format: Hook (1-2 lines) → Insight (3-5 lines) → Proof or example (2-3 lines) → Question CTA. 150-250 words. No generic phrases. Start with something other than 'I'.",
     },
     {
       id: "linkedin_framework",
       icon: "15",
       label: "Fifteen Framework LinkedIn post",
       category: "LinkedIn",
-      prompt: "Write a LinkedIn post explaining one specific aspect of The Fifteen Framework. Make it educational and actionable — show how 15 minutes of executive attention, or one of the 15 key metrics, or one of the 15 strategic pillars can transform a company's marketing. Use a real-world GCC example. End with a question about their current marketing measurement.",
+      prompt: "Write a LinkedIn post explaining one specific aspect of The Fifteen Framework. Make it educational and actionable — show how 15 minutes of executive attention, or one of the 15 key metrics, or one of the 15 strategic pillars can transform a company's marketing. Use a real-world example. End with a question about their current marketing measurement.",
     },
     {
       id: "linkedin_west_africa",
       icon: "🌍",
-      label: "West Africa market post",
+      label: "global market post",
       category: "LinkedIn",
-      prompt: "Write a LinkedIn post about a marketing opportunity or insight specific to West Africa — focusing on Nigeria, Ghana, or pan-African trends. Position FifteenConsult as a consultancy that understands both GCC and African markets. This should differentiate us from typical Qatar/GCC agencies. Use the news headlines from today's feed if relevant.",
+      prompt: "Write a LinkedIn post about a marketing opportunity or insight in a high-growth market anywhere in the world. Position Mumin Consult as a consultancy that wins across markets — not one tied to a single region. This should differentiate us from region-locked agencies. Use the news headlines from today's feed if relevant.",
     },
     {
       id: "newsletter_draft",
       icon: "📧",
       label: "Draft weekly newsletter",
       category: "Email",
-      prompt: "Draft this week's FifteenConsult email newsletter for our MailerLite subscribers. Use the email performance data to understand what our audience engages with. Include: one strong marketing insight relevant to GCC/West Africa, one tip from The Fifteen Framework, one piece of FifteenConsult news or client win, and one clear CTA. Subject line under 50 chars. Total length: 300-400 words.",
+      prompt: "Draft this week's Mumin Consult email newsletter for our MailerLite subscribers. Use the email performance data to understand what our audience engages with. Include: one strong marketing insight relevant to global, one tip from The Fifteen Framework, one piece of Mumin Consult news or client win, and one clear CTA. Subject line under 50 chars. Total length: 300-400 words.",
     },
     {
       id: "blog_brief",
       icon: "📝",
       label: "Write SEO blog article",
       category: "Blog",
-      prompt: "Write a full SEO-optimised blog article for fifteenconsult.com (800-1200 words). Target keyword: 'marketing consultancy Qatar' or 'real estate marketing GCC'. Structure: compelling intro, 4-5 key sections with subheadings, practical takeaways, and CTA to book a strategy call. Include The Fifteen Framework naturally. Use the news feed headlines for a topical angle if relevant.",
+      prompt: "Write a full SEO-optimised blog article for muminconsult.com (800-1200 words). Target keyword: 'strategic marketing consultancy' or 'marketing systems for real estate' (add a location modifier only for a specific client). Structure: compelling intro, 4-5 key sections with subheadings, practical takeaways, and CTA to book a strategy call. Include The Fifteen Framework naturally. Use the news feed headlines for a topical angle if relevant.",
     },
     {
       id: "case_study",
       icon: "🏆",
       label: "Write client case study",
       category: "Case Study",
-      prompt: "Write a case study for one of our clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, or African Languages Lab. Format: Challenge (what problem did they face) → Approach (how FifteenConsult applied the Fifteen Framework) → Results (specific metrics and outcomes) → Key Lesson (what other brands can learn). 400-600 words. Professional but engaging tone.",
+      prompt: "Write a case study for one of our clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, or African Languages Lab. Format: Challenge (what problem did they face) → Approach (how Mumin Consult applied the Fifteen Framework) → Results (specific metrics and outcomes) → Key Lesson (what other brands can learn). 400-600 words. Professional but engaging tone.",
     },
     {
       id: "instagram_carousel",
       icon: "📱",
       label: "Instagram carousel content",
       category: "Instagram",
-      prompt: "Create content for a 6-slide Instagram carousel for FifteenConsult. Topic: a practical marketing tip relevant to GCC SMEs or startups. Slide 1: Bold hook/problem statement. Slides 2-5: One tip per slide with brief explanation. Slide 6: CTA to book a strategy call. Keep each slide to 15-20 words max. Make it visually structured with clear hierarchy.",
+      prompt: "Create content for a 6-slide Instagram carousel for Mumin Consult. Topic: a practical marketing tip relevant to SMEs or startups anywhere. Slide 1: Bold hook/problem statement. Slides 2-5: One tip per slide with brief explanation. Slide 6: CTA to book a strategy call. Keep each slide to 15-20 words max. Make it visually structured with clear hierarchy.",
     },
     {
       id: "news_content",
       icon: "📰",
       label: "News-inspired content",
       category: "LinkedIn",
-      prompt: "Using the latest news headlines from the live feed, identify the most relevant story for FifteenConsult's audience and write a LinkedIn post that connects it to a marketing lesson for GCC or West Africa businesses. Position FifteenConsult as the expert voice on this topic. Be specific and add genuine insight beyond what the headline says.",
+      prompt: "Using the latest news headlines from the live feed, identify the most relevant story for Mumin Consult's audience and write a LinkedIn post that connects it to a marketing lesson for businesses in any market. Position Mumin Consult as the expert voice on this topic. Be specific and add genuine insight beyond what the headline says.",
     },
   ],
 
@@ -77,42 +77,42 @@ export const AGENT_PRESETS = {
       icon: "🔧",
       label: "Technical audit",
       category: "Task",
-      prompt: "Run a full technical SEO audit focus today. Identify the top 5 technical issues on fifteenconsult.com that are hurting our ability to rank for 'marketing consultancy Qatar'. Give specific fix instructions for each.",
+      prompt: "Run a full technical SEO audit focus today. Identify the top 5 technical issues on muminconsult.com that are hurting our ability to rank for 'strategic marketing consultancy'. Give specific fix instructions for each.",
     },
     {
       id: "keyword_research",
       icon: "🔑",
       label: "Keyword research",
       category: "Task",
-      prompt: "Focus on keyword research for FifteenConsult. Find the 10 highest-opportunity keywords we're not currently ranking for — specifically terms that Real Estate developers, SaaS companies, and hospitality brands in Qatar would search when looking for a marketing partner.",
+      prompt: "Focus on keyword research for Mumin Consult. Find the 10 highest-opportunity keywords we're not currently ranking for — specifically terms that Real Estate developers, SaaS companies, and hospitality brands anywhere would search when looking for a marketing partner.",
     },
     {
       id: "competitor_seo",
       icon: "🕵️",
       label: "Competitor analysis",
       category: "Task",
-      prompt: "Research what marketing consultancies in Qatar and GCC are ranking for that we aren't. Identify the top 3 competitors' SEO strategies and what FifteenConsult needs to do to outrank them.",
+      prompt: "Research what marketing consultancies worldwide are ranking for that we aren't. Identify the top 3 competitors' SEO strategies and what Mumin Consult needs to do to outrank them.",
     },
     {
       id: "blog_brief",
       icon: "📝",
       label: "Blog brief for Nadia",
       category: "Output",
-      prompt: "Write a detailed SEO blog brief for Nadia. The article must target a high-value keyword for 'marketing consultancy Qatar' or related terms. Include: target keyword, search intent, outline with H2s, internal link suggestions, and word count.",
+      prompt: "Write a detailed SEO blog brief for Nadia. The article must target a high-value keyword for 'strategic marketing consultancy' or related service terms. Include: target keyword, search intent, outline with H2s, internal link suggestions, and word count.",
     },
     {
       id: "ai_seo",
       icon: "🤖",
       label: "AI search visibility",
       category: "Task",
-      prompt: "Focus on AI search visibility. How do we make FifteenConsult appear when someone asks ChatGPT or Perplexity 'who are the best marketing consultancies in Qatar?' Give specific actions to improve our AI search presence.",
+      prompt: "Focus on AI search visibility. How do we make Mumin Consult appear when someone asks ChatGPT or Perplexity 'who are the best strategic marketing consultancies?' Give specific actions to improve our AI search presence.",
     },
     {
       id: "backlinks",
       icon: "🔗",
       label: "Backlink opportunities",
       category: "Task",
-      prompt: "Focus on finding backlink opportunities for fifteenconsult.com. Identify 5 GCC-based business publications, directories, or websites where we could get listed or contribute guest content. Include contact approach.",
+      prompt: "Focus on finding backlink opportunities for muminconsult.com. Identify 5 reputable business publications, directories, or websites (in clients' markets and globally) where we could get listed or contribute guest content. Include contact approach.",
     },
   ],
 
@@ -122,49 +122,49 @@ export const AGENT_PRESETS = {
       icon: "📱",
       label: "Social media morning brief",
       category: "Daily",
-      prompt: "Run my social media morning brief. Using the injected data and news feed, show me: what's scheduled to post today, yesterday's best performing post (from any data available), 10 specific accounts to engage with today in our target market, trending topics in GCC or West Africa marketing I should capitalise on, and any comments or messages needing urgent response.",
+      prompt: "Run my social media morning brief. Using the injected data and news feed, show me: what's scheduled to post today, yesterday's best performing post (from any data available), 10 specific accounts to engage with today in our target market, trending topics in global marketing I should capitalise on, and any comments or messages needing urgent response.",
     },
     {
       id: "linkedin_post",
       icon: "💼",
       label: "Write LinkedIn post",
       category: "Content",
-      prompt: "Write a high-performing LinkedIn post for FifteenConsult. Use the news feed for a topical angle. Format: bold hook that stops the scroll → insight or observation → specific GCC or West Africa context → question CTA. 150-250 words. Start with something other than 'I'. Challenger tone — bold and direct. Include relevant hashtags: #QatarMarketing #GCCBusiness #MarketingStrategy",
+      prompt: "Write a high-performing LinkedIn post for Mumin Consult. Use the news feed for a topical angle. Format: bold hook that stops the scroll → insight or observation → specific market context relevant to the audience → question CTA. 150-250 words. Start with something other than 'I'. Challenger tone — bold and direct. Include relevant hashtags: #MarketingStrategy #B2BMarketing #BrandStrategy",
     },
     {
       id: "instagram_caption",
       icon: "📸",
       label: "Write Instagram caption",
       category: "Content",
-      prompt: "Write an Instagram caption for FifteenConsult. Choose from: carousel tip post, behind-the-scenes, client result highlight, or quick marketing insight reel. Conversational but professional tone. 100-150 words. 5-8 relevant hashtags. End with a question or CTA. GCC or West Africa context required. Suggest the visual direction for the post too.",
+      prompt: "Write an Instagram caption for Mumin Consult. Choose from: carousel tip post, behind-the-scenes, client result highlight, or quick marketing insight reel. Conversational but professional tone. 100-150 words. 5-8 relevant hashtags. End with a question or CTA. Clear market context relevant to the audience required. Suggest the visual direction for the post too.",
     },
     {
       id: "content_calendar",
       icon: "📅",
       label: "Plan this week's content",
       category: "Planning",
-      prompt: "Plan this week's social media content calendar for FifteenConsult. Use the GCC working week (Sunday-Thursday). Create a schedule for: 4 LinkedIn posts, 3 Instagram posts, 1 Facebook post. For each post include: day, platform, content pillar, topic, format, and one sentence brief. Use news feed headlines for timely content. Include at least one Fifteen Framework post.",
+      prompt: "Plan this week's social media content calendar for Mumin Consult. Use the Doha working week (Sunday-Thursday) as the baseline, adjusting for each audience's own week. Create a schedule for: 4 LinkedIn posts, 3 Instagram posts, 1 Facebook post. For each post include: day, platform, content pillar, topic, format, and one sentence brief. Use news feed headlines for timely content. Include at least one Fifteen Framework post.",
     },
     {
       id: "engagement_strategy",
       icon: "💬",
       label: "Daily engagement targets",
       category: "Growth",
-      prompt: "Give me today's engagement strategy. Identify 10 specific accounts on LinkedIn I should comment on today — Marketing Directors, CMOs, or Founders in Qatar, UAE, or West Africa. For each account suggest what to comment based on their recent activity. Also suggest 5 relevant hashtags to engage with today. Goal: 5 new LinkedIn connections from targeted engagement.",
+      prompt: "Give me today's engagement strategy. Identify 10 specific accounts on LinkedIn I should comment on today — Marketing Directors, CMOs, or Founders in your target markets. For each account suggest what to comment based on their recent activity. Also suggest 5 relevant hashtags to engage with today. Goal: 5 new LinkedIn connections from targeted engagement.",
     },
     {
       id: "competitor_social",
       icon: "🕵️",
       label: "Competitor social audit",
       category: "Intelligence",
-      prompt: "Audit the social media presence of our GCC competitors: BPG Group, MCN Middle East, and Elixirr. Check their LinkedIn and Instagram profiles. Analyse: posting frequency, content themes, engagement rates (estimate from visible data), follower counts, and what's working for them. Where is FifteenConsult's opportunity to look different and better?",
+      prompt: "Audit the social media presence of our key competitors: BPG Group, MCN Middle East, and Elixirr. Check their LinkedIn and Instagram profiles. Analyse: posting frequency, content themes, engagement rates (estimate from visible data), follower counts, and what's working for them. Where is Mumin Consult's opportunity to look different and better?",
     },
     {
       id: "reel_script",
       icon: "🎬",
       label: "Write reel script",
       category: "Content",
-      prompt: "Write a script for a 30-60 second Instagram or TikTok reel for FifteenConsult. Topic: a quick marketing tip, myth-bust, or insight relevant to GCC or West Africa business owners. Format: hook (3 seconds) → main point (20-40 seconds) → CTA (5 seconds). Conversational, energetic tone. Include on-screen text suggestions. The Fifteen Framework can be the hook.",
+      prompt: "Write a script for a 30-60 second Instagram or TikTok reel for Mumin Consult. Topic: a quick marketing tip, myth-bust, or insight relevant to business owners in any market. Format: hook (3 seconds) → main point (20-40 seconds) → CTA (5 seconds). Conversational, energetic tone. Include on-screen text suggestions. The Fifteen Framework can be the hook.",
     },
     {
       id: "weekly_report",
@@ -188,21 +188,21 @@ export const AGENT_PRESETS = {
       icon: "🔍",
       label: "Research 5 new prospects",
       category: "Research",
-      prompt: "Research and present 5 high-quality prospects for FifteenConsult using the news feed intelligence and your knowledge of the GCC and West Africa markets. For each prospect include: company name, sector, why they need FifteenConsult now (specific trigger), decision maker name and title, and a personalised outreach angle. Focus on companies with recent funding, expansion announcements, or visible marketing gaps.",
+      prompt: "Research and present 5 high-quality prospects for Mumin Consult using the news feed intelligence and your knowledge of global markets. For each prospect include: company name, sector, why they need Mumin Consult now (specific trigger), decision maker name and title, and a personalised outreach angle. Focus on companies with recent funding, expansion announcements, or visible marketing gaps.",
     },
     {
       id: "outreach_email",
       icon: "📧",
       label: "Write cold outreach email",
       category: "Outreach",
-      prompt: "Write a challenger cold email for a prospect in [specify: Real Estate / SaaS / Hospitality / West Africa Tech]. Use the framework: specific company observation → problem they likely have → social proof from our clients → simple 15-minute call CTA. Under 100 words. Subject line must be specific to their situation. No generic phrases.",
+      prompt: "Write a challenger cold email for a prospect in [specify: Real Estate / SaaS / Hospitality / Tech]. Use the framework: specific company observation → problem they likely have → social proof from our clients → simple 15-minute call CTA. Under 100 words. Subject line must be specific to their situation. No generic phrases.",
     },
     {
       id: "linkedin_outreach",
       icon: "💼",
       label: "Write LinkedIn message",
       category: "Outreach",
-      prompt: "Write a LinkedIn connection request note and follow-up message for a prospect. Connection note: 1 sentence, specific insight about their company, under 300 characters. Follow-up message (sent after connection accepted): challenger framework, under 75 words. Target: Marketing Director or CMO at a GCC real estate or tech company.",
+      prompt: "Write a LinkedIn connection request note and follow-up message for a prospect. Connection note: 1 sentence, specific insight about their company, under 300 characters. Follow-up message (sent after connection accepted): challenger framework, under 75 words. Target: Marketing Director or CMO at a real estate or tech company.",
     },
     {
       id: "follow_up_sequence",
@@ -214,23 +214,23 @@ export const AGENT_PRESETS = {
     {
       id: "nigeria_prospects",
       icon: "🌍",
-      label: "West Africa prospect scan",
+      label: "High-growth market prospect scan",
       category: "Research",
-      prompt: "Scan the news feed for West Africa market intelligence. Identify companies in Nigeria, Ghana, or broader West Africa that have recently raised funding, announced expansion, or show signs of needing sophisticated marketing strategy. For each opportunity: company name, funding or trigger event, why they need FifteenConsult, best outreach channel (LinkedIn vs WhatsApp vs email), and suggested message angle.",
+      prompt: "Scan the news feed for global market intelligence. Identify companies in any high-growth market — African tech hubs, the Gulf, and beyond — that have recently raised funding, announced expansion, or show signs of needing sophisticated marketing strategy. For each opportunity: company name, market, funding or trigger event, why they need Mumin Consult, best outreach channel (LinkedIn vs WhatsApp vs email), and suggested message angle.",
     },
     {
       id: "competitor_intelligence",
       icon: "🕵️",
       label: "Competitor intelligence report",
       category: "Intelligence",
-      prompt: "Produce a competitive intelligence report on FifteenConsult's main competitors in the GCC market: BPG Group, MCN Middle East, Elixirr, and any other marketing consultancies active in Qatar and UAE. What are they winning? Where are they weak? What client types are they targeting? Where is the gap FifteenConsult can exploit? Use any news feed intelligence available.",
+      prompt: "Produce a competitive intelligence report on Mumin Consult's main competitors in the global market: BPG Group, MCN Middle East, Elixirr, and any other marketing consultancies active in our target markets. What are they winning? Where are they weak? What client types are they targeting? Where is the gap Mumin Consult can exploit? Use any news feed intelligence available.",
     },
     {
       id: "discovery_prep",
       icon: "📋",
       label: "Discovery call preparation",
       category: "Sales",
-      prompt: "Prepare a discovery call brief for an upcoming call with a prospect. Give me: 5 smart questions to ask that demonstrate FifteenConsult's expertise, 3 potential objections and how to handle them, the key points to make about The Fifteen Framework, and how to close the call with a clear next step. Tailor to [specify: Real Estate / SaaS / Hospitality / West Africa Tech].",
+      prompt: "Prepare a discovery call brief for an upcoming call with a prospect. Give me: 5 smart questions to ask that demonstrate Mumin Consult's expertise, 3 potential objections and how to handle them, the key points to make about The Fifteen Framework, and how to close the call with a clear next step. Tailor to [specify: Real Estate / SaaS / Hospitality / Tech].",
     },
   ],
 
@@ -240,56 +240,56 @@ export const AGENT_PRESETS = {
       icon: "🎨",
       label: "Create LinkedIn post design",
       category: "Canva",
-      prompt: "Create a LinkedIn post design in Canva (1200x1200px). Use FifteenConsult brand guidelines: #151c33 dark background, #C8A96E gold accent, white body text, Cormorant Garamond for headlines. The post should feel premium and challenger brand. Topic: [specify topic or I'll choose a relevant marketing insight]. Include the FifteenConsult name and make the hierarchy bold and editorial.",
+      prompt: "Create a LinkedIn post design in Canva (1200x1200px). Use Mumin Consult brand guidelines: #151c33 dark background, #C8A96E gold accent, white body text, Cormorant Garamond for headlines. The post should feel premium and challenger brand. Topic: [specify topic or I'll choose a relevant marketing insight]. Include the Mumin Consult name and make the hierarchy bold and editorial.",
     },
     {
       id: "instagram_carousel",
       icon: "📱",
       label: "Create Instagram carousel",
       category: "Canva",
-      prompt: "Create a 6-slide Instagram carousel in Canva (1080x1350px per slide). FifteenConsult brand: dark background, gold headlines, white body text. Slide 1: Bold hook. Slides 2-5: one insight per slide. Slide 6: CTA. Topic: [specify or I'll choose]. Consistent header with FifteenConsult branding across all slides. Export-ready design.",
+      prompt: "Create a 6-slide Instagram carousel in Canva (1080x1350px per slide). Mumin Consult brand: dark background, gold headlines, white body text. Slide 1: Bold hook. Slides 2-5: one insight per slide. Slide 6: CTA. Topic: [specify or I'll choose]. Consistent header with Mumin Consult branding across all slides. Export-ready design.",
     },
     {
       id: "pitch_deck_slide",
       icon: "📊",
       label: "Design pitch deck slide",
       category: "Canva",
-      prompt: "Design a pitch deck slide in Canva (1920x1080px, 16:9). FifteenConsult dark theme: #151c33 background, #C8A96E gold for key data points, clean white text. Slide type: [specify: title, problem, solution, results, case study, pricing, or CTA]. Make data and numbers visually prominent. Premium consultancy feel — not a startup pitch.",
+      prompt: "Design a pitch deck slide in Canva (1920x1080px, 16:9). Mumin Consult dark theme: #151c33 background, #C8A96E gold for key data points, clean white text. Slide type: [specify: title, problem, solution, results, case study, pricing, or CTA]. Make data and numbers visually prominent. Premium consultancy feel — not a startup pitch.",
     },
     {
       id: "brand_audit",
       icon: "🔍",
       label: "Competitor brand audit",
       category: "Research",
-      prompt: "Audit the visual brand identity of our main competitors: BPG Group (bpggroup.com), MCN Middle East (mcnme.com), and Elixirr (elixirr.com). Fetch each website and analyse: colour palette, typography choices, visual tone, template patterns, and overall brand positioning. Where does FifteenConsult look more premium? Where do we need to improve? Give specific recommendations.",
+      prompt: "Audit the visual brand identity of our main competitors: BPG Group (bpggroup.com), MCN Middle East (mcnme.com), and Elixirr (elixirr.com). Fetch each website and analyse: colour palette, typography choices, visual tone, template patterns, and overall brand positioning. Where does Mumin Consult look more premium? Where do we need to improve? Give specific recommendations.",
     },
     {
       id: "social_template_set",
       icon: "✨",
       label: "Design social template set",
       category: "Canva",
-      prompt: "Create a cohesive set of 3 social media templates in Canva for FifteenConsult: 1) LinkedIn thought leadership post (1200x1200px), 2) Instagram carousel cover (1080x1350px), 3) Instagram story (1080x1920px). All three must feel like a family — consistent use of #151c33, #C8A96E, Cormorant Garamond, DM Mono. These become our reusable template system.",
+      prompt: "Create a cohesive set of 3 social media templates in Canva for Mumin Consult: 1) LinkedIn thought leadership post (1200x1200px), 2) Instagram carousel cover (1080x1350px), 3) Instagram story (1080x1920px). All three must feel like a family — consistent use of #151c33, #C8A96E, Cormorant Garamond, DM Mono. These become our reusable template system.",
     },
     {
       id: "case_study_design",
       icon: "🏆",
       label: "Design case study layout",
       category: "Canva",
-      prompt: "Design a case study layout in Canva for one of our clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, or African Languages Lab. Format: cover page + 3 content pages. Include: challenge, approach, results (numbers prominent in gold), and FifteenConsult branding. Professional enough to send to prospects as social proof.",
+      prompt: "Design a case study layout in Canva for one of our clients: Coreo Real Estate, Nappy Qatar, Elite Escape Tourism, Base Intelligent Communities, or African Languages Lab. Format: cover page + 3 content pages. Include: challenge, approach, results (numbers prominent in gold), and Mumin Consult branding. Professional enough to send to prospects as social proof.",
     },
     {
       id: "website_section_brief",
       icon: "🌐",
       label: "Website section design brief",
       category: "Figma",
-      prompt: "Create a detailed design brief for a new section of fifteenconsult.com. Specify: exact layout, element positions, colours (using FifteenConsult brand tokens), typography sizes, spacing values, mobile considerations, and interaction notes. Format as a Figma-ready specification that Sadick can implement in Webflow. Section options: Fifteen Framework page, case study grid, services detail, or team section.",
+      prompt: "Create a detailed design brief for a new section of muminconsult.com. Specify: exact layout, element positions, colours (using Mumin Consult brand tokens), typography sizes, spacing values, mobile considerations, and interaction notes. Format as a Figma-ready specification that Sadick can implement in Webflow. Section options: Fifteen Framework page, case study grid, services detail, or team section.",
     },
     {
       id: "fifteen_framework_visual",
       icon: "⚡",
       label: "Fifteen Framework visual",
       category: "Canva",
-      prompt: "Design a visual representation of The Fifteen Framework in Canva. Show the three pillars: 15 minutes of executive attention, 15 key metrics, 15 strategic pillars. Create a diagram or infographic that makes the framework immediately clear and memorable. Use FifteenConsult brand guidelines. This should be usable as a LinkedIn post, website section, and proposal page.",
+      prompt: "Design a visual representation of The Fifteen Framework in Canva. Show the three pillars: 15 minutes of executive attention, 15 key metrics, 15 strategic pillars. Create a diagram or infographic that makes the framework immediately clear and memorable. Use Mumin Consult brand guidelines. This should be usable as a LinkedIn post, website section, and proposal page.",
     },
   ],
 
@@ -306,28 +306,28 @@ export const AGENT_PRESETS = {
       icon: "✍️",
       label: "Write ad copy variations",
       category: "Creative",
-      prompt: "Write 3 ad copy variations for FifteenConsult using the Challenger approach. Each variation must have: a pattern-interrupt headline (under 70 chars), problem-led body copy (under 150 words), and a clear CTA (Book Free Strategy Call or Get Your Marketing Audit). Write one for Real Estate Qatar, one for SaaS/Tech GCC, and one for West Africa (Nigeria). Dark background with gold accents visual direction.",
+      prompt: "Write 3 ad copy variations for Mumin Consult using the Challenger approach. Each variation must have: a pattern-interrupt headline (under 70 chars), problem-led body copy (under 150 words), and a clear CTA (Book Free Strategy Call or Get Your Marketing Audit). Write one for Real Estate, one for SaaS/Tech, and one for an emerging market. Dark background with gold accents visual direction.",
     },
     {
       id: "campaign_setup",
       icon: "🚀",
       label: "Set up new campaign",
       category: "Campaigns",
-      prompt: "Help me set up a new LinkedIn or Meta campaign for FifteenConsult. Define: campaign objective, target audience (job titles, industries, geos), budget allocation, ad format, offer, and success metrics. Use the Meta Ads MCP to check current audience performance before recommending targeting. Start with the channel that has the lowest current CPL.",
+      prompt: "Help me set up a new LinkedIn or Meta campaign for Mumin Consult. Define: campaign objective, target audience (job titles, industries, geos), budget allocation, ad format, offer, and success metrics. Use the Meta Ads MCP to check current audience performance before recommending targeting. Start with the channel that has the lowest current CPL.",
     },
     {
       id: "competitor_ads",
       icon: "🕵️",
       label: "Scan competitor ads",
       category: "Intelligence",
-      prompt: "Check the Meta Ad Library (facebook.com/ads/library) for active ads from our GCC competitors: BPG Group, MCN Middle East, and Elixirr. Also search for 'marketing consultancy Qatar' and 'marketing agency Doha' to see what any agency is running. Report: what angles they're using, what offers they're promoting, what creatives are running, and what gaps FifteenConsult can exploit.",
+      prompt: "Check the Meta Ad Library (facebook.com/ads/library) for active ads from our key competitors: BPG Group, MCN Middle East, and Elixirr. Also search for 'strategic marketing consultancy' and 'fractional CMO' to see what any agency is running. Report: what angles they're using, what offers they're promoting, what creatives are running, and what gaps Mumin Consult can exploit.",
     },
     {
       id: "landing_page_audit",
       icon: "🌐",
       label: "Landing page audit",
       category: "Optimisation",
-      prompt: "Using the PageSpeed data injected, audit fifteenconsult.com as a paid ads landing page. What is the mobile performance score? Is it above 70 — the minimum for running paid campaigns? What specific fixes would improve conversion rate? Check: headline clarity, CTA visibility, social proof above the fold, form simplicity, and page load speed. Give Sadick a prioritised fix list for Webflow.",
+      prompt: "Using the PageSpeed data injected, audit muminconsult.com as a paid ads landing page. What is the mobile performance score? Is it above 70 — the minimum for running paid campaigns? What specific fixes would improve conversion rate? Check: headline clarity, CTA visibility, social proof above the fold, form simplicity, and page load speed. Give Sadick a prioritised fix list for Webflow.",
     },
     {
       id: "ab_test",
@@ -339,9 +339,9 @@ export const AGENT_PRESETS = {
     {
       id: "west_africa_campaign",
       icon: "🌍",
-      label: "West Africa campaign strategy",
+      label: "Emerging-market campaign strategy",
       category: "Strategy",
-      prompt: "Design a paid campaign strategy for West Africa (Nigeria primary, Ghana secondary). Consider: Facebook dominance vs LinkedIn for B2B, mobile-first creative requirements, local business culture, lower CPCs, and different buying triggers vs GCC. What budget allocation, targeting, ad formats, and offers would work best? How should creative differ from our GCC campaigns?",
+      prompt: "Design a paid campaign strategy for a specific emerging market [specify, e.g. Nigeria, Egypt, Kenya]. Consider: the channel mix that actually dominates there (Facebook/WhatsApp vs LinkedIn for B2B), mobile-first creative requirements, local business culture, CPC levels, and local buying triggers. What budget allocation, targeting, ad formats, and offers would work best? How should creative differ from other markets?",
     },
     {
       id: "budget_optimisation",
@@ -372,35 +372,35 @@ export const AGENT_PRESETS = {
       icon: "📧",
       label: "Email performance deep dive",
       category: "Analysis",
-      prompt: "Analyse our MailerLite email performance in detail. How do our open rates and click rates compare to GCC benchmarks (25% open, 3% CTR)? What should we do differently? Which subscriber segments should we target? Give specific recommendations for the next campaign based on live data.",
+      prompt: "Analyse our MailerLite email performance in detail. How do our open rates and click rates compare to B2B benchmarks (25% open, 3% CTR)? What should we do differently? Which subscriber segments should we target? Give specific recommendations for the next campaign based on live data.",
     },
     {
       id: "website_health",
       icon: "🌐",
       label: "Website health report",
       category: "Report",
-      prompt: "Using the PageSpeed and Schema data injected, give a complete website health assessment for fifteenconsult.com. What are the most critical performance issues? What is the SEO health score? What specific fixes should Sadick make in Webflow this week? Prioritise by impact.",
+      prompt: "Using the PageSpeed and Schema data injected, give a complete website health assessment for muminconsult.com. What are the most critical performance issues? What is the SEO health score? What specific fixes should Sadick make in Webflow this week? Prioritise by impact.",
     },
     {
       id: "utm_strategy",
       icon: "🔗",
       label: "UTM tracking strategy",
       category: "Strategy",
-      prompt: "Build a complete UTM tracking strategy for FifteenConsult. For each channel we use (LinkedIn, Instagram, TikTok, MailerLite, Meta Ads, Google Ads), define the exact UTM parameters to use. Create a naming convention we'll follow consistently. Explain how to use this data in GA4 to measure channel ROI.",
+      prompt: "Build a complete UTM tracking strategy for Mumin Consult. For each channel we use (LinkedIn, Instagram, TikTok, MailerLite, Meta Ads, Google Ads), define the exact UTM parameters to use. Create a naming convention we'll follow consistently. Explain how to use this data in GA4 to measure channel ROI.",
     },
     {
       id: "kpi_dashboard",
       icon: "📈",
       label: "Build KPI dashboard brief",
       category: "Strategy",
-      prompt: "Design FifteenConsult's master KPI dashboard. What are the 15 most important metrics to track weekly? How should they be organised? What benchmarks should each metric be measured against? What alerts should fire automatically? This brief will guide how we set up Looker Studio.",
+      prompt: "Design Mumin Consult's master KPI dashboard. What are the 15 most important metrics to track weekly? How should they be organised? What benchmarks should each metric be measured against? What alerts should fire automatically? This brief will guide how we set up Looker Studio.",
     },
     {
       id: "clarity_analysis",
       icon: "👁",
       label: "Clarity behaviour analysis",
       category: "Analysis",
-      prompt: "Analyse the Microsoft Clarity behavioural data from the live feed. What do the rage clicks, dead clicks, and scroll depth tell us about how users experience fifteenconsult.com? Which pages need UX fixes? What specific changes should Sadick make in Webflow to improve user behaviour metrics?",
+      prompt: "Analyse the Microsoft Clarity behavioural data from the live feed. What do the rage clicks, dead clicks, and scroll depth tell us about how users experience muminconsult.com? Which pages need UX fixes? What specific changes should Sadick make in Webflow to improve user behaviour metrics?",
     },
   ],
 
@@ -417,21 +417,21 @@ export const AGENT_PRESETS = {
       icon: "💡",
       label: "New campaign concept",
       category: "Creative Strategy",
-      prompt: "Develop a new campaign concept for FifteenConsult. It should simultaneously build brand awareness AND generate leads. Include: campaign theme and big idea, target audience and insight, key message and proof point, recommended channels and formats, creative direction (dark/gold brand aesthetic), offer, and success metrics. The Fifteen Framework should be the strategic anchor.",
+      prompt: "Develop a new campaign concept for Mumin Consult. It should simultaneously build brand awareness AND generate leads. Include: campaign theme and big idea, target audience and insight, key message and proof point, recommended channels and formats, creative direction (dark/gold brand aesthetic), offer, and success metrics. The Fifteen Framework should be the strategic anchor.",
     },
     {
       id: "competitor_intelligence",
       icon: "🕵️",
       label: "Competitor advertising intelligence",
       category: "Intelligence",
-      prompt: "Run a full competitor advertising intelligence report. Check Meta Ad Library and LinkedIn Ad Library for BPG Group, MCN Middle East, and Elixirr. Also scan for any new marketing agencies appearing in Qatar/UAE ads. Analyse: their positioning angle, offers, creative style, apparent budget level, and target audience. Where is FifteenConsult's competitive advantage in the paid media landscape?",
+      prompt: "Run a full competitor advertising intelligence report. Check Meta Ad Library and LinkedIn Ad Library for BPG Group, MCN Middle East, and Elixirr. Also scan for any new marketing agencies appearing in our target-market ads. Analyse: their positioning angle, offers, creative style, apparent budget level, and target audience. Where is Mumin Consult's competitive advantage in the paid media landscape?",
     },
     {
       id: "west_africa_strategy",
       icon: "🌍",
-      label: "West Africa advertising strategy",
+      label: "Emerging-market advertising strategy",
       category: "Strategy",
-      prompt: "Develop FifteenConsult's West Africa advertising strategy. Define: which markets to enter first (Nigeria, Ghana, or pan-African), what channels to use (Facebook vs LinkedIn vs Google), what message resonates with Nigerian and Ghanaian business decision makers, how to position FifteenConsult as a premium consultancy in these markets, and what budget to allocate. Use news intelligence to assess market timing.",
+      prompt: "Develop an advertising strategy for a specific high-growth market [specify]. Define: whether to enter it now, what channels to use (Facebook vs LinkedIn vs Google, per where the audience actually is), what message resonates with local business decision makers, how to position Mumin Consult as a premium consultancy there, and what budget to allocate. Use news intelligence to assess market timing.",
     },
     {
       id: "creative_brief",
@@ -443,23 +443,23 @@ export const AGENT_PRESETS = {
     {
       id: "gccc_calendar",
       icon: "📅",
-      label: "GCC advertising calendar",
+      label: "90-day advertising calendar",
       category: "Planning",
-      prompt: "Build FifteenConsult's GCC advertising calendar for the next 90 days. Account for: Ramadan periods (reduced direct response, more brand), Eid (high engagement window), summer slowdown (shift to West Africa), and Q4 budget season (ROI messaging). For each period: recommended campaign type, message angle, budget allocation, and key performance indicator. Align with the GCC working week (Sunday-Thursday).",
+      prompt: "Build Mumin Consult's advertising calendar for the next 90 days across target markets. Account for each market's cultural calendar (e.g. Ramadan and Eid in Muslim-majority markets — reduced direct response then a high-engagement window), local summer slowdowns, and budget seasons (often Q4 — ROI messaging). For each period: recommended campaign type, message angle, budget allocation, and key performance indicator. Use the Doha working week (Sunday-Thursday) as the baseline and adjust to each audience's own week.",
     },
     {
       id: "fifteen_framework_campaign",
       icon: "⚡",
       label: "Fifteen Framework campaign",
       category: "Brand Campaign",
-      prompt: "Design a campaign specifically built around The Fifteen Framework. This should educate the GCC market about what The Fifteen Framework is and why it matters, while positioning FifteenConsult as the only consultancy that delivers it. Include: awareness phase (what is it?), consideration phase (how does it work?), and conversion phase (book a call to see it applied). Multi-channel approach across LinkedIn, Meta, and Google.",
+      prompt: "Design a campaign specifically built around The Fifteen Framework. This should educate the global market about what The Fifteen Framework is and why it matters, while positioning Mumin Consult as the only consultancy that delivers it. Include: awareness phase (what is it?), consideration phase (how does it work?), and conversion phase (book a call to see it applied). Multi-channel approach across LinkedIn, Meta, and Google.",
     },
     {
       id: "performance_review",
       icon: "📈",
       label: "Strategic performance review",
       category: "Reporting",
-      prompt: "Pull Meta Ads MCP data and conduct a strategic performance review — not just numbers, but what the numbers mean. Are we building the right brand in the right markets? Is our CPL sustainable for FifteenConsult's growth stage? Are we acquiring the right types of leads? What should we stop, start, and continue? Give me a director-level view, not an analyst report.",
+      prompt: "Pull Meta Ads MCP data and conduct a strategic performance review — not just numbers, but what the numbers mean. Are we building the right brand in the right markets? Is our CPL sustainable for Mumin Consult's growth stage? Are we acquiring the right types of leads? What should we stop, start, and continue? Give me a director-level view, not an analyst report.",
     },
   ],
 
@@ -476,49 +476,49 @@ export const AGENT_PRESETS = {
       icon: "👥",
       label: "Department performance review",
       category: "Strategy",
-      prompt: "Conduct a full department performance review for all 10 FifteenConsult team members. For each agent: what are they working on, are they hitting their targets, what's their biggest blocker, and what do they need from Sadick this week? Synthesise into a department health score (Red/Yellow/Green) and give Sadick 3 specific management actions.",
+      prompt: "Conduct a full department performance review for all 10 Mumin Consult team members. For each agent: what are they working on, are they hitting their targets, what's their biggest blocker, and what do they need from Sadick this week? Synthesise into a department health score (Red/Yellow/Green) and give Sadick 3 specific management actions.",
     },
     {
       id: "pipeline_review",
       icon: "💰",
       label: "Revenue pipeline review",
       category: "Revenue",
-      prompt: "Review FifteenConsult's revenue pipeline using HubSpot data. What is the current pipeline health? Are we on track for QAR 2.5M ARR by Q4 2026? What's the lead velocity? Which channels are producing the best quality leads? What's the conversion rate at each stage? Give me a realistic Q2 revenue forecast and what needs to change to hit targets.",
+      prompt: "Review Mumin Consult's revenue pipeline using HubSpot data. What is the current pipeline health? Are we on track for QAR 2.5M ARR by Q4 2026? What's the lead velocity? Which channels are producing the best quality leads? What's the conversion rate at each stage? Give me a realistic Q2 revenue forecast and what needs to change to hit targets.",
     },
     {
       id: "strategic_direction",
       icon: "🧭",
       label: "Set weekly strategic direction",
       category: "Strategy",
-      prompt: "Set FifteenConsult's strategic direction for this week. Based on pipeline health, market intelligence, and department performance, define: the single most important objective this week, specific priorities for each team member, any strategy pivots needed, and what to stop doing to free up bandwidth. Make it executable — each team member should know exactly what to focus on.",
+      prompt: "Set Mumin Consult's strategic direction for this week. Based on pipeline health, market intelligence, and department performance, define: the single most important objective this week, specific priorities for each team member, any strategy pivots needed, and what to stop doing to free up bandwidth. Make it executable — each team member should know exactly what to focus on.",
     },
     {
       id: "competitive_position",
       icon: "⚔️",
       label: "Competitive position assessment",
       category: "Intelligence",
-      prompt: "Assess FifteenConsult's competitive position in the GCC market using news feed intelligence and your knowledge. How are we positioned against BPG Group, MCN Middle East, and Elixirr? Where are we winning? Where are we losing? What's the single biggest competitive threat this quarter? What does FifteenConsult need to do differently to become the first-choice challenger consultancy in Qatar?",
+      prompt: "Assess Mumin Consult's competitive position in the global market using news feed intelligence and your knowledge. How are we positioned against BPG Group, MCN Middle East, and Elixirr? Where are we winning? Where are we losing? What's the single biggest competitive threat this quarter? What does Mumin Consult need to do differently to become the first-choice challenger consultancy in its category?",
     },
     {
       id: "west_africa_strategy",
       icon: "🌍",
-      label: "West Africa expansion strategy",
+      label: "Market expansion strategy",
       category: "Strategy",
-      prompt: "Develop FifteenConsult's West Africa expansion strategy. When should we formally enter Nigeria and Ghana? What resources do we need? How do we position GCC-proven credentials in West Africa? Which sectors should we target first (fintech, e-commerce, SaaS)? What's the revenue opportunity? Give me a 90-day expansion plan with specific milestones.",
+      prompt: "Develop Mumin Consult's market expansion strategy. Which new markets should we prioritise next, and when? What resources do we need? How do we position our proven credentials when entering a new market? Which sectors should we target first (fintech, e-commerce, SaaS, real estate)? What's the revenue opportunity? Give me a 90-day expansion plan with specific milestones.",
     },
     {
       id: "fifteen_framework",
       icon: "⚡",
       label: "Fifteen Framework activation",
       category: "Brand",
-      prompt: "The Fifteen Framework is FifteenConsult's most powerful differentiator but it's underutilised. How do we make it more prominent across all marketing channels? Give me a specific activation plan: how Nadia should write about it, how Hassan should use it in ads, how Tariq should build SEO content around it, how Amara should visualise it, and how David should pitch it. Make it the centrepiece of everything.",
+      prompt: "The Fifteen Framework is Mumin Consult's most powerful differentiator but it's underutilised. How do we make it more prominent across all marketing channels? Give me a specific activation plan: how Nadia should write about it, how Hassan should use it in ads, how Tariq should build SEO content around it, how Amara should visualise it, and how David should pitch it. Make it the centrepiece of everything.",
     },
     {
       id: "board_report",
       icon: "📋",
       label: "Monthly board report",
       category: "Reporting",
-      prompt: "Generate FifteenConsult's monthly marketing performance report for Sadick. Using all available live data: summarise the month's key achievements, metrics against targets (pipeline, social growth, content output, ad performance), lessons learned, what we're changing next month, and the 3 biggest opportunities ahead. Format as an executive summary Sadick could share with advisors or investors.",
+      prompt: "Generate Mumin Consult's monthly marketing performance report for Sadick. Using all available live data: summarise the month's key achievements, metrics against targets (pipeline, social growth, content output, ad performance), lessons learned, what we're changing next month, and the 3 biggest opportunities ahead. Format as an executive summary Sadick could share with advisors or investors.",
     },
   ],
 };
@@ -552,7 +552,7 @@ export function getSmartSuggestions(agentId, dateContext, alerts) {
   }
 
   if (isThursday || isFriday) {
-    if (agentId === "zara")   suggestions.push({ text: "End of GCC working week — generate weekly performance report", icon: "📋" });
+    if (agentId === "zara")   suggestions.push({ text: "End of the Doha working week — generate weekly performance report", icon: "📋" });
     if (agentId === "kwame")  suggestions.push({ text: "End of week — follow up all leads before the weekend", icon: "🔄" });
     if (agentId === "hassan") suggestions.push({ text: "End of week — pause underperforming ads before weekend spend", icon: "⏸" });
   }
@@ -568,10 +568,10 @@ export function getSmartSuggestions(agentId, dateContext, alerts) {
     }
   });
 
-  // GCC seasonal
+  // Cultural-calendar seasonal (market-specific)
   if (dateContext.month === "March" || dateContext.month === "April") {
-    if (agentId === "nadia") suggestions.push({ text: "Post-Ramadan/Eid — strong engagement period in GCC", icon: "🌙" });
-    if (agentId === "hassan") suggestions.push({ text: "Post-Eid — high ad engagement window in Qatar", icon: "📈" });
+    if (agentId === "nadia") suggestions.push({ text: "Post-Ramadan/Eid — strong engagement period in Muslim-majority markets", icon: "🌙" });
+    if (agentId === "hassan") suggestions.push({ text: "Post-Eid — high ad engagement window in Muslim-majority markets", icon: "📈" });
   }
 
   return suggestions.slice(0, 3);
