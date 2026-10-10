@@ -17,7 +17,7 @@ const T = {
 const HOURS = Array.from({length:24},(_,i)=>i);
 const MINS  = [0,15,30,45];
 
-function AgentScheduleRow({ member, schedule, onUpdate }) {
+function AgentScheduleRow({ member, schedule, onUpdate, autoRun = false }) {
   const [expanded, setExpanded] = useState(false);
   const nextRun  = getNextRun(schedule);
   const nextStr  = formatNextRun(nextRun);
@@ -94,8 +94,8 @@ function AgentScheduleRow({ member, schedule, onUpdate }) {
           <div style={{ fontSize: 11, color: isActive ? T.text : T.textDim, fontWeight: 500 }}>
             {schedule.label}
           </div>
-          <div style={{ fontSize: 10, marginTop: 3, color: isActive ? member.color : T.textDim }}>
-            {isActive ? `Next: ${nextStr}` : "Disabled"}
+          <div style={{ fontSize: 10, marginTop: 3, color: isActive ? (autoRun ? member.color : T.textDim) : T.textDim }}>
+            {!isActive ? "Disabled" : autoRun ? `Next: ${nextStr}` : "Scheduled · auto off"}
           </div>
         </div>
 
@@ -239,7 +239,7 @@ function AgentScheduleRow({ member, schedule, onUpdate }) {
 }
 
 // ── MAIN SCHEDULER PANEL ──────────────────────────────────────────────────────
-export default function SchedulerPanel({ schedules, onUpdate, onClose, onRunAll }) {
+export default function SchedulerPanel({ schedules, onUpdate, onClose, onRunAll, autoRun = false, onToggleAutoRun }) {
   const activeCount   = Object.values(schedules).filter(s => s.enabled && s.frequency !== "disabled").length;
   const dueCount      = Object.entries(schedules).filter(([,s]) => {
     if (!s.enabled || s.frequency === "disabled") return false;
@@ -263,10 +263,13 @@ export default function SchedulerPanel({ schedules, onUpdate, onClose, onRunAll 
             ⏰ Agent Scheduler
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <span style={{ fontSize: 10, color: T.green, background: T.green + "18", padding: "2px 10px", borderRadius: 10, fontWeight: 700 }}>
-              {activeCount} active
+            <span style={{ fontSize: 10, color: autoRun ? T.green : T.textDim, background: (autoRun ? T.green : T.textDim) + "18", padding: "2px 10px", borderRadius: 10, fontWeight: 700 }}>
+              {autoRun ? "Automatic" : "Manual mode"}
             </span>
-            {dueCount > 0 && (
+            <span style={{ fontSize: 10, color: T.textMid, background: T.border, padding: "2px 10px", borderRadius: 10, fontWeight: 700 }}>
+              {activeCount} scheduled
+            </span>
+            {autoRun && dueCount > 0 && (
               <span style={{ fontSize: 10, color: T.amber, background: T.amber + "18", padding: "2px 10px", borderRadius: 10, fontWeight: 700 }}>
                 {dueCount} due soon
               </span>
@@ -278,11 +281,35 @@ export default function SchedulerPanel({ schedules, onUpdate, onClose, onRunAll 
         </button>
       </div>
 
-      {/* Info banner */}
-      <div style={{ padding: "12px 24px", background: T.gold + "0e", borderBottom: `1px solid #C8A96E22` }}>
-        <p style={{ fontSize: 11, color: T.gold + "bb", lineHeight: 1.7 }}>
-          ⚡ Schedules run automatically when the dashboard is <strong style={{ color: T.gold }}>open in your browser</strong>. Keep the tab open for fully autonomous operation. Times are in your local timezone.
-        </p>
+      {/* Master auto-run switch */}
+      <div style={{ padding: "16px 24px", borderBottom: `1px solid ${T.border}`, background: autoRun ? T.green + "0c" : T.card }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div
+            onClick={() => onToggleAutoRun && onToggleAutoRun()}
+            style={{
+              width: 44, height: 24, borderRadius: 12, flexShrink: 0,
+              background: autoRun ? T.green : T.border,
+              position: "relative", cursor: "pointer", transition: "background 0.2s",
+            }}
+          >
+            <div style={{
+              position: "absolute", top: 3, left: autoRun ? 23 : 3,
+              width: 18, height: 18, borderRadius: "50%",
+              background: "#fff", transition: "left 0.2s",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+            }} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>
+              Automatic daily runs — {autoRun ? "ON" : "OFF"}
+            </div>
+            <div style={{ fontSize: 11, color: T.textDim, lineHeight: 1.6, marginTop: 3 }}>
+              {autoRun
+                ? <>Enabled agents below run on their own at the set times while this tab is open. Turn off to go fully manual.</>
+                : <>Manual mode — nothing starts on its own. Agents run only when you click <strong style={{ color: T.text }}>Run</strong> on an agent, or <strong style={{ color: T.text }}>Run All Now</strong> below.</>}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Quick actions */}
@@ -328,6 +355,7 @@ export default function SchedulerPanel({ schedules, onUpdate, onClose, onRunAll 
             member={member}
             schedule={schedules[member.id] || {}}
             onUpdate={onUpdate}
+            autoRun={autoRun}
           />
         ))}
       </div>
