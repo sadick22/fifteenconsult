@@ -7,7 +7,7 @@ import {
 } from "../lib/datahub.js";
 
 /**
- * DataHub — one page for FifteenConsult's shared company data.
+ * DataHub — one page for Mumin Consult's shared company data.
  * Three tabs: Clients · Documents · Assets.
  * Everything saved here is injected (lean) into all 11 agents automatically.
  */
@@ -95,7 +95,7 @@ function DocumentForm({ initial, onSave, onCancel, color }) {
   const set = (k) => (e) => setV(p => ({ ...p, [k]: e.target.value }));
   return (
     <div style={{ background:T.base, border:`1px solid ${color}44`, borderRadius:10, padding:14, marginBottom:10 }}>
-      <input value={v.title} onChange={set("title")} placeholder="Document title * (e.g. FifteenConsult Marketing Strategy v2.0)" style={{ ...inputStyle, marginBottom:8 }}/>
+      <input value={v.title} onChange={set("title")} placeholder="Document title * (e.g. Mumin Consult Marketing Strategy v2.0)" style={{ ...inputStyle, marginBottom:8 }}/>
       <textarea value={v.summary} onChange={set("summary")} rows={2} placeholder="Lean summary * — 1-3 lines. This is what every agent carries at all times, so make it count." style={{ ...inputStyle, resize:"none", marginBottom:8 }}/>
       <textarea value={v.content} onChange={set("content")} rows={10} placeholder="Full document text — paste everything here. Stored permanently; agents receive it only when you attach it to a chat (📚). Large documents are fine." style={{ ...inputStyle, resize:"vertical", marginBottom:8 }}/>
       <div style={{ display:"flex", gap:8, alignItems:"center" }}>
@@ -217,7 +217,7 @@ export default function DataHub({ color = "#C8A96E" }) {
       <div style={{ marginBottom:6 }}>
         <div style={{ fontSize:14, fontWeight:600, color:T.text, marginBottom:3 }}>🗂 Data Hub</div>
         <div style={{ fontSize:11, color:T.textDim, lineHeight:1.6 }}>
-          FifteenConsult's shared company data. Everything here is automatically known by all 11 agents — clients, documents, and assets.
+          Mumin Consult's shared company data. Everything here is automatically known by all 11 agents — clients, documents, and assets.
         </div>
       </div>
 

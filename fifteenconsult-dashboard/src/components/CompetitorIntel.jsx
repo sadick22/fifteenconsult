@@ -124,7 +124,7 @@ function CompetitorRow({ comp, onDelete, onEdit, onFetch, color }) {
       </div>
 
       <textarea value={vals.notes||""} onChange={e=>setVals(p=>({...p,notes:e.target.value}))}
-        placeholder="Notes — positioning, strengths, weaknesses, what FifteenConsult should do differently"
+        placeholder="Notes — positioning, strengths, weaknesses, what Mumin Consult should do differently"
         rows={2}
         style={{ width:"100%",background:"var(--bg-card)",border:"1px solid var(--border)",borderRadius:6,padding:"7px 10px",fontSize:12,color:"var(--text)",fontFamily:"var(--font-mono)",outline:"none",resize:"none",marginBottom:8,boxSizing:"border-box" }}/>
       <div style={{ display:"flex",gap:8 }}>
@@ -199,7 +199,7 @@ function CompetitorRow({ comp, onDelete, onEdit, onFetch, color }) {
             </div>
           ))}
           <div style={{ fontSize:9,color:"var(--text-dim)",marginTop:4,opacity:0.7 }}>
-            💡 After fetching, paste results into David's chat: "Analyse this competitor data and give me FifteenConsult's competitive positioning against {comp.name}"
+            💡 After fetching, paste results into David's chat: "Analyse this competitor data and give me Mumin Consult's competitive positioning against {comp.name}"
           </div>
         </div>
       )}
@@ -229,7 +229,7 @@ export default function CompetitorIntel({ color="#34D399" }) {
         schema.schemas?.count > 0 ? `✓ Schema: ${schema.schemas.types?.join(", ")}` : "✗ No schema markup",
         `SEO Score: ${schema.score}/100`,
         schema.recommendations?.length ? `Issues: ${schema.recommendations.join(" | ")}` : "",
-        `→ Paste into David's chat: "Fetch ${url} and analyse ${name}'s ${label} — positioning, messaging, services, and how FifteenConsult should compete."`,
+        `→ Paste into David's chat: "Fetch ${url} and analyse ${name}'s ${label} — positioning, messaging, services, and how Mumin Consult should compete."`,
       ].filter(Boolean).join("\n");
       return { summary };
     } catch (err) {

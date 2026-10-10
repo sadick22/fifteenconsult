@@ -1,6 +1,6 @@
 /**
  * /src/lib/datahub.js
- * The Data Hub — FifteenConsult's shared company data: clients, documents,
+ * The Data Hub — Mumin Consult's shared company data: clients, documents,
  * and assets. Stored in Firestore + localStorage (same pattern as handoffs
  * and memory). Every agent receives a LEAN injected block so they always
  * know the clients, the documents that exist, and the assets available —

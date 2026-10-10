@@ -6,7 +6,7 @@
 
 // ── PAGESPEED ─────────────────────────────────────────────────────────────────
 async function handlePageSpeed(req, res) {
-  const { url = "https://fifteenconsult.com", strategy = "mobile" } = req.query;
+  const { url = "https://muminconsult.com", strategy = "mobile" } = req.query;
   const apiKey = process.env.PAGESPEED_API_KEY;
   const apiUrl = apiKey
     ? `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=${strategy}&key=${apiKey}`
@@ -44,10 +44,10 @@ async function handlePageSpeed(req, res) {
 
 // ── SCHEMA TEST ───────────────────────────────────────────────────────────────
 async function handleSchema(req, res) {
-  const { url = "https://fifteenconsult.com" } = req.query;
+  const { url = "https://muminconsult.com" } = req.query;
   const pageRes = await fetch(url, {
     headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; FifteenConsult-Dashboard/1.0)",
+      "User-Agent": "Mozilla/5.0 (compatible; MuminConsult-Dashboard/1.0)",
       "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     },
     redirect: "follow",
@@ -97,7 +97,7 @@ async function handleSchema(req, res) {
 
 // ── GOOGLE SEARCH CONSOLE ─────────────────────────────────────────────────────
 async function handleGSC(req, res) {
-  const SITE_URL = "https://fifteenconsult.com/";
+  const SITE_URL = "https://muminconsult.com/";
   const { action = "overview" } = req.query;
 
   const hasAuth = !!(process.env.GSC_REFRESH_TOKEN && process.env.GSC_CLIENT_ID && process.env.GSC_CLIENT_SECRET);
@@ -123,7 +123,7 @@ async function handleGSC(req, res) {
     });
     const d = await r.json();
     if (d.error) return res.status(200).json({ error: d.error.message });
-    const targets = ["marketing consultancy qatar","marketing agency doha","brand strategy qatar","real estate marketing gcc","digital marketing consultant qatar","fifteen framework","fifteenconsult","marketing consultancy west africa"];
+    const targets = ["strategic marketing consultancy","fractional cmo services","brand strategy consultant","marketing systems consultancy","growth marketing consultant","ai marketing consultancy","fifteen framework","muminconsult"];
     const allRows = d.rows || [];
     return res.status(200).json({ period:`${startDate} to ${endDate}`, keywords: targets.map(kw => {
       const row = allRows.find(r => r.keys[0].toLowerCase().includes(kw));
@@ -142,14 +142,14 @@ async function handleGSC(req, res) {
 
 // ── TRENDS ────────────────────────────────────────────────────────────────────
 async function handleTrends(req, res) {
-  const { keywords = "marketing Qatar,digital marketing Qatar", geo = "QA" } = req.query;
+  const { keywords = "marketing consultancy,strategic marketing,brand strategy", geo = "" } = req.query;
   return res.status(200).json({
     keywords: keywords.split(",").map(k=>k.trim()),
     geo,
     message: "Use the Trends panel links for visual data — Google Trends doesn't provide a public JSON API.",
     quickLinks: [
-      { label:"GCC Broad", url:`https://trends.google.com/trends/explore?geo=QA&q=marketing+Qatar,digital+marketing+Qatar` },
-      { label:"West Africa", url:`https://trends.google.com/trends/explore?geo=NG&q=marketing+agency+Nigeria,digital+marketing+Lagos` },
+      { label:"Service Terms (Global)", url:`https://trends.google.com/trends/explore?q=marketing+consultancy,strategic+marketing,brand+strategy` },
+      { label:"Buyer Terms (Global)", url:`https://trends.google.com/trends/explore?q=fractional+CMO,marketing+consultant,growth+marketing` },
     ],
   });
 }

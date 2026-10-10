@@ -137,11 +137,11 @@ export default function MorningBriefing({ outputs, alerts, taskStates, streaming
           </div>
         </div>
 
-        {/* GCC context */}
+        {/* Weekend context */}
         {dateCtx.isGCCWeekend && (
           <div style={{ padding:"12px 24px",borderBottom:`1px solid ${T.border}`,background:"#fbbf240a" }}>
             <div style={{ fontSize:11,color:T.amber }}>
-              🌙 GCC Weekend — Outreach paused. Good time to focus on content creation and planning.
+              🌙 Weekend — Outreach paused. Good time to focus on content creation and planning.
             </div>
           </div>
         )}

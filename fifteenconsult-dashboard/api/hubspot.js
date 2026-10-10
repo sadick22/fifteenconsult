@@ -86,7 +86,7 @@ export default async function handler(req, res) {
           system: "You are a CRM assistant. Create contacts in HubSpot as requested. Return ONLY JSON.",
           messages: [{
             role: "user",
-            content: `Create a HubSpot contact with: firstName="${firstName||""}", lastName="${lastName||""}", email="${email}", company="${company||""}", phone="${phone||""}", notes="${notes||"Added via FifteenConsult AI Dashboard"}". Return ONLY: {"success": true, "id": "contact_id"} or {"success": false, "error": "reason"}`
+            content: `Create a HubSpot contact with: firstName="${firstName||""}", lastName="${lastName||""}", email="${email}", company="${company||""}", phone="${phone||""}", notes="${notes||"Added via Mumin Consult AI Dashboard"}". Return ONLY: {"success": true, "id": "contact_id"} or {"success": false, "error": "reason"}`
           }],
         }),
       });

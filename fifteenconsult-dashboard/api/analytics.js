@@ -36,7 +36,7 @@ async function handleClarity(req, res) {
     deadClicks:      summary.deadClickCount  || summary.deadClicks       || 0,
     quickBacks:      summary.quickBackCount  || summary.quickBacks       || 0,
     topPages: (summary.topUrls||summary.topPages||[]).slice(0,5).map(p=>({
-      page: (p.url||p.page||"/").replace("https://fifteenconsult.com",""),
+      page: (p.url||p.page||"/").replace("https://muminconsult.com",""),
       sessions: p.sessions||p.totalSessions||0,
       scrollDepth: p.avgScrollDepth?`${Math.round(p.avgScrollDepth*100)}%`:"—",
     })),
@@ -62,11 +62,11 @@ async function handleUTM(req, res) {
     return res.status(200).json({ utmUrl:`${baseUrl}?${params.toString()}` });
   }
   return res.status(200).json({ templates:[
-    { campaign:"LinkedIn Paid",    source:"linkedin",   medium:"paid",    example:"https://fifteenconsult.com?utm_source=linkedin&utm_medium=paid&utm_campaign=linkedin-leadgen" },
-    { campaign:"Email Newsletter", source:"mailerlite", medium:"email",   example:"https://fifteenconsult.com?utm_source=mailerlite&utm_medium=email&utm_campaign=weekly-newsletter" },
-    { campaign:"Meta Ads",         source:"facebook",   medium:"paid",    example:"https://fifteenconsult.com?utm_source=facebook&utm_medium=paid&utm_campaign=meta-awareness-qatar" },
-    { campaign:"Instagram Organic",source:"instagram",  medium:"organic", example:"https://fifteenconsult.com?utm_source=instagram&utm_medium=organic&utm_campaign=instagram-organic" },
-    { campaign:"Google Ads",       source:"google",     medium:"cpc",     example:"https://fifteenconsult.com?utm_source=google&utm_medium=cpc&utm_campaign=google-search-qatar" },
+    { campaign:"LinkedIn Paid",    source:"linkedin",   medium:"paid",    example:"https://muminconsult.com?utm_source=linkedin&utm_medium=paid&utm_campaign=linkedin-leadgen" },
+    { campaign:"Email Newsletter", source:"mailerlite", medium:"email",   example:"https://muminconsult.com?utm_source=mailerlite&utm_medium=email&utm_campaign=weekly-newsletter" },
+    { campaign:"Meta Ads",         source:"facebook",   medium:"paid",    example:"https://muminconsult.com?utm_source=facebook&utm_medium=paid&utm_campaign=meta-awareness-qatar" },
+    { campaign:"Instagram Organic",source:"instagram",  medium:"organic", example:"https://muminconsult.com?utm_source=instagram&utm_medium=organic&utm_campaign=instagram-organic" },
+    { campaign:"Google Ads",       source:"google",     medium:"cpc",     example:"https://muminconsult.com?utm_source=google&utm_medium=cpc&utm_campaign=google-search-qatar" },
   ]});
 }
 

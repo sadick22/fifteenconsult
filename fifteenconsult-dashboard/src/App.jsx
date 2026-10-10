@@ -124,7 +124,7 @@ function DateBadge() {
         { label:`Week ${d.weekNum}`, color:"var(--text-mid)" },
         { label:`Q${d.currentQuarter} · ${d.daysLeftInQuarter}d left`, color:"var(--blue)" },
         { label:`${d.daysLeftInMonth}d left in month`, color:d.daysLeftInMonth<=7?"#fbbf24":"var(--text-mid)" },
-        { label:d.isGCCWeekend?"GCC Weekend":"GCC Working Day", color:d.isGCCWeekend?"#fbbf24":"#4ade80" },
+        { label:d.isGCCWeekend?"Weekend":"Working Day", color:d.isGCCWeekend?"#fbbf24":"#4ade80" },
       ].map((b,i)=>(
         <span key={i} style={{ fontSize:9,color:b.color,background:b.color+"18",padding:"3px 9px",borderRadius:20,fontWeight:500,border:`1px solid ${b.color}28` }}>{b.label}</span>
       ))}
@@ -537,7 +537,7 @@ function Sidebar({ activeTab, setActiveTab, activeMember, setActiveMember, strea
   return (
     <aside style={{ width:210,flexShrink:0,background:T.sidebar,borderRight:`1px solid ${T.border}`,display:"flex",flexDirection:"column",height:"100vh",position:"sticky",top:0 }}>
       <div style={{ padding:"20px 18px 16px",borderBottom:`1px solid ${T.border}` }}>
-        <div style={{ fontFamily:"var(--font-display)",fontSize:17,fontWeight:700,color:T.gold }}>FifteenConsult</div>
+        <div style={{ fontFamily:"var(--font-display)",fontSize:17,fontWeight:700,color:T.gold }}>Mumin Consult</div>
         <div style={{ fontSize:9,color:T.textDim,letterSpacing:"0.2em",textTransform:"uppercase",marginTop:3 }}>AI Marketing Dept</div>
       </div>
 
@@ -834,9 +834,9 @@ ${competitorCtx}
       try {
         // Fetch all SEO data in parallel
         const [psRes, gscRes, schemaRes] = await Promise.allSettled([
-          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/seo?tool=pagespeed&url=https://muminconsult.com&strategy=mobile"),
           fetch("/api/seo?tool=gsc&action=keywords"),
-          fetch("/api/seo?tool=schema&url=https://fifteenconsult.com"),
+          fetch("/api/seo?tool=schema&url=https://muminconsult.com"),
         ]);
 
         let seoContext = "\n\n===\nLIVE SEO DATA (fetched right now — use these exact numbers):\n";
@@ -845,7 +845,7 @@ ${competitorCtx}
         if (psRes.status === "fulfilled" && psRes.value.ok) {
           const ps = await psRes.value.json();
           if (!ps.error) {
-            seoContext += `\nPAGESPEED INSIGHTS (fifteenconsult.com — Mobile):
+            seoContext += `\nPAGESPEED INSIGHTS (muminconsult.com — Mobile):
 Performance Score: ${ps.scores?.performance}/100
 SEO Score: ${ps.scores?.seo}/100
 Accessibility: ${ps.scores?.accessibility}/100
@@ -877,7 +877,7 @@ Top Opportunities: ${(ps.opportunities||[]).map(o => `${o.title} (${o.impact} im
         if (schemaRes.status === "fulfilled" && schemaRes.value.ok) {
           const schema = await schemaRes.value.json();
           if (!schema.error) {
-            seoContext += `\n\nSTRUCTURED DATA & META TAGS (fifteenconsult.com homepage):
+            seoContext += `\n\nSTRUCTURED DATA & META TAGS (muminconsult.com homepage):
 Schema Score: ${schema.score}/100
 Schema Types Found: ${schema.schemas?.types?.join(", ") || "None"}
 Missing Schema: ${schema.schemas?.missing?.join(", ") || "None — good!"}
@@ -931,7 +931,7 @@ Recent posts engagement: ${inst.recentEngagement || "Check Instagram Insights"}`
             news.articles.slice(0, 6).forEach(a => {
               saraContext += `\n- [${a.source}] ${a.title}`;
             });
-            saraContext += "\n\nUse these headlines to create timely, relevant social content. Connect each to GCC or West Africa marketing context.";
+            saraContext += "\n\nUse these headlines to create timely, relevant social content. Connect each to the relevant market context for the audience.";
           }
         }
 
@@ -946,7 +946,7 @@ Recent posts engagement: ${inst.recentEngagement || "Check Instagram Insights"}`
         const [hsRes, mlRes, psRes, newsRes] = await Promise.allSettled([
           fetch("/api/hubspot?action=pipeline"),
           fetch("/api/mailerlite"),
-          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/seo?tool=pagespeed&url=https://muminconsult.com&strategy=mobile"),
           fetch("/api/news"),
         ]);
 
@@ -1024,7 +1024,7 @@ Status: All channels in growth phase — consistency is the priority`;
     if (member.id === "hassan" || member.id === "malik") {
       try {
         const [psRes, newsRes] = await Promise.allSettled([
-          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/seo?tool=pagespeed&url=https://muminconsult.com&strategy=mobile"),
           fetch("/api/news"),
         ]);
 
@@ -1037,7 +1037,7 @@ Status: All channels in growth phase — consistency is the priority`;
           if (!ps.error) {
             const perfScore = ps.scores?.performance || 0;
             const alert = perfScore < 70 ? "🔴 CRITICAL — Fix before running ads" : perfScore < 85 ? "🟡 Needs improvement" : "✅ Good";
-            adsContext += `\nLANDING PAGE PERFORMANCE (fifteenconsult.com):
+            adsContext += `\nLANDING PAGE PERFORMANCE (muminconsult.com):
 Mobile Performance Score: ${perfScore}/100 ${alert}
 SEO Score: ${ps.scores?.seo}/100
 LCP: ${ps.coreWebVitals?.lcp}
@@ -1115,7 +1115,7 @@ Pipeline Health: ${hs.openDeals > 0 ? "Active deals in progress" : "No open deal
             news.articles.slice(0, 10).forEach(a => {
               sofiaContext += `\n- [${a.source} · ${a.category}] ${a.title}`;
             });
-            sofiaContext += "\n\nINSTRUCTION: Use Google Calendar MCP for today's schedule. Use Gmail MCP to check priority emails. Select the 3 most relevant news items for Sadick's morning briefing based on GCC business, West Africa tech, and marketing industry relevance.\n===";
+            sofiaContext += "\n\nINSTRUCTION: Use Google Calendar MCP for today's schedule. Use Gmail MCP to check priority emails. Select the 3 most relevant news items for Sadick's morning briefing based on global business, tech, and marketing industry relevance.\n===";
             enrichedSystemPrompt += sofiaContext;
           }
         }
@@ -1203,11 +1203,11 @@ Best Performing Topic: ${ml.bestCampaign || "Check MailerLite dashboard"}`;
             news.articles.slice(0, 8).forEach(a => {
               nadiaContext += `\n- [${a.source}] ${a.title}`;
             });
-            nadiaContext += "\n\nUse 1-2 of these headlines as content inspiration for today's posts. Make the connection to FifteenConsult's expertise.";
+            nadiaContext += "\n\nUse 1-2 of these headlines as content inspiration for today's posts. Make the connection to Mumin Consult's expertise.";
           }
         }
 
-        nadiaContext += "\n\nINSTRUCTION: Reference the email performance data when creating newsletter content. Use news headlines to create timely, relevant posts. Always connect news to GCC/West Africa marketing context.\n===";
+        nadiaContext += "\n\nINSTRUCTION: Reference the email performance data when creating newsletter content. Use news headlines to create timely, relevant posts. Always connect news to the relevant market context for the audience.\n===";
         enrichedSystemPrompt += nadiaContext;
 
       } catch (err) {
@@ -1221,7 +1221,7 @@ Best Performing Topic: ${ml.bestCampaign || "Check MailerLite dashboard"}`;
         const [hsRes, mlRes, psRes, clarityRes] = await Promise.allSettled([
           fetch("/api/hubspot?action=pipeline"),
           fetch(`/api/mailerlite`),
-          fetch("/api/seo?tool=pagespeed&url=https://fifteenconsult.com&strategy=mobile"),
+          fetch("/api/seo?tool=pagespeed&url=https://muminconsult.com&strategy=mobile"),
           fetch("/api/analytics?tool=clarity"),
         ]);
 
@@ -1477,7 +1477,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
                 <div onClick={()=>setShowAlerts(true)} style={{ background:"#f8717112",border:"1px solid #f8717133",borderRadius:10,padding:"12px 18px",display:"flex",alignItems:"center",gap:13,marginBottom:22,cursor:"pointer" }}>
                   <span style={{ fontSize:18,flexShrink:0 }}>🚨</span>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:12,fontWeight:700,color:"#f87171",marginBottom:2 }}>{criticalCount} critical alert{criticalCount>1?"s":""} — FifteenConsult's new business pipeline needs attention</div>
+                    <div style={{ fontSize:12,fontWeight:700,color:"#f87171",marginBottom:2 }}>{criticalCount} critical alert{criticalCount>1?"s":""} — Mumin Consult's new business pipeline needs attention</div>
                     <div style={{ fontSize:11,color:T.textMid }}>{(alerts||[]).filter(a=>a.level==="red").slice(0,2).map(a=>a.title).join(" · ")}</div>
                   </div>
                   <span style={{ fontSize:11,color:"#f87171",fontWeight:600,flexShrink:0 }}>View all →</span>
@@ -1574,7 +1574,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
           <div style={{ flex:1,background:"rgba(0,0,0,0.6)" }} onClick={()=>setShowMobileMenu(false)}/>
           <div style={{ width:260,background:"var(--bg-sidebar)",borderLeft:"1px solid var(--border)",overflowY:"auto",animation:"slideIn 0.25s ease" }}>
             <div style={{ padding:"20px 18px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid var(--border)" }}>
-              <div style={{ fontFamily:"var(--font-display)",fontSize:17,fontWeight:700,color:"#C8A96E" }}>FifteenConsult</div>
+              <div style={{ fontFamily:"var(--font-display)",fontSize:17,fontWeight:700,color:"#C8A96E" }}>Mumin Consult</div>
               <button onClick={()=>setShowMobileMenu(false)} style={{ background:"none",border:"none",color:"var(--text-mid)",fontSize:20,cursor:"pointer" }}>×</button>
             </div>
             <div style={{ padding:"12px 10px" }}>

@@ -1,11 +1,11 @@
 /**
  * alerts.js
- * KPI alert engine for FifteenConsult.
+ * KPI alert engine for Mumin Consult.
  *
- * FifteenConsult is a marketing consultancy seeking clients.
+ * Mumin Consult is a marketing consultancy seeking clients.
  * Alerts are framed around: winning new business, staying visible,
  * nurturing pipeline, and producing enough content to attract
- * Real Estate, SaaS, Hospitality, and SME clients in GCC.
+ * Real Estate, SaaS, Hospitality, and SME clients worldwide.
  */
 
 // ── ALERT LEVELS ─────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
   const lastDay    = new Date(today.getFullYear(), today.getMonth()+1, 0).getDate();
   const daysLeft   = lastDay - dayOfMonth;
   const isEndOfMonth = daysLeft <= 5;
-  const isEndOfWeek  = dow === 4 || dow === 5; // Thu/Fri GCC end of week
+  const isEndOfWeek  = dow === 4 || dow === 5; // Thu/Fri Doha end of week
 
   // ── PIPELINE & LEAD GEN (Kwame) ───────────────────────────────────────────
   const kwame = kpiData.kwame || {};
@@ -54,7 +54,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Kwame Asante",
       emoji: "🎯",
       title: "Zero discovery calls booked",
-      detail: "No strategy calls booked this week. FifteenConsult cannot win clients without conversations. Kwame must prioritise outreach and follow-ups today.",
+      detail: "No strategy calls booked this week. Mumin Consult cannot win clients without conversations. Kwame must prioritise outreach and follow-ups today.",
       action: "Run Kwame's briefing and instruct: 'Focus entirely on booking calls — follow up all touch-2 and touch-3 leads today.'",
     });
   } else if ((kwame.meetingsBooked || 0) < 2) {
@@ -65,7 +65,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Kwame Asante",
       emoji: "🎯",
       title: `Only ${kwame.meetingsBooked} discovery call booked — target is 3`,
-      detail: "Pipeline is thin. Below 3 calls/week means FifteenConsult won't hit its client acquisition targets.",
+      detail: "Pipeline is thin. Below 3 calls/week means Mumin Consult won't hit its client acquisition targets.",
       action: "Ask Kwame to draft follow-up messages for all leads in 'Contacted' stage.",
     });
   }
@@ -78,7 +78,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Kwame Asante",
       emoji: "🎯",
       title: `Outreach response rate at ${kwame.responseRate || 0}% — below 10%`,
-      detail: "Response rate is weak. Messaging likely not hitting the right pain points for GCC Real Estate / SaaS decision makers.",
+      detail: "Response rate is weak. Messaging likely not hitting the right pain points for Real Estate / SaaS decision makers.",
       action: "Ask Kwame to rewrite the outreach sequence using stronger challenger-style hooks.",
     });
   }
@@ -92,7 +92,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       emoji: "🎯",
       title: "Prospect research behind target",
       detail: `Only ${kwame.leadsResearched || 0} of 50 prospects researched this week. Thin top-of-funnel means fewer conversations next week.`,
-      action: "Run Kwame with directive: 'Research 10 Real Estate and 10 Hospitality prospects in Qatar today.'",
+      action: "Run Kwame with directive: 'Research 10 Real Estate and 10 Hospitality prospects in a target market today.'",
     });
   }
 
@@ -107,7 +107,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Nadia Al-Hassan",
       emoji: "✍️",
       title: `Only ${nadia.postsPerWeek || 0} LinkedIn posts published — target 4`,
-      detail: "FifteenConsult's visibility to potential clients is critically low. Decision makers in Qatar/GCC won't know we exist without consistent content.",
+      detail: "Mumin Consult's visibility to potential clients is critically low. Decision makers in our target markets won't know we exist without consistent content.",
       action: "Run Nadia immediately. Ask her to produce 2 LinkedIn posts: one Real Estate insight, one SaaS marketing tip.",
     });
   }
@@ -120,8 +120,8 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Nadia Al-Hassan",
       emoji: "✍️",
       title: "No email newsletter drafted this week",
-      detail: "The newsletter nurtures warm leads who have heard of FifteenConsult but haven't hired us yet. Missing it weakens the pipeline.",
-      action: "Ask Nadia to draft this week's newsletter — angle: 'One marketing mistake GCC businesses make in Q2.'",
+      detail: "The newsletter nurtures warm leads who have heard of Mumin Consult but haven't hired us yet. Missing it weakens the pipeline.",
+      action: "Ask Nadia to draft this week's newsletter — angle: 'One marketing mistake businesses make in Q2.'",
     });
   }
 
@@ -133,7 +133,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Nadia Al-Hassan",
       emoji: "✍️",
       title: `Content engagement at ${nadia.engagementRate || 0}% — below 3%`,
-      detail: "Low engagement means content isn't resonating with target clients. Posts need stronger hooks and more specific GCC market insight.",
+      detail: "Low engagement means content isn't resonating with target clients. Posts need stronger hooks and more specific market insight.",
       action: "Ask Nadia to review top-performing posts and adjust the content angle for the next 3 posts.",
     });
   }
@@ -149,7 +149,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Tariq Osman",
       emoji: "🔍",
       title: "Website organic traffic critically low",
-      detail: `Only ${tariq.organicVisits || 0} organic visits this month. Prospects searching 'marketing agency Qatar' are not finding FifteenConsult.`,
+      detail: `Only ${tariq.organicVisits || 0} organic visits this month. Prospects searching 'strategic marketing consultancy' are not finding Mumin Consult.`,
       action: "Ask Tariq to audit the homepage and top 2 service pages for keyword gaps today.",
     });
   } else if ((tariq.organicVisits || 0) < 250) {
@@ -160,8 +160,8 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Tariq Osman",
       emoji: "🔍",
       title: "Organic traffic below halfway to monthly target",
-      detail: `${tariq.organicVisits || 0} of 500 target visits. FifteenConsult needs stronger search visibility to attract inbound client enquiries.`,
-      action: "Ask Tariq for the top 3 quick-win SEO actions for fifteenconsult.com this week.",
+      detail: `${tariq.organicVisits || 0} of 500 target visits. Mumin Consult needs stronger search visibility to attract inbound client enquiries.`,
+      action: "Ask Tariq for the top 3 quick-win SEO actions for muminconsult.com this week.",
     });
   }
 
@@ -173,8 +173,8 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Tariq Osman",
       emoji: "🔍",
       title: "No backlinks built this week",
-      detail: "Domain authority stays low without backlinks. Less authority = harder to rank for 'marketing consultancy Qatar'.",
-      action: "Ask Tariq to identify 3 GCC business publications for guest post outreach.",
+      detail: "Domain authority stays low without backlinks. Less authority = harder to rank for 'strategic marketing consultancy'.",
+      action: "Ask Tariq to identify 3 relevant business publications for guest post outreach.",
     });
   }
 
@@ -189,7 +189,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Sara Mensah",
       emoji: "📱",
       title: "LinkedIn following too low to attract clients",
-      detail: "Target clients (CMOs, founders, marketing directors in Qatar) need to see FifteenConsult as established. Under 300 followers undermines credibility.",
+      detail: "Target clients (CMOs, founders, marketing directors in target markets) need to see Mumin Consult as established. Under 300 followers undermines credibility.",
       action: "Ask Sara to run a LinkedIn growth sprint: engage 20 target accounts today + invite connections.",
     });
   }
@@ -203,7 +203,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       emoji: "📱",
       title: `Social engagement at ${sara.avgEngagement || 0}% — too low to generate inbound`,
       detail: "Posts aren't driving enough interaction. Low engagement = LinkedIn algorithm won't show posts to target clients.",
-      action: "Ask Sara to audit the last 5 posts and identify what's underperforming. Shift to more opinionated, GCC-specific content.",
+      action: "Ask Sara to audit the last 5 posts and identify what's underperforming. Shift to more opinionated, market-specific content.",
     });
   }
 
@@ -218,7 +218,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Hassan Al-Amin",
       emoji: "📊",
       title: `CPL at QAR ${hassan.costPerLead} — above QAR 150 threshold`,
-      detail: "Paid acquisition is too expensive. At this rate, ad spend won't generate profitable client enquiries for FifteenConsult.",
+      detail: "Paid acquisition is too expensive. At this rate, ad spend won't generate profitable client enquiries for Mumin Consult.",
       action: "Run Hassan immediately. Ask him to audit targeting, pause underperformers, and tighten audience segments.",
     });
   }
@@ -231,7 +231,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Hassan Al-Amin",
       emoji: "📊",
       title: `Only ${hassan.campaignsActive || 0} campaigns active — target is 4`,
-      detail: "FifteenConsult isn't running enough paid activity to fill the pipeline. More campaigns = more touchpoints with potential clients.",
+      detail: "Mumin Consult isn't running enough paid activity to fill the pipeline. More campaigns = more touchpoints with potential clients.",
       action: "Ask Hassan to set up the LinkedIn Lead Gen campaign and Meta retargeting campaign this week.",
     });
   }
@@ -260,7 +260,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Zara Nkosi",
       emoji: "📈",
       title: "Data sources incomplete — blind spots in reporting",
-      detail: `Only ${zara.dataSourcesConnected || 0} of 6 data sources connected. FifteenConsult can't make confident decisions without full visibility.`,
+      detail: `Only ${zara.dataSourcesConnected || 0} of 6 data sources connected. Mumin Consult can't make confident decisions without full visibility.`,
       action: "Ask Zara to prioritise connecting HubSpot and MailerLite to the reporting dashboard.",
     });
   }
@@ -277,7 +277,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
         agentName: "All Agents",
         emoji: "📅",
         title: `End of month in ${daysLeft} days — pipeline targets at risk`,
-        detail: "FifteenConsult is approaching end of month with gaps in both content output and lead generation. This affects next month's pipeline.",
+        detail: "Mumin Consult is approaching end of month with gaps in both content output and lead generation. This affects next month's pipeline.",
         action: "Run all agents with end-of-month directive. Focus on: booking calls, publishing content, and sending final outreach.",
       });
     }
@@ -293,7 +293,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "All Agents",
       emoji: "🔔",
       title: "No briefings run this week",
-      detail: "End of GCC working week with no agent briefings run. The team has no direction and no outputs to show for this week.",
+      detail: "End of the Doha working week with no agent briefings run. The team has no direction and no outputs to show for this week.",
       action: "Run all agents now using the 'Run All Agents' button.",
     });
   }
@@ -320,7 +320,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
       agentName: "Nadia Al-Hassan",
       emoji: "✍️",
       title: "Content target hit ✓",
-      detail: `${nadia.postsPerWeek} LinkedIn posts published. FifteenConsult is visible to potential clients.`,
+      detail: `${nadia.postsPerWeek} LinkedIn posts published. Mumin Consult is visible to potential clients.`,
       action: null,
     });
   }
@@ -330,7 +330,7 @@ export function evaluateAlerts(kpiData, taskStates, outputs) {
   if (!malikMember || (malikMember.activeCampaigns || 0) === 0) {
     alerts.push({ id:"malik-no-campaigns", agent:"malik", level:ALERT.AMBER, emoji:"📢",
       title:"No active ad campaigns",
-      detail:"FifteenConsult has no paid campaigns running across GCC or West Africa.",
+      detail:"Mumin Consult has no paid campaigns running in any market.",
       action:"Ask Malik to build a starter campaign plan for LinkedIn lead generation." });
   }
 
