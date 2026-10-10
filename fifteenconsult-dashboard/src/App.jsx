@@ -15,7 +15,7 @@ import MorningBriefing from "./components/MorningBriefing.jsx";
 import WarRoom from "./components/WarRoom.jsx";
 import FifteenFramework from "./components/FifteenFramework.jsx";
 import NotificationCentre, { addNotification } from "./components/NotificationCentre.jsx";
-import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNextRun, formatNextRun, markRun } from "./lib/scheduler.js";
+import { loadSchedules, saveSchedules, updateAgentSchedule, getDueAgents, getNextRun, formatNextRun, markRun, isAutoRunEnabled, setAutoRunEnabled as persistAutoRun } from "./lib/scheduler.js";
 import { loadTheme, saveTheme, applyTheme } from "./lib/theme.js";
 import IntegrationsPanel from "./components/IntegrationsPanel.jsx";
 import OrbitalCommandCenter from "./components/OrbitalCommandCenter.jsx";
@@ -748,6 +748,7 @@ export default function App() {
   const [showMorningBriefing,setShowMorningBriefing] = useState(false);
   const [activeView,setActiveView]         = useState("dashboard"); // dashboard|warroom|framework
   const [schedules,setSchedules]       = useState(()=>loadSchedules());
+  const [autoRun,setAutoRun]           = useState(()=>isAutoRunEnabled());
   const [outputs,setOutputs]           = useState(stored.outputs||{});
   const [taskStates,setTaskStates]     = useState(()=>{
     const init={};
@@ -1334,6 +1335,9 @@ Quick Backs: ${clarity.quickBacks || 0}`;
   // Save schedules whenever they change
   useEffect(()=>{ saveSchedules(schedules); },[schedules]);
 
+  // Persist the global auto-run master switch
+  useEffect(()=>{ persistAutoRun(autoRun); },[autoRun]);
+
   // Update a single agent schedule
   const handleScheduleUpdate=useCallback((agentId, updated)=>{
     setSchedules(prev=>({ ...prev, [agentId]:updated }));
@@ -1342,6 +1346,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
   // Auto-run scheduler — checks every 60 seconds when page is visible
   useEffect(()=>{
     const check=()=>{
+      if(!autoRun) return;   // Manual mode: agents only run when you click Run
       if(streaming) return;
       const due=getDueAgents(schedules);
       if(due.length>0) {
@@ -1359,7 +1364,7 @@ Quick Backs: ${clarity.quickBacks || 0}`;
     const onVisible=()=>{ if(document.visibilityState==="visible") check(); };
     document.addEventListener("visibilitychange",onVisible);
     return ()=>{ clearInterval(timer); document.removeEventListener("visibilitychange",onVisible); };
-  },[schedules,streaming,runBriefing]);
+  },[schedules,streaming,runBriefing,autoRun]);
 
   const totalTasks  = TEAM.reduce((s,m)=>s+m.tasks.length,0);
   const totalDone   = TEAM.reduce((s,m)=>s+(taskStates[m.id]||[]).filter(Boolean).length,0);
@@ -1454,6 +1459,8 @@ Quick Backs: ${clarity.quickBacks || 0}`;
               onUpdate={handleScheduleUpdate}
               onClose={()=>setShowScheduler(false)}
               onRunAll={()=>{ setShowScheduler(false); runAll(); }}
+              autoRun={autoRun}
+              onToggleAutoRun={()=>setAutoRun(v=>!v)}
             />
           )}
 

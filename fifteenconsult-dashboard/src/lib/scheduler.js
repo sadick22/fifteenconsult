@@ -119,6 +119,20 @@ export function updateAgentSchedule(agentId, updates) {
   return all;
 }
 
+// ── GLOBAL AUTO-RUN MASTER SWITCH ─────────────────────────────────────────────
+// OFF by default: no agent ever starts on its own — they only run when you
+// click Run (per agent) or "Run All Now". Turn ON for hands-off scheduled
+// operation, where enabled schedules fire automatically while the tab is open.
+const AUTORUN_KEY = "fc_autorun_v1";
+
+export function isAutoRunEnabled() {
+  try { return localStorage.getItem(AUTORUN_KEY) === "true"; } catch { return false; }
+}
+
+export function setAutoRunEnabled(on) {
+  try { localStorage.setItem(AUTORUN_KEY, on ? "true" : "false"); } catch {}
+}
+
 // ── LAST RUN TRACKING ─────────────────────────────────────────────────────────
 const LAST_RUN_KEY = "fc_last_run_v2";
 
