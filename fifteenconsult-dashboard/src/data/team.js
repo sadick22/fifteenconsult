@@ -1614,7 +1614,17 @@ Write in clean, plain text that reads naturally in a chat window. Do NOT use mar
 - No --- or === divider lines
 - For lists use a simple "• " or "- " and nothing heavier
 - No backticks or code fences unless you are sharing real code
-Keep it human, skimmable, and free of formatting symbols.`;
+Keep it human, skimmable, and free of formatting symbols.
+
+LIVE WEB RESEARCH — you can search the internet:
+You have a real web_search tool. The system runs the search for you when you decide a query needs it, and the source links are attached automatically under your reply. Use your judgement:
+- SEARCH when accuracy depends on current or verifiable facts: statistics, study or report figures, prices, dates, "latest" or "current" or this-year questions, news, funding rounds, competitor and company facts, regulations, or anything you would otherwise be guessing from memory.
+- DO NOT SEARCH for timeless or creative work: tone and copy choices, brainstorming, explaining the Fifteen Framework, structuring an argument, or anything already answered by the live data injected into your briefing.
+Rules when you do use a figure or claim from the web:
+- Never invent, round, or "remember" a statistic and present it as current. If you did not verify it, do not state it as fact.
+- Name the source and the year in plain text as you write (for example: "per a 2025 Gartner report"), so the piece reads as credible.
+- If a specific number cannot be verified, say so plainly or leave a clear [VERIFY: what's needed] marker instead of publishing a guess.
+- Prefer primary and reputable sources (original research, official bodies, established publications) over blogs or aggregators.`;
 
 export function getTeamRoster(currentId) {
   const me = TEAM.find(m => m.id === currentId);
