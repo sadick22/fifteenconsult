@@ -1,25 +1,27 @@
 /**
- * api.js — Anthropic Claude API with streaming
- * API key loaded from environment variable VITE_ANTHROPIC_API_KEY
+ * api.js — talks to our own server proxy (/api/chat), which holds the
+ * Anthropic key server-side and enables the web_search tool for every agent.
+ * The key is NO LONGER shipped to the browser.
+ *
  * Accepts an optional attachment: an image OR a PDF.
  *   attachment = { base64, mediaType, name? }
  *   - image  → mediaType like "image/png", "image/jpeg"
  *   - pdf    → mediaType "application/pdf"
+ *
+ * When an agent uses web search, the sources it relied on are collected from
+ * the stream and appended as a "Sources" list so briefings stay citeable.
  */
 
 // Remove lone/unpaired UTF-16 surrogates (e.g. an emoji cut in half by a
-// .slice()). The Anthropic API rejects these as invalid JSON
-// ("no low surrogate in string"). No lookbehind — safe on all browsers.
+// .slice()). The Anthropic API rejects these as invalid JSON. No lookbehind.
 function sanitizeUnicode(str) {
   if (typeof str !== "string") return str;
   return str.replace(/[\uD800-\uDFFF]/g, (ch, i, s) => {
     const code = ch.charCodeAt(0);
     if (code <= 0xDBFF) {
-      // high surrogate — keep only if immediately followed by a low surrogate
       const next = s.charCodeAt(i + 1);
       return (next >= 0xDC00 && next <= 0xDFFF) ? ch : "";
     } else {
-      // low surrogate — keep only if immediately preceded by a high surrogate
       const prev = s.charCodeAt(i - 1);
       return (prev >= 0xD800 && prev <= 0xDBFF) ? ch : "";
     }
@@ -27,70 +29,84 @@ function sanitizeUnicode(str) {
 }
 
 export async function callClaudeAPI(systemPrompt, userMessage, onChunk, attachment = null) {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "No API key found. Add VITE_ANTHROPIC_API_KEY to your Vercel environment variables.\n\n" +
-      "Go to: Vercel → Project → Settings → Environment Variables\n" +
-      "Key: VITE_ANTHROPIC_API_KEY\n" +
-      "Value: your Anthropic API key from console.anthropic.com"
-    );
-  }
-
-  // Build the user content. If a PDF or image is attached, send a content array.
-  const safeMessage = sanitizeUnicode(userMessage);
-  let userContent = safeMessage;
-  if (attachment && attachment.base64) {
-    const isPdf = attachment.mediaType === "application/pdf";
-    const block = isPdf
-      ? { type: "document", source: { type: "base64", media_type: "application/pdf", data: attachment.base64 } }
-      : { type: "image",    source: { type: "base64", media_type: attachment.mediaType, data: attachment.base64 } };
-    userContent = [block, { type: "text", text: safeMessage }];
-  }
-
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/chat", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 8000,
       system: sanitizeUnicode(systemPrompt),
-      messages: [{ role: "user", content: userContent }],
-      stream: true,
+      userMessage: sanitizeUnicode(userMessage),
+      attachment: attachment && attachment.base64 ? attachment : null,
     }),
   });
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${response.status}`);
+    throw new Error(err.error || `API error ${response.status}`);
   }
 
   const reader  = response.body.getReader();
   const decoder = new TextDecoder();
   let fullText  = "";
+  let buffer    = "";              // holds a partial trailing line between reads
+  const sources = [];              // { url, title } collected from web search
+  const seenUrls = new Set();
+
+  const addSource = (url, title) => {
+    if (!url || seenUrls.has(url)) return;
+    seenUrls.add(url);
+    sources.push({ url, title: title || url });
+  };
+
+  const handleEvent = (parsed) => {
+    // Streamed answer text
+    if (parsed.type === "content_block_delta") {
+      if (parsed.delta?.type === "text_delta" && parsed.delta.text) {
+        fullText += parsed.delta.text;
+        onChunk(fullText);
+      } else if (parsed.delta?.text) {           // older/simple shape
+        fullText += parsed.delta.text;
+        onChunk(fullText);
+      } else if (parsed.delta?.type === "citations_delta" && parsed.delta.citation) {
+        const c = parsed.delta.citation;
+        addSource(c.url, c.title);
+      }
+      return;
+    }
+    // A finished web search returns its results as a content block
+    if (parsed.type === "content_block_start") {
+      const block = parsed.content_block;
+      if (block?.type === "web_search_tool_result" && Array.isArray(block.content)) {
+        block.content.forEach((r) => addSource(r.url, r.title));
+      }
+      // Some responses attach citations directly on a text block
+      if (block?.type === "text" && Array.isArray(block.citations)) {
+        block.citations.forEach((c) => addSource(c.url, c.title));
+      }
+    }
+  };
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    const lines = decoder.decode(value).split("\n");
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";    // keep the last, possibly-incomplete line
     for (const line of lines) {
-      if (!line.startsWith("data: ")) continue;
-      const data = line.slice(6).trim();
-      if (data === "[DONE]") continue;
-      try {
-        const parsed = JSON.parse(data);
-        if (parsed.type === "content_block_delta" && parsed.delta?.text) {
-          fullText += parsed.delta.text;
-          onChunk(fullText);
-        }
-      } catch {}
+      const trimmed = line.trim();
+      if (!trimmed.startsWith("data:")) continue;
+      const data = trimmed.slice(5).trim();
+      if (!data || data === "[DONE]") continue;
+      try { handleEvent(JSON.parse(data)); } catch {}
     }
   }
+
+  // Append a Sources list if the agent searched and we didn't already print one.
+  // Plain text (no markdown) to match how the dashboard renders agent output.
+  if (sources.length && !/\nSources:\s*\n/i.test(fullText)) {
+    const list = sources.map((s) => `- ${s.title} (${s.url})`).join("\n");
+    fullText = `${fullText.trimEnd()}\n\nSources:\n${list}`;
+    onChunk(fullText);
+  }
+
   return fullText;
 }
